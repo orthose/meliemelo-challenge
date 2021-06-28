@@ -20,6 +20,10 @@ structure permet d'exprimer les différents types de quiz possibles.
     {"L'arc de triomphe": true},
     {"Le château de Versailles": false}
   ]
+  "players": {
+    "login1": ["La Tour Eiffel", "L'arc de triomphe"],
+    "login2": ["Le château de Versailles"],
+  },
 }
 ```
 **Contrainte 1** = L'identifiant est le même que dans le nom du fichier. Ici on aurait
@@ -78,9 +82,15 @@ L'évaluation de la réponse du joueur devra être insensible à la casse.
 est la réponse. La deuxième exprime l'intervalle des nombres possibles parmi lesquels
 le joueur peut choisir.
 
+**Contrainte 10** = Le champ "players" contient les logins des utilisateurs
+ayant répondu, auquel on associe toujours un tableau contenant la/les réponse(s) 
+saisie(s) par le joueur. On peut associer un tableau vide si le joueur n'a rien 
+répondu mais a validé le quiz. Dans ce cas le joueur gagne 0 point.
+
 ## Responsabilités entre client et serveur
 Le client ne doit servir qu'à de la visualisation. Le serveur doit vérifier tout
-ce que le client lui envoie rigoureusement.
+ce que le client lui envoie rigoureusement. Notamment chaque action ne peut être
+effectuée qu'avec un rôle précis, et dans un contexte particulier.
 
 ## Rôles des utilisateurs
 Le client ne doit pas pouvoir compromettre les données stockées sur le serveur.
@@ -89,7 +99,7 @@ de l'utilisateur et l'action qu'il tente d'exécuter. De plus, en fonction de so
 rôle l'utilisateur ne devra pas avoir reçu toutes les fonctions javascript possibles.
 
 Liste des rôles et actions possibles
-* Administrateur = {1, 2, 3, 4, 8}  U actions(Joueur)
+* Administrateur = {1, 2, 3, 4, 8} U actions(Joueur)
 * Joueur = {5, 7, 9, 10, 11, 12}
 
 Détail des actions possibles
@@ -120,3 +130,42 @@ d'y répondre.
 Par contre pas de système de récupération de mot de passe car pas la création
 de compte ne nécessite pas d'entrer un mail.
 12. Connexion / Déconnexion / Création de compte
+
+## Données utilisateur
+Le fichier contenant les données utilisateur est un fichier json de la forme :
+```
+{
+  "login1": {...},
+  "login2": {...},
+}
+```
+**Contrainte 11** = Un login ne doit pas apparaître 2 fois. Un nouvel inscrit
+ne doit pas pouvoir écraser un profil en ayant choisi un login préexistant.
+
+Chaque objet associé à un login correspond aux données de l'utilisateur
+et est de la forme :
+```
+{
+  "role": "player",
+  "answered": [123, 456, 789],
+  "created": [],
+  "points": 6,
+  "success": 3,
+  "fail": 0,
+}
+```
+**Contrainte 12** = Le champ role peut prendre les valeurs player ou admin mais
+pas undefined !
+
+**Contraint 13** = Le champ answered est un tableau contenant les identifiants 
+valides des quiz, auxquels a répondu le joueur.
+
+**Contrainte 14** = Le champ created contient la liste des identifiants de quiz
+créés par l'utilisateur. Il ne peut être rempli que si l'utilisateur est admin.
+Mais il doit être présent même si l'utilisateur est un simple joueur (le rôle
+d'admin pourra être révoqué). Un joueur ne peut répondre que à des quiz qu'il n'a
+pas créé.
+
+**Contrainte 15** = Le champ points représente le nombre de points de l'utilisateur.
+Il est initialisé à 0. Le champ success compte le nombre de quiz réussis,
+et fail le nombre de quiz ratés.
