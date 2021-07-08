@@ -1,5 +1,56 @@
 # Introduction
-Application web multi-utilisateurs de quiz journalier où s'affrontent les joueurs pour monter sur le podium.
+Application web multi-utilisateurs de quiz journalier où s'affrontent 
+les joueurs pour monter sur le podium.
+
+# Mise en production
+
+## Paramétrage de la base de données
+
+1. Création de la base de données
+```
+$ cd sql
+$ sudo mysql
+mysql> CREATE DATABASE meliemelo_challenge;
+```
+2. Création des utilisateurs
+* L'utilisateur principal est meliemelo à n'utiliser qu'en ligne de commande et pour cron.php.
+```
+mysql> CREATE USER "meliemelo"@"localhost" IDENTIFIED BY "mot_de_passe";
+```
+* L'utilisateur admin_meliemelo correspond aux droits des utilisateurs dont
+le rôle est fixé à admin.
+```
+mysql> CREATE USER "admin_meliemelo"@"localhost" IDENTIFIED BY "mot_de_passe";
+```
+* L'utilisateur player_meliemelo correspond aux droits des utilisateurs dont
+le rôle est fixé à player.
+```
+mysql> CREATE USER "player_meliemelo"@"localhost" IDENTIFIED BY "mot_de_passe";
+```
+* L'utilisateur undefined_meliemelo correspond aux droits des utilisateurs
+non-connectés.
+```
+mysql> CREATE USER "undefined_meliemelo"@"localhost" IDENTIFIED BY "mot_de_passe";
+```
+3. Se déconnecter puis se connecter
+```
+mysql> EXIT;
+$ mysql -u meliemelo -D meliemelo_challenge -p
+```
+4. Créer les tables de la base
+```
+mysql> source schema.sql;
+```
+5. Créer les fonctions et procédures
+```
+mysql> source actions.sql;
+```
+6. Définition des droits
+```
+mysql> EXIT;
+$ sudo mysql
+mysql> source rules.sql;
+```
 
 # Cahier des charges
 
