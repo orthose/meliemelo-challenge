@@ -43,7 +43,7 @@ function exists($login) {
 
 // Enregistrement d'un nouvel utilisateur
 // Différents code d'erreur
-function register($login) {
+function register($login, $passwd) {
   // Taille minimale du password = 8
   $pattern_passwd = "/[\w\s]{8}[\w\s]*/";
   $res = array();
