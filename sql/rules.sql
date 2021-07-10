@@ -5,7 +5,6 @@ GRANT EXECUTE ON PROCEDURE meliemelo_challenge.crontab_routine TO "meliemelo"@"l
 -- Utilisateurs non-définis pour le processus de connexion
 -- REVOKE ALL ON meliemelo_challenge.* FROM "undefined_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.register_new_user TO "undefined_meliemelo"@"localhost";
-GRANT EXECUTE ON FUNCTION meliemelo_challenge.get_salt TO "undefined_meliemelo"@"localhost";
 GRANT EXECUTE ON FUNCTION meliemelo_challenge.get_role TO "undefined_meliemelo"@"localhost";
 GRANT EXECUTE ON FUNCTION meliemelo_challenge.authentication_is_valid TO "undefined_meliemelo"@"localhost";
 GRANT EXECUTE ON FUNCTION meliemelo_challenge.login_exists TO "undefined_meliemelo"@"localhost";

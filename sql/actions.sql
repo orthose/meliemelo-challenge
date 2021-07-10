@@ -1,21 +1,21 @@
 /* Enregistrer un nouvel utilisateur */
+DELIMITER //
 CREATE PROCEDURE register_new_user (
   new_login TYPE OF Users.login, 
-  new_passwd TYPE OF Users.password,
-  new_salt TYPE OF Users.salt
+  new_passwd VARCHAR(2048)
 )
-INSERT INTO Users (login, password, salt)
-VALUES (new_login, new_passwd, new_salt);
-
-/* Récupérer le sel de mot de passe */
-DELIMITER //
-CREATE FUNCTION get_salt (
-  login_user TYPE OF Users.login
-) RETURNS CHAR(16)
 BEGIN
-  DECLARE res TYPE OF Users.salt;
-  SELECT salt INTO res FROM Users WHERE login = login_user;
-  RETURN res;
+  DECLARE random_salt TYPE OF Users.salt;
+  DECLARE hash_passwd TYPE OF Users.password;
+  IF LENGTH(new_passwd) < 8 THEN
+    SIGNAL SQLSTATE "45000" 
+    SET MESSAGE_TEXT = "Password must have length >= 8" ;
+  ELSE
+    SELECT LEFT(MD5(RAND()), 16) INTO random_salt;
+    SELECT SHA2(CONCAT(new_passwd, random_salt), 256) INTO hash_passwd;
+    INSERT INTO Users (login, password, salt)
+    VALUES (new_login, hash_passwd, random_salt);
+  END IF;
 END; //
 DELIMITER ;
 
@@ -38,15 +38,14 @@ DELIMITER ;
 DELIMITER //
 CREATE FUNCTION authentication_is_valid (
   login_user TYPE OF Users.login,
-  passwd_user TYPE OF Users.password
+  passwd_user VARCHAR(2048)
 ) RETURNS BOOLEAN
 BEGIN
   DECLARE res BOOLEAN;
-  SELECT EXISTS(
-  SELECT TRUE FROM Users 
-  WHERE login = login_user AND password = passwd_user)
-  INTO res;
-  RETURN res;
+  SELECT password = SHA2(CONCAT(passwd_user, salt), 256) FROM Users 
+  WHERE login = login_user INTO res;
+  -- Si res = NULL alors le login n'existe pas
+  RETURN res IS NOT NULL AND res;
 END; //
 DELIMITER ;
 
@@ -78,14 +77,18 @@ WHERE login = login_user;
 
 /* Changer le mot de passe */
 DELIMITER //
-CREATE PROCEDURE set_password (
+CREATE OR REPLACE PROCEDURE set_password (
   login_user TYPE OF Users.login,
-  actual_passwd TYPE OF Users.password,
-  new_passwd TYPE OF Users.password
+  actual_passwd VARCHAR(2048),
+  new_passwd VARCHAR(2048)
 )
 BEGIN
-  IF authentication_is_valid(login_user, actual_passwd) THEN
-    UPDATE Users SET password = new_passwd WHERE login = login_user;
+  IF LENGTH(new_passwd) < 8 THEN
+    SIGNAL SQLSTATE "45000" 
+    SET MESSAGE_TEXT = "Password must have length >= 8";
+  ELSEIF authentication_is_valid(login_user, actual_passwd) THEN
+    UPDATE Users SET password = SHA2(CONCAT(new_passwd, salt), 256) 
+    WHERE login = login_user;
   END IF;
 END; //
 DELIMITER ;
@@ -94,7 +97,7 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE unregister_user (
   login_user TYPE OF Users.login,
-  passwd TYPE OF Users.password
+  passwd VARCHAR(2048)
 )
 BEGIN
   IF authentication_is_valid(login_user, passwd) THEN

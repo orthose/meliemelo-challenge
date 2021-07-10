@@ -1,19 +1,11 @@
 /* Tests sur la table Users */
-CALL register_new_user("Maxime", "password", "1234567891234567"); -- Query OK
-CALL register_new_user("Maxime", "aaaaaaaa", "6846845446846849"); -- ERROR 1062 (23000): Duplicate entry 'Maxime' for key 'PRIMARY' 
-CALL register_new_user("Amélie", "password", "1234567891234567"); -- Query OK 
-CALL register_new_user("Maéva", "drowssap", "7894561237894561"); -- Query OK 
-CALL register_new_user("Lucie", "passwordpassword", "1234567891234567"); -- Query OK 
-CALL register_new_user("Yann", "passwor", "1234567891234567"); -- ERROR 4025 (23000): CONSTRAINT `Users.password` failed for `meliemelo_challenge`.`Users` 
-CALL register_new_user("Yann", "password", "123456789123456"); -- ERROR 4025 (23000): CONSTRAINT `Users.salt` failed for `meliemelo_challenge`.`Users` 
-CALL register_new_user("Yann", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "1234567891234567"); --  ERROR 1406 (22001): Data too long for column 'password' at row 1 
-CALL register_new_user("Yann", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "12345678912345678"); -- ERROR 1406 (22001): Data too long for column 'salt' at row 5 
-CALL register_new_user("YannYannYannYannY", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "1234567891234567"); --  ERROR 1406 (22001): Data too long for column 'login' at row 1 
-CALL register_new_user("YannYannYannYann", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "1234567891234567"); --  Query OK 
-
-SELECT get_salt("Maxime"); -- 1234567891234567
-SELECT get_salt("Maéva"); -- 7894561237894561
-SELECT get_salt("Yann"); -- NULL
+CALL register_new_user("Maxime", "password"); -- Query OK
+CALL register_new_user("Maxime", "aaaaaaaa"); -- ERROR 1062 (23000): Duplicate entry 'Maxime' for key 'PRIMARY' 
+CALL register_new_user("Amélie", "password"); -- Query OK 
+CALL register_new_user("Maéva", "drowssap"); -- Query OK 
+CALL register_new_user("Lucie", "passwordpassword"); -- Query OK 
+CALL register_new_user("Yann", "passwor"); -- ERROR 1644 (45000): Password must have length >= 8
+CALL register_new_user("Yann", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"); --  Query OK
 
 SELECT authentication_is_valid("Maxime", "password"); -- 1 
 SELECT authentication_is_valid("Maxim", "password"); -- 0 
@@ -35,9 +27,11 @@ SELECT get_role("Maxime"); -- player
 
 CALL set_password("Maxime", "password", "new_password"); -- Query OK et change le mot de passe de Maxime
 CALL set_password("Maxime", "password", "new_password"); -- Query OK mais mot de passe pas changé
+SELECT authentication_is_valid("Maxime", "new_password"); -- 1
+SELECT authentication_is_valid("Maxime", "password"); -- 0
 
 CALL unregister_user("Yann", "aaa"); -- Query OK mais ne fait rien
-CALL unregister_user("YannYannYannYann", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"); -- Query OK et supprime YannYannYannYann
+CALL unregister_user("Yann", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"); -- Query OK et supprime Yann
 
 /* Tests sur les tables de Quiz */
 CALL create_quiz("Maxime", "2021-07-01", "2021-07-31", 1, 1, "checkbox", "Un quiz très facile", "Qui est Emmanuel Macron ?"); -- Query OK 

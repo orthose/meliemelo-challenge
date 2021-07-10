@@ -23,7 +23,6 @@ DROP VIEW QuizResponsesArchiveView;
 
 /* Fonctions et Procédures */
 DROP PROCEDURE register_new_user;
-DROP FUNCTION get_salt;
 DROP FUNCTION get_role;
 DROP FUNCTION authentication_is_valid;
 DROP FUNCTION login_exists;

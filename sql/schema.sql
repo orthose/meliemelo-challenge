@@ -6,7 +6,7 @@
  **/
 CREATE TABLE Users (
   login VARCHAR(16) PRIMARY KEY,
-  password VARCHAR(64) NOT NULL CHECK(LENGTH(password) >= 8),
+  password CHAR(64) NOT NULL,
   salt CHAR(16) NOT NULL CHECK(LENGTH(salt) = 16),
   role ENUM("player", "admin") NOT NULL DEFAULT "player",
   points INT NOT NULL DEFAULT 0,
