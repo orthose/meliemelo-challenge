@@ -4,24 +4,35 @@
 /* Fonctions du système d'authentification */
 /*******************************************/
 
-require("config.php");
-require("role_manager.php");
-require("user_data_manager.php");
+require("connect_mariadb.php");
 
-// Le couple (login, passwd) est-il valide ?
+/**
+ * Le couple (login, passwd) est-il valide ?
+ * @return: JSON avec le champ connection_status = true
+ * si l'authentification est valide, et les champs user_role et login
+ **/
 function connection($login, $passwd) {
-  // Simples quotes 'passwd' pour protéger injection bash
-  $cmd = "htpasswd -vb ".$config["login_file"]." $login '$passwd'";
-  system($cmd, $res);
-  // Code d'erreur = 0 si bon mot de passe
-  // Code d'erreur = 3 si mauvais mot de passe
-  $res = ($res === 0);
+  
+  // Préparation de la requête d'authentification
+  $sql = "SELECT authentication_is_valid(:login, :passwd), get_role(:login)";
+  $params = array(":login" => $login, ":passwd" => $passwd);
+  $res = array();
+  // Ne renvoie qu'un seul résultat car login unique
+  $fill_res = function($row, &$res) {
+    $res["connection_status"] = $row[0] === "1";
+    if ($res["connection_status"]) { $res["user_role"] = $row[1]; }
+  };
+  
+  // Appel du schéma de requête de base de données
+  request_database("undefined_user", $sql, $params, $res, $fill_res);
+  
   // Démarrage de la session
-  if ($res) {
+  if ($res["connection_status"]) {
     $_SESSION["login"] = $login;
-    $_SESSION["role"] = get_role($login);
+    $_SESSION["role"] = $res["user_role"];
+    $res["login"] = $login;
   }
-  return json_encode(array("connection_status" => $res));
+  return json_encode($res);
 }
 
 // Déconnexion et fermeture de session
@@ -35,44 +46,32 @@ function disconnection() {
 
 // L'utilisateur avec ce login existe-t-il déjà ?
 function exists($login) {
-  $cmd = "cut -f1 -d: ".$config["login_file"];
-	$all_users = shell_exec($cmd);
-	$all_users = preg_split("/\n/", $all_users);
-	return in_array($login, $all_users);
+  $sql = "SELECT login_exists(:login)";
+  $params = array(":login" => $login);
+  $res = array("login" => $login);
+  // Ne renvoie qu'un seul résultat car login unique
+  $fill_res = function($row, &$res) {
+    $res["already_used"] = $row[0] === "1";
+  };
+  request_database("undefined_user", $sql, $params, $res, $fill_res);
+  return json_encode($res);
 }
 
-// Enregistrement d'un nouvel utilisateur
-// Différents code d'erreur
+/**
+ * Enregistrement d'un nouvel utilisateur
+ * La base de données refusera les login déjà pris
+ * où les mots de passe de moins de 8 caractères
+ * @return: JSON avec champ successful_registration = true
+ * si l'enregistrement est un succès et le login associé
+ **/
 function register($login, $passwd) {
-  // Taille minimale du password = 8
-  $pattern_passwd = "/[\w\s]{8}[\w\s]*/";
-  $res = array();
-  // Le mot de passe correspond-il au pattern ?
-  if (!preg_match($pattern_passwd, $passwd)) {
-	   $res["register_code"] = -1;
-  }
-  // Le format de l'email est-il valide ?
-  else if (!filter_var($login, FILTER_VALIDATE_EMAIL)) {
-	  $res["register_code"] = -2;
-  }
-  // Le login est-il déjà pris ?
-  else if (exists($login)) {
-	  $res["register_code"] = -3;
-  }
-  // Enregistrement de l'utilisateur
-  else {
-	  // Simples quotes 'passwd' pour protéger injection bash
-	  $cmd = "htpasswd -b ".$config["login_file"]." $login '$passwd'";
-    // Code d'erreur = 0 si succès de mise à jour
-	  // Code d'erreur in [1-7] si problème rencontré
-	  $test = system($cmd, $res["register_code"]);
-    
-    // Initialisation des données utilisateur
-    if ($res["register_code"]) {
-      // On ne vérifie pas si le login existe déjà
-      init_user_data($login);
-    }
-  }
+  $sql = "CALL register_new_user(:login, :passwd)";
+  $params = array(":login" => $login, ":passwd" => $passwd);
+  $res = array("login" => $login, "successful_registration" => true);
+  $error_fun = function($request, &$res) {
+    $res["successful_registration"] = false;
+  };
+  request_database("undefined_user", $sql, $params, $res, NULL, $error_fun);
   return json_encode($res);
 }
 
