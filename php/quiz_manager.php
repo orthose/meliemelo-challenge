@@ -22,7 +22,7 @@ function create_quiz($login, $open, $close, $difficulty, $points, $type, $title,
     error_fun_default($request, $res);
     $res["creation_quiz_status"] = false;
   };
-  request_database($_SESSION["role"], $sql, $params, $res, NULL, $error_fun);
+  request_database($_SESSION["role"], $sql, $params, $res, $error_fun);
   return json_encode($res);
 }
 
@@ -39,7 +39,7 @@ function remove_quiz($login, $quiz_id) {
     error_fun_default($request, $res);
     $res["remove_quiz_status"] = false;
   };
-  request_database($_SESSION["role"], $sql, $params, $res, NULL, $error_fun);
+  request_database($_SESSION["role"], $sql, $params, $res, $error_fun);
   return json_encode($res);
 }
 

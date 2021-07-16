@@ -24,7 +24,7 @@ function connection($login, $passwd) {
   };
   
   // Appel du schéma de requête de base de données
-  request_database("undefined_user", $sql, $params, $res, $fill_res);
+  request_database("undefined_user", $sql, $params, $res, NULL, $fill_res);
   
   // Démarrage de la session
   if ($res["connection_status"]) {
@@ -57,7 +57,7 @@ function exists($login) {
   $fill_res = function($row, &$res) {
     $res["already_used"] = $row[0] === "1";
   };
-  request_database("undefined_user", $sql, $params, $res, $fill_res);
+  request_database("undefined_user", $sql, $params, $res, NULL, $fill_res);
   return json_encode($res);
 }
 
@@ -76,7 +76,7 @@ function register($login, $passwd) {
     error_fun_default($request, $res);
     $res["registration_status"] = false;
   };
-  request_database("undefined_user", $sql, $params, $res, NULL, $error_fun);
+  request_database("undefined_user", $sql, $params, $res, $error_fun);
   return json_encode($res);
 }
 
@@ -93,7 +93,7 @@ function unregister($login, $passwd) {
     error_fun_default($request, $res);
     $res["unregistration_status"] = false;
   };
-  request_database($_SESSION["role"], $sql, $params, $res, NULL, $error_fun);
+  request_database($_SESSION["role"], $sql, $params, $res, $error_fun);
   return json_encode($res);
 }
 
@@ -113,7 +113,7 @@ function set_password($login, $actual_passwd, $new_passwd) {
     error_fun_default($request, $res);
     $res["setting_password_status"] = false;
   };
-  request_database($_SESSION["role"], $sql, $params, $res, NULL, $error_fun);
+  request_database($_SESSION["role"], $sql, $params, $res, $error_fun);
   return json_encode($res);
 }
 
@@ -131,7 +131,7 @@ function set_role($login, $new_role) {
     error_fun_default($request, $res);
     $res["setting_role_status"] = false;
   };
-  request_database($_SESSION["role"], $sql, $params, $res, NULL, $error_fun);
+  request_database($_SESSION["role"], $sql, $params, $res, $error_fun);
   return json_encode($res);
 }
 

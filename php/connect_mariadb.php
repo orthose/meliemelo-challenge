@@ -26,7 +26,7 @@ function error_fun_default($request, &$res) {
  * en cas d'erreur de requête 
  * @return: Tableau PHP de résultat
  **/
-function request_database($user, $sql, &$params, &$res, $fill_res = NULL, $error_fun = NULL) {
+function request_database($user, $sql, &$params, &$res, $error_fun = NULL, $fill_res = NULL) {
   global $config;
   try {
     
