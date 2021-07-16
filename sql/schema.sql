@@ -14,6 +14,8 @@ CREATE TABLE Users (
   fail INT NOT NULL DEFAULT 0 -- Nombre de quiz échoués
 );
 
+CREATE SEQUENCE QuizSequence START WITH 1 INCREMENT BY 1;
+
 /**
  * Informations principales d'un quiz
  * Pour la plupart des métadonnées
@@ -24,7 +26,7 @@ CREATE TABLE Users (
  * archive: le quiz n'est plus jouable définitivement
  **/
 CREATE TABLE Quiz (
-  id INT AUTO_INCREMENT PRIMARY KEY,
+  id INT PRIMARY KEY,
   login_creator VARCHAR(16), -- Utilisateur ayant créé le quiz
   FOREIGN KEY (login_creator) REFERENCES Users(login),
   open DATE NOT NULL, -- Date à laquelle pour être ouvert le quiz
@@ -69,9 +71,9 @@ BEGIN
   DECLARE quiz_state TYPE OF Quiz.state;
   SELECT state INTO quiz_state FROM Quiz
   WHERE id = OLD.id; 
-  IF quiz_state != "stock" THEN
+  IF NOT (quiz_state = "creation" OR quiz_state = "stock") THEN
     SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "You can delete only quiz in stock";
+    SET MESSAGE_TEXT = "You can delete only quiz in creation or in stock";
   ELSE
     DELETE FROM QuizResponses WHERE id = OLD.id;
     DELETE FROM PlayerQuizResponses WHERE id = OLD.id;

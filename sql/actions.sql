@@ -118,7 +118,8 @@ SELECT login, points, success, fail FROM Users
 ORDER BY points DESC;
 
 /* Créer un nouveau quiz */
-CREATE PROCEDURE create_quiz (
+DELIMITER //
+CREATE FUNCTION create_quiz (
   login TYPE OF Quiz.login_creator,
   open TYPE OF Quiz.open,
   close TYPE OF Quiz.close,
@@ -127,9 +128,15 @@ CREATE PROCEDURE create_quiz (
   type TYPE OF Quiz.type,
   title TYPE OF Quiz.title,
   question TYPE OF Quiz.question
-)
-INSERT INTO Quiz (login_creator, open, close, difficulty, points, type, title, question)
-VALUES (login, open, close, difficulty, points, type, title, question);
+) RETURNS INT
+BEGIN
+  DECLARE quiz_id INT;
+  SELECT NEXTVAl(QuizSequence) INTO quiz_id;
+  INSERT INTO Quiz (id, login_creator, open, close, difficulty, points, type, title, question)
+  VALUES (quiz_id, login, open, close, difficulty, points, type, title, question);
+  RETURN quiz_id;
+END; //
+DELIMITER ;
 
 /* Supprimer un quiz existant en stock */
 DELIMITER //

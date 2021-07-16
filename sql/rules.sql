@@ -33,7 +33,7 @@ GRANT EXECUTE ON PROCEDURE meliemelo_challenge.answer_quiz TO "admin_meliemelo"@
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.check_answer TO "admin_meliemelo"@"localhost";
 -- Privilèges supplémentaires
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.set_role TO "admin_meliemelo"@"localhost";
-GRANT EXECUTE ON PROCEDURE meliemelo_challenge.create_quiz TO "admin_meliemelo"@"localhost";
+GRANT EXECUTE ON FUNCTION meliemelo_challenge.create_quiz TO "admin_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.remove_quiz TO "admin_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizStockView TO "admin_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.add_response TO "admin_meliemelo"@"localhost";

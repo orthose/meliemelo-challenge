@@ -9,6 +9,7 @@ DROP TRIGGER PlayerQuizAnsweredTrigger;
 DROP TABLE PlayerQuizResponses;
 DROP TABLE PlayerQuizAnswered;
 DROP TABLE QuizResponses;
+DROP SEQUENCE QuizSequence;
 DROP TABLE Quiz;
 DROP TABLE Users;
 
@@ -29,7 +30,7 @@ DROP FUNCTION login_exists;
 DROP PROCEDURE set_role;
 DROP PROCEDURE set_password;
 DROP PROCEDURE unregister_user;
-DROP PROCEDURE create_quiz;
+DROP FUNCTION create_quiz;
 DROP PROCEDURE remove_quiz;
 DROP PROCEDURE add_response;
 DROP PROCEDURE answer_quiz;

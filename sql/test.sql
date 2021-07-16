@@ -34,20 +34,20 @@ CALL unregister_user("Yann", "aaa"); -- Query OK mais ne fait rien
 CALL unregister_user("Yann", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"); -- Query OK et supprime Yann
 
 /* Tests sur les tables de Quiz */
-CALL create_quiz("Maxime", "2021-07-01", "2021-07-31", 1, 1, "checkbox", "Un quiz très facile", "Qui est Emmanuel Macron ?"); -- Query OK 
-CALL create_quiz("Maxim", "2021-07-01", "2021-07-31", 1, 1, "checkbox", "Un quiz très facile", "Qui est Emmanuel Macron ?"); -- ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`meliemelo_challenge`.`Quiz`, CONSTRAINT `Quiz_ibfk_1` FOREIGN KEY (`login_creator`) REFERENCES `Users` (`login`)) 
-CALL create_quiz("Maxime", "2021-08-01", "2021-07-31", 1, 1, "checkbox", "Un quiz très facile", "Qui est Emmanuel Macron ?"); -- ERROR 4025 (23000): CONSTRAINT `CONSTRAINT_1` failed for `meliemelo_challenge`.`Quiz` 
-CALL create_quiz("Maxime", "2021-07-01", "2021-07-31", 0, 1, "checkbox", "Un quiz très facile", "Qui est Emmanuel Macron ?"); -- ERROR 4025 (23000): CONSTRAINT `Quiz.difficulty` failed for `meliemelo_challenge`.`Quiz` 
-CALL create_quiz("Maxime", "2021-07-01", "2021-07-31", 1, 0, "checkbox", "Un quiz très facile", "Qui est Emmanuel Macron ?"); -- Query OK 
-CALL create_quiz("Maxime", "2021-07-01", "2021-07-31", 10, 10, "checkbox", "Un quiz horrible", "Qui est Dieu ?"); -- Query OK 
-CALL create_quiz("Maxime", "2021-07-01", "2021-07-31", 11, 10, "checkbox", "Un quiz horrible", "Qui est Dieu ?"); -- ERROR 4025 (23000): CONSTRAINT `Quiz.difficulty` failed for `meliemelo_challenge`.`Quiz` 
-CALL create_quiz("Maxime", "2021-07-01", "2021-07-31", 10, 11, "checkbox", "Un quiz horrible", "Qui est Dieu ?"); -- ERROR 4025 (23000): CONSTRAINT `Quiz.points` failed for `meliemelo_challenge`.`Quiz` 
-CALL create_quiz("Maxime", "2021-07-01", "2021-07-31", 1, 2, "radio", "Un quiz gentil", "Sélectionnez le président actuel."); -- Query OK 
-CALL create_quiz("Maxime", "2021-07-01", "2021-07-31", 2, 5, "text", "Un quiz vicieux", "Quel est le nom de famille de Sarkozy ?"); -- Query OK 
-CALL create_quiz("Maxime", "2021-07-01", "2021-07-31", 2, 5, "check", "Un quiz vicieux", "Quel est le nom de famille de Sarkozy ?"); -- ERROR 1265 (01000): Data truncated for column 'type' at row 7 
-CALL create_quiz("Maxime", "2021-06-01", "2021-07-1", 2, 5, "radio", "Un quiz surprenant", "Qu'est-ce qu'une surprise ?"); -- Query OK 
+SELECT create_quiz("Maxime", "2021-07-01", "2021-07-31", 1, 1, "checkbox", "Un quiz très facile", "Qui est Emmanuel Macron ?"); -- Query OK 
+SELECT create_quiz("Maxim", "2021-07-01", "2021-07-31", 1, 1, "checkbox", "Un quiz très facile", "Qui est Emmanuel Macron ?"); -- ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`meliemelo_challenge`.`Quiz`, CONSTRAINT `Quiz_ibfk_1` FOREIGN KEY (`login_creator`) REFERENCES `Users` (`login`)) 
+SELECT create_quiz("Maxime", "2021-08-01", "2021-07-31", 1, 1, "checkbox", "Un quiz très facile", "Qui est Emmanuel Macron ?"); -- ERROR 4025 (23000): CONSTRAINT `CONSTRAINT_1` failed for `meliemelo_challenge`.`Quiz` 
+SELECT create_quiz("Maxime", "2021-07-01", "2021-07-31", 0, 1, "checkbox", "Un quiz très facile", "Qui est Emmanuel Macron ?"); -- ERROR 4025 (23000): CONSTRAINT `Quiz.difficulty` failed for `meliemelo_challenge`.`Quiz` 
+SELECT create_quiz("Maxime", "2021-07-01", "2021-07-31", 1, 0, "checkbox", "Un quiz très facile", "Qui est Emmanuel Macron ?"); -- Query OK 
+SELECT create_quiz("Maxime", "2021-07-01", "2021-07-31", 10, 10, "checkbox", "Un quiz horrible", "Qui est Dieu ?"); -- Query OK 
+SELECT create_quiz("Maxime", "2021-07-01", "2021-07-31", 11, 10, "checkbox", "Un quiz horrible", "Qui est Dieu ?"); -- ERROR 4025 (23000): CONSTRAINT `Quiz.difficulty` failed for `meliemelo_challenge`.`Quiz` 
+SELECT create_quiz("Maxime", "2021-07-01", "2021-07-31", 10, 11, "checkbox", "Un quiz horrible", "Qui est Dieu ?"); -- ERROR 4025 (23000): CONSTRAINT `Quiz.points` failed for `meliemelo_challenge`.`Quiz` 
+SELECT create_quiz("Maxime", "2021-07-01", "2021-07-31", 1, 2, "radio", "Un quiz gentil", "Sélectionnez le président actuel."); -- Query OK 
+SELECT create_quiz("Maxime", "2021-07-01", "2021-07-31", 2, 5, "text", "Un quiz vicieux", "Quel est le nom de famille de Sarkozy ?"); -- Query OK 
+SELECT create_quiz("Maxime", "2021-07-01", "2021-07-31", 2, 5, "check", "Un quiz vicieux", "Quel est le nom de famille de Sarkozy ?"); -- ERROR 1265 (01000): Data truncated for column 'type' at row 7 
+SELECT create_quiz("Maxime", "2021-06-01", "2021-07-1", 2, 5, "radio", "Un quiz surprenant", "Qu'est-ce qu'une surprise ?"); -- Query OK 
 
-CALL remove_quiz(3); -- ERROR 1644 (45000): You can delete only quiz in stock
+CALL remove_quiz("Maxime", 3); -- ERROR 1644 (45000): You can delete only quiz in stock
 CALL stock_quiz(3); -- ERROR 1644 (45000): Before setting quiz to stock you have to add at least one valid response
 CALL add_response(3, "Je ne sais pas", FALSE); -- Query OK
 CALL stock_quiz(3); -- ERROR 1644 (45000): Before setting quiz to stock you have to add at least one valid response
@@ -57,7 +57,7 @@ CALL close_quiz(3); -- ERROR 1644 (45000): Order of state must be creation -> st
 CALL stock_quiz(3); -- Query OK
 CALL close_quiz(3); -- ERROR 1644 (45000): Order of state must be creation -> stock -> current -> archive
 CALL answer_quiz("Amélie", 3, "Un humain"); -- ERROR 1644 (45000): Quiz isn't in current state
-CALL remove_quiz(3); -- Query OK et les réponses sont bien supprimées
+CALL remove_quiz("Maxime", 3); -- Query OK et les réponses sont bien supprimées
 
 CALL add_response(1, "Un sombre personnage", FALSE); -- Query OK 
 CALL add_response(1, "L'idole des jeunes", FALSE); -- Query OK 
@@ -130,9 +130,9 @@ CALL check_answer("Amélie", 7); -- Query OK 10 points pour Amélie
 CALL check_answer("Maéva", 7); -- Query OK une défaite pour Maéva
 
 CALL crontab_routine(); -- Query OK Attention dépend de la date actuelle
-CALL remove_quiz(1); -- ERROR 1644 (45000): You can delete only quiz in stock
-CALL remove_quiz(5); -- ERROR 1644 (45000): You can delete only quiz in stock
-CALL remove_quiz(7); -- ERROR 1644 (45000): You can delete only quiz in stock
+CALL remove_quiz("Maxime", 1); -- ERROR 1644 (45000): You can delete only quiz in stock
+CALL remove_quiz("Maxime", 5); -- ERROR 1644 (45000): You can delete only quiz in stock
+CALL remove_quiz("Maxime", 7); -- ERROR 1644 (45000): You can delete only quiz in stock
 
 SELECT * FROM HighScoreView;
 /************************************
