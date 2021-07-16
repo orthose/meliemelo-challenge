@@ -132,10 +132,21 @@ INSERT INTO Quiz (login_creator, open, close, difficulty, points, type, title, q
 VALUES (login, open, close, difficulty, points, type, title, question);
 
 /* Supprimer un quiz existant en stock */
+DELIMITER //
 CREATE PROCEDURE remove_quiz (
+  login TYPE OF Quiz.login_creator,
   quiz_id TYPE OF Quiz.id
 )
-DELETE FROM Quiz WHERE id = quiz_id;
+BEGIN
+  IF NOT EXISTS(SELECT * FROM Quiz WHERE login_creator = login AND id = quiz_id) 
+  THEN
+    SIGNAL SQLSTATE "45000" 
+    SET MESSAGE_TEXT = "Invalid login creator or id for this quiz";
+  ELSE
+    DELETE FROM Quiz WHERE login_creator = login AND id = quiz_id;
+  END IF;
+END; //
+DELIMITER ;
 
 /* Vue pour obtenir les quiz en stock */
 CREATE VIEW QuizStockView AS SELECT * FROM Quiz WHERE state = "stock";

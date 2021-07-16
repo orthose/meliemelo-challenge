@@ -73,6 +73,7 @@ function register($login, $passwd) {
   $params = array(":login" => $login, ":passwd" => $passwd);
   $res = array("login" => $login, "registration_status" => true);
   $error_fun = function($request, &$res) {
+    error_fun_default($request, $res);
     $res["registration_status"] = false;
   };
   request_database("undefined_user", $sql, $params, $res, NULL, $error_fun);
@@ -89,6 +90,7 @@ function unregister($login, $passwd) {
   $params = array(":login" => $login, ":passwd" => $passwd);
   $res = array("login" => $login, "unregistration_status" => true);
   $error_fun = function($request, &$res) {
+    error_fun_default($request, $res);
     $res["unregistration_status"] = false;
   };
   request_database($_SESSION["role"], $sql, $params, $res, NULL, $error_fun);
@@ -108,6 +110,7 @@ function set_password($login, $actual_passwd, $new_passwd) {
     ":new_passwd" => $new_passwd);
   $res = array("login" => $login, "setting_password_status" => true);
   $error_fun = function($request, &$res) {
+    error_fun_default($request, $res);
     $res["setting_password_status"] = false;
   };
   request_database($_SESSION["role"], $sql, $params, $res, NULL, $error_fun);
@@ -125,6 +128,7 @@ function set_role($login, $new_role) {
   $params = array(":login" => $login, ":new_role" => $new_role);
   $res = array("login" => $login, "setting_role_status" => true);
   $error_fun = function($request, &$res) {
+    error_fun_default($request, $res);
     $res["setting_role_status"] = false;
   };
   request_database($_SESSION["role"], $sql, $params, $res, NULL, $error_fun);
