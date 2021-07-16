@@ -86,7 +86,10 @@ BEGIN
   IF LENGTH(new_passwd) < 8 THEN
     SIGNAL SQLSTATE "45000" 
     SET MESSAGE_TEXT = "Password must have length >= 8";
-  ELSEIF authentication_is_valid(login_user, actual_passwd) THEN
+  ELSEIF NOT authentication_is_valid(login_user, actual_passwd) THEN
+    SIGNAL SQLSTATE "45000" 
+    SET MESSAGE_TEXT = "Authentication has failed";
+  ELSE
     UPDATE Users SET password = SHA2(CONCAT(new_passwd, salt), 256) 
     WHERE login = login_user;
   END IF;
@@ -100,7 +103,10 @@ CREATE PROCEDURE unregister_user (
   passwd VARCHAR(2048)
 )
 BEGIN
-  IF authentication_is_valid(login_user, passwd) THEN
+  IF NOT authentication_is_valid(login_user, passwd) THEN
+    SIGNAL SQLSTATE "45000" 
+    SET MESSAGE_TEXT = "Authentication has failed";
+  ELSE
     DELETE FROM Users WHERE login = login_user;
   END IF;
 END; //

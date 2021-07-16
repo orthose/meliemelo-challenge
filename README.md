@@ -5,6 +5,8 @@ les joueurs pour monter sur le podium.
 # Mise en production
 
 ## Paramétrage de la base de données
+L'application n'a été testée qu'avec le SGBD MariaDB.
+En principe, elle devrait aussi être compatible avec MySQL.
 
 1. Création de la base de données
 ```
@@ -51,6 +53,23 @@ mysql> EXIT;
 $ sudo mysql
 mysql> source rules.sql;
 ```
+
+## Configuration de l'accès à la base
+Rendez-vous dans le fichier ./php/config.php et modifiez uniquement
+les valeurs commençant par passwd. Ce sont les mots de passe associés
+aux utilisateurs de MariaDB créés précédemment.
+
+## Créer un premier utilisateur
+Pour pouvoir commencer à créer des quiz, il va falloir créer un premier 
+utilisateur, avec le rôle d'administrateur.
+Pour cela rendez-vous sur le site web et créez un nouveau compte.
+Une fois créé, rendez-vous sur votre base de données.
+```
+$ mysql -u meliemelo -D meliemelo_challenge -p
+mysql> CALL set_role("nouvel_utilisateur", "role");
+```
+Ce premier utilisateur peut par la suite donner le rôle d'administrateur,
+ou le reprendre à un utilisateur depuis l'interface web directement.
 
 # Cahier des charges
 

@@ -29,7 +29,7 @@ function connection($login, $passwd) {
   // Démarrage de la session
   if ($res["connection_status"]) {
     $_SESSION["login"] = $login;
-    $_SESSION["role"] = $res["user_role"];
+    $_SESSION["role"] = $res["user_role"]."_user";
     $res["login"] = $login;
   }
   return json_encode($res);
@@ -44,7 +44,11 @@ function disconnection() {
   return json_encode(array("disconnection_status" => $res));
 }
 
-// L'utilisateur avec ce login existe-t-il déjà ?
+/**
+ * L'utilisateur avec ce login existe-t-il déjà ?
+ * @return: JSON avec le champ already_used = true si le login est déjà pris
+ * et le login associé
+ **/
 function exists($login) {
   $sql = "SELECT login_exists(:login)";
   $params = array(":login" => $login);
@@ -61,17 +65,69 @@ function exists($login) {
  * Enregistrement d'un nouvel utilisateur
  * La base de données refusera les login déjà pris
  * où les mots de passe de moins de 8 caractères
- * @return: JSON avec champ successful_registration = true
+ * @return: JSON avec champ registration_status = true
  * si l'enregistrement est un succès et le login associé
  **/
 function register($login, $passwd) {
   $sql = "CALL register_new_user(:login, :passwd)";
   $params = array(":login" => $login, ":passwd" => $passwd);
-  $res = array("login" => $login, "successful_registration" => true);
+  $res = array("login" => $login, "registration_status" => true);
   $error_fun = function($request, &$res) {
-    $res["successful_registration"] = false;
+    $res["registration_status"] = false;
   };
   request_database("undefined_user", $sql, $params, $res, NULL, $error_fun);
+  return json_encode($res);
+}
+
+/**
+ * Suppression d'un utilisateur inscrit
+ * @return: JSON avec champ unregistration_status = true
+ * si la suppression réussie et le login associé
+ **/
+function unregister($login, $passwd) {
+  $sql = "CALL unregister_user(:login, :passwd)";
+  $params = array(":login" => $login, ":passwd" => $passwd);
+  $res = array("login" => $login, "unregistration_status" => true);
+  $error_fun = function($request, &$res) {
+    $res["unregistration_status"] = false;
+  };
+  request_database($_SESSION["role"], $sql, $params, $res, NULL, $error_fun);
+  return json_encode($res);
+}
+
+/**
+ * Modification du mot de passe, nécessite le mot de passe actuel
+ * @return: JSON avec champ setting_password_status = true si la mise 
+ * à jour est un succès et le login associé
+ **/
+function set_password($login, $actual_passwd, $new_passwd) {
+  $sql = "CALL set_password(:login, :actual_passwd, :new_passwd)";
+  $params = array(
+    ":login" => $login, 
+    ":actual_passwd" => $actual_passwd,
+    ":new_passwd" => $new_passwd);
+  $res = array("login" => $login, "setting_password_status" => true);
+  $error_fun = function($request, &$res) {
+    $res["setting_password_status"] = false;
+  };
+  request_database($_SESSION["role"], $sql, $params, $res, NULL, $error_fun);
+  return json_encode($res);
+}
+
+/**
+ * Modification du rôle d'un utilisateur
+ * @param new_role: "admin", "player"
+ * @return: JSON avec champ setting_role_status = true si la mise 
+ * à jour est un succès et le login associé
+ **/
+function set_role($login, $new_role) {
+  $sql = "CALL set_role(:login, :new_role)";
+  $params = array(":login" => $login, ":new_role" => $new_role);
+  $res = array("login" => $login, "setting_role_status" => true);
+  $error_fun = function($request, &$res) {
+    $res["setting_role_status"] = false;
+  };
+  request_database($_SESSION["role"], $sql, $params, $res, NULL, $error_fun);
   return json_encode($res);
 }
 
