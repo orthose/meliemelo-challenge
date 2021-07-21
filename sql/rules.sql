@@ -1,6 +1,6 @@
 -- Utilisateur en ligne de commande
 GRANT ALL ON meliemelo_challenge.* TO "meliemelo"@"localhost";
-GRANT EXECUTE ON PROCEDURE meliemelo_challenge.cron_routine TO "meliemelo"@"localhost";
+GRANT EXECUTE ON FUNCTION meliemelo_challenge.cron_routine TO "meliemelo"@"localhost";
 
 -- Utilisateurs non-définis pour le processus de connexion
 -- REVOKE ALL ON meliemelo_challenge.* FROM "undefined_meliemelo"@"localhost";

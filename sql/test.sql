@@ -106,7 +106,7 @@ CALL add_response(6, "Emmanuel Macron", TRUE); -- Query OK
 CALL add_response(6, "Édouard Philippe", TRUE); -- ERROR 1644 (45000): Text quiz must have only one response 
 CALL stock_quiz(6); -- Query OK
 
-CALL cron_routine(); -- Query OK Attention dépend de la date actuelle
+SELECT cron_routine(); -- Query OK Attention dépend de la date actuelle
 CALL answer_quiz("Lucie", 6, " EmmAnuel MacRoN    "); -- Query OK
 CALL answer_quiz("Lucie", 6, "Emmanuel Macron"); -- ERROR 1644 (45000): Player must give only one answer for radio or text quiz
 CALL answer_quiz("Lucie", 6, "Nicolas Sarkozy"); -- ERROR 1644 (45000): Player must give only one answer for radio or text quiz
@@ -129,7 +129,7 @@ CALL answer_quiz("Maéva", 7, "Nicolas"); -- Query OK
 SELECT check_answer("Amélie", 7); -- Query OK 10 points pour Amélie
 CALL check_answer("Maéva", 7); -- Query OK une défaite pour Maéva
 
-CALL cron_routine(); -- Query OK Attention dépend de la date actuelle
+SELECT cron_routine(); -- Query OK Attention dépend de la date actuelle
 CALL remove_quiz("Maxime", 1); -- ERROR 1644 (45000): You can delete only quiz in stock
 CALL remove_quiz("Maxime", 5); -- ERROR 1644 (45000): You can delete only quiz in stock
 CALL remove_quiz("Maxime", 7); -- ERROR 1644 (45000): You can delete only quiz in stock

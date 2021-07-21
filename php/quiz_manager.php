@@ -1,5 +1,7 @@
 <?php
 
+require("connect_mariadb.php");
+
 /**
  * Création de quiz par un administrateur
  * @param responses: Tableau des réponses possibles, chaque réponse est de la forme
@@ -104,15 +106,21 @@ function answer_quiz($login, $quiz_id, $responses) {
   return json_encode($res);
 }
 
+// Routine à exécuter avec crontab de manière régulière
 function cron_routine() {
-  $sql = "CALL cron_routine()";
+  $sql = "SELECT cron_routine()";
   $params = array();
   $res = array("cron_routine_status" => true);
   $error_fun = function($request, &$res) {
     error_fun_default($request, $res);
     $res["cron_routine_status"] = false;
   };
-  request_database("main_user", $sql, $params, $res, $error_fun);
+  $fill_res = function($row, &$res) {
+    $res_json = json_decode($row[0], true);
+    $res["stock"] = $res_json["stock"];
+    $res["close"] = $res_json["close"];
+  };
+  request_database("main_user", $sql, $params, $res, $error_fun, $fill_res);
   return json_encode($res);
 }
 

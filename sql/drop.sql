@@ -38,7 +38,7 @@ DROP FUNCTION check_answer;
 DROP PROCEDURE stock_quiz;
 DROP PROCEDURE open_quiz;
 DROP PROCEDURE close_quiz;
-DROP PROCEDURE cron_routine;
+DROP FUNCTION cron_routine;
 
 /* Pour supprimer les utilisateurs */
 -- DROP USER "meliemelo"@"localhost";

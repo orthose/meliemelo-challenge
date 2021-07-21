@@ -292,8 +292,10 @@ UPDATE Quiz SET state = "archive" WHERE id = quiz_id;
 
 /* Traitement automatique des quiz en fonction de leurs dates */
 DELIMITER //
-CREATE PROCEDURE cron_routine ()
+CREATE FUNCTION cron_routine () RETURNS JSON
 BEGIN
+  DECLARE res ROW (stock INT, close INT);
+  DECLARE res_json JSON;
   DECLARE end_cursor BOOLEAN DEFAULT FALSE;
   DECLARE quiz_row ROW TYPE OF Quiz; 
   DECLARE quiz_stock_cursor CURSOR FOR
@@ -302,12 +304,15 @@ BEGIN
   SELECT * FROM Quiz WHERE state = "current"; 
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET end_cursor = TRUE;
   
+  SET res.stock = 0; SET res.close = 0;
+  
   /* Traitement quiz en stock */
   OPEN quiz_stock_cursor;
   FETCH quiz_stock_cursor INTO quiz_row;
   WHILE NOT end_cursor DO
     IF quiz_row.open <= CURRENT_DATE THEN
       CALL open_quiz(quiz_row.id);
+      SET res.stock = res.stock + 1;
     END IF;
     FETCH quiz_stock_cursor INTO quiz_row;
   END WHILE;
@@ -320,9 +325,13 @@ BEGIN
   WHILE NOT end_cursor DO
     IF quiz_row.close < CURRENT_DATE THEN
       CALL close_quiz(quiz_row.id);
+      SET res.close = res.close + 1;
     END IF;
     FETCH quiz_current_cursor INTO quiz_row;
   END WHILE;
   CLOSE quiz_current_cursor;
+  
+  SELECT CONCAT('{"stock":', res.stock, ',"close":', res.close, '}') INTO res_json;
+  RETURN res_json;
 END; //
 DELIMITER ;
