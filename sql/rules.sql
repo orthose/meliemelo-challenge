@@ -1,6 +1,6 @@
 -- Utilisateur en ligne de commande
 GRANT ALL ON meliemelo_challenge.* TO "meliemelo"@"localhost";
-GRANT EXECUTE ON PROCEDURE meliemelo_challenge.crontab_routine TO "meliemelo"@"localhost";
+GRANT EXECUTE ON PROCEDURE meliemelo_challenge.cron_routine TO "meliemelo"@"localhost";
 
 -- Utilisateurs non-définis pour le processus de connexion
 -- REVOKE ALL ON meliemelo_challenge.* FROM "undefined_meliemelo"@"localhost";
@@ -18,7 +18,7 @@ GRANT SELECT ON meliemelo_challenge.QuizCurrentView TO "player_meliemelo"@"local
 GRANT SELECT ON meliemelo_challenge.QuizArchiveView TO "player_meliemelo"@"localhost";
 GRANT SELECT (id, response) ON meliemelo_challenge.QuizResponsesCurrentView TO "player_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.answer_quiz TO "player_meliemelo"@"localhost";
-GRANT EXECUTE ON PROCEDURE meliemelo_challenge.check_answer TO "player_meliemelo"@"localhost";
+GRANT EXECUTE ON FUNCTION meliemelo_challenge.check_answer TO "player_meliemelo"@"localhost";
 
 -- Utilisateurs avec role = admin
 -- REVOKE ALL ON meliemelo_challenge.* FROM "admin_meliemelo"@"localhost";
@@ -30,7 +30,7 @@ GRANT SELECT ON meliemelo_challenge.QuizCurrentView TO "admin_meliemelo"@"localh
 GRANT SELECT ON meliemelo_challenge.QuizArchiveView TO "admin_meliemelo"@"localhost";
 GRANT SELECT (id, response) ON meliemelo_challenge.QuizResponsesCurrentView TO "admin_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.answer_quiz TO "admin_meliemelo"@"localhost";
-GRANT EXECUTE ON PROCEDURE meliemelo_challenge.check_answer TO "admin_meliemelo"@"localhost";
+GRANT EXECUTE ON FUNCTION meliemelo_challenge.check_answer TO "admin_meliemelo"@"localhost";
 -- Privilèges supplémentaires
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.set_role TO "admin_meliemelo"@"localhost";
 GRANT EXECUTE ON FUNCTION meliemelo_challenge.create_quiz TO "admin_meliemelo"@"localhost";

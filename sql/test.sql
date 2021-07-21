@@ -75,13 +75,13 @@ CALL answer_quiz("Amélie", 1, "Un sombre personnage"); -- Query OK
 CALL answer_quiz("Amélie", 1, "Un sombre personnage"); -- ERROR 1062 (23000): Duplicate entry 'Amélie-1-Un sombre personnage' for key 'PRIMARY'
 CALL answer_quiz("Maéva", 1, "Le président de la République"); -- Query OK
 
-CALL check_answer("Yann", 1); -- ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`meliemelo_challenge`.`PlayerQuizAnswered`, CONSTRAINT `PlayerQuizAnswered_ibfk_1` FOREIGN KEY (`login`) REFERENCES `Users` (`login`))
-CALL check_answer("Maxime", 1); -- Query OK, 2 rows affected (0.034 sec) incrémente fail de Users pour Maxime
-CALL check_answer("Amélie", 3); -- ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`meliemelo_challenge`.`PlayerQuizAnswered`, CONSTRAINT `PlayerQuizAnswered_ibfk_2` FOREIGN KEY (`id`) REFERENCES `Quiz` (`id`))
-CALL check_answer("Amélie", 1); -- Query OK, 3 rows affected (0.095 sec) incrémente fail de Users pour Amélie
-CALL check_answer("Amélie", 1); -- Query OK, 2 rows affected (0.000 sec) mais ne modifie rien heureusement
+SELECT check_answer("Yann", 1); -- ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`meliemelo_challenge`.`PlayerQuizAnswered`, CONSTRAINT `PlayerQuizAnswered_ibfk_1` FOREIGN KEY (`login`) REFERENCES `Users` (`login`))
+SELECT check_answer("Maxime", 1); -- Query OK, 2 rows affected (0.034 sec) incrémente fail de Users pour Maxime
+SELECT check_answer("Amélie", 3); -- ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`meliemelo_challenge`.`PlayerQuizAnswered`, CONSTRAINT `PlayerQuizAnswered_ibfk_2` FOREIGN KEY (`id`) REFERENCES `Quiz` (`id`))
+SELECT check_answer("Amélie", 1); -- Query OK, 3 rows affected (0.095 sec) incrémente fail de Users pour Amélie
+SELECT check_answer("Amélie", 1); -- Query OK, 2 rows affected (0.000 sec) mais ne modifie rien heureusement
 CALL answer_quiz("Amélie", 1, "Le président de la République"); -- ERROR 1644 (45000): Player has already answered this quiz
-CALL check_answer("Maéva", 1); -- Query OK, 4 rows affected (0.070 sec) Maéva obtient 1 point et 1 success
+SELECT check_answer("Maéva", 1); -- Query OK, 4 rows affected (0.070 sec) Maéva obtient 1 point et 1 success
 
 CALL add_response(4, "Personne ne le sait", TRUE); -- Query OK
 CALL add_response(4, "Le créateur de l'univers", TRUE); -- Query OK
@@ -94,26 +94,26 @@ CALL answer_quiz("Amélie", 4, "Un sombre personnage"); -- ERROR 1644 (45000): R
 CALL answer_quiz("Amélie", 4, "Personne ne le sait"); -- Query OK
 CALL answer_quiz("Amélie", 4, "Le créateur de l'univers"); -- Query OK
 CALL answer_quiz("Amélie", 4, "L'auteur de la Bible"); -- Query OK
-CALL check_answer("Amélie", 4); -- Query OK, 3 rows affected (0.054 sec) Amélie se prend un fail
+SELECT check_answer("Amélie", 4); -- Query OK, 3 rows affected (0.054 sec) Amélie se prend un fail
 CALL answer_quiz("Maéva", 4, "Personne ne le sait"); -- Query OK
 CALL answer_quiz("Maéva", 4, "Le créateur de l'univers"); -- Query OK
-CALL check_answer("Maéva", 4); -- Query OK, 4 rows affected (0.177 sec) Maéva a 101 points bravo !
+SELECT check_answer("Maéva", 4); -- Query OK, 4 rows affected (0.177 sec) Maéva a 101 points bravo !
 CALL answer_quiz("Lucie", 4, "Le créateur de l'univers"); -- Query OK, 3 rows affected (0.028 sec)
-CALL check_answer("Lucie", 4); -- Query OK, 3 rows affected (0.065 sec)
+SELECT check_answer("Lucie", 4); -- Query OK, 3 rows affected (0.065 sec)
 
 CALL add_response(6, "Nicolas Sarkozy", FALSE); -- ERROR 1644 (45000): Text quiz must have always valid = TRUE
 CALL add_response(6, "Emmanuel Macron", TRUE); -- Query OK 
 CALL add_response(6, "Édouard Philippe", TRUE); -- ERROR 1644 (45000): Text quiz must have only one response 
 CALL stock_quiz(6); -- Query OK
 
-CALL crontab_routine(); -- Query OK Attention dépend de la date actuelle
+CALL cron_routine(); -- Query OK Attention dépend de la date actuelle
 CALL answer_quiz("Lucie", 6, " EmmAnuel MacRoN    "); -- Query OK
 CALL answer_quiz("Lucie", 6, "Emmanuel Macron"); -- ERROR 1644 (45000): Player must give only one answer for radio or text quiz
 CALL answer_quiz("Lucie", 6, "Nicolas Sarkozy"); -- ERROR 1644 (45000): Player must give only one answer for radio or text quiz
 CALL answer_quiz("Lucie", 6, "Édouard Philippe"); -- ERROR 1644 (45000): Player must give only one answer for radio or text quiz
 CALL answer_quiz("Maéva", 6, "Nicolas Sarkozy"); -- Query OK
-CALL check_answer("Lucie", 6); -- Query OK 10 points pour Lucie
-CALL check_answer("Maéva", 6); -- Query OK une défaite pour Maéva
+SELECT check_answer("Lucie", 6); -- Query OK 10 points pour Lucie
+SELECT check_answer("Maéva", 6); -- Query OK une défaite pour Maéva
 
 CALL add_response(7, "Nicolas", FALSE); -- Query OK
 CALL add_response(7, "Sarkozy", TRUE); -- Query OK 
@@ -126,10 +126,10 @@ CALL answer_quiz("Amélie", 7, "Bruel"); -- ERROR 1644 (45000): Response doesn't
 CALL answer_quiz("Amélie", 7, "Sarkozy"); -- ERROR 1644 (45000): Player must give only one answer for radio or text quiz
 CALL answer_quiz("Amélie", 7, "Nicolas"); -- ERROR 1644 (45000): Player must give only one answer for radio or text quiz
 CALL answer_quiz("Maéva", 7, "Nicolas"); -- Query OK
-CALL check_answer("Amélie", 7); -- Query OK 10 points pour Amélie
+SELECT check_answer("Amélie", 7); -- Query OK 10 points pour Amélie
 CALL check_answer("Maéva", 7); -- Query OK une défaite pour Maéva
 
-CALL crontab_routine(); -- Query OK Attention dépend de la date actuelle
+CALL cron_routine(); -- Query OK Attention dépend de la date actuelle
 CALL remove_quiz("Maxime", 1); -- ERROR 1644 (45000): You can delete only quiz in stock
 CALL remove_quiz("Maxime", 5); -- ERROR 1644 (45000): You can delete only quiz in stock
 CALL remove_quiz("Maxime", 7); -- ERROR 1644 (45000): You can delete only quiz in stock

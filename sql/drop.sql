@@ -34,11 +34,11 @@ DROP FUNCTION create_quiz;
 DROP PROCEDURE remove_quiz;
 DROP PROCEDURE add_response;
 DROP PROCEDURE answer_quiz;
-DROP PROCEDURE check_answer;
+DROP FUNCTION check_answer;
 DROP PROCEDURE stock_quiz;
 DROP PROCEDURE open_quiz;
 DROP PROCEDURE close_quiz;
-DROP PROCEDURE crontab_routine;
+DROP PROCEDURE cron_routine;
 
 /* Pour supprimer les utilisateurs */
 -- DROP USER "meliemelo"@"localhost";

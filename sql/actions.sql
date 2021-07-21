@@ -199,17 +199,20 @@ INSERT INTO PlayerQuizResponses (login, id, response) VALUES (login_player, quiz
  * Procédure à appeler après avoir répondu à un quiz
  * Notamment après avoir envoyé toutes les réponses d'un checkbox
  * Le score, et les statistiques du joueur sont alors mis à jour
+ * @return Nombre de points ajoutés au score du joueur
  **/
 DELIMITER //
-CREATE PROCEDURE check_answer (
+CREATE FUNCTION check_answer (
   login_player TYPE OF PlayerQuizResponses.login,
   quiz_id TYPE OF PlayerQuizResponses.id
-)
+) RETURNS INT
 BEGIN
   DECLARE quiz_type TYPE OF Quiz.type;
   DECLARE quiz_difficulty TYPE OF Quiz.difficulty;
   DECLARE quiz_points TYPE OF Quiz.points;
   DECLARE success_quiz TYPE OF PlayerQuizAnswered.success;
+  DECLARE res INT;
+  SET res = 0;
   
   SELECT type, difficulty, points INTO quiz_type, quiz_difficulty, quiz_points
   FROM Quiz WHERE id = quiz_id;
@@ -248,7 +251,8 @@ BEGIN
     INSERT INTO PlayerQuizAnswered VALUES
     (login_player, quiz_id, TRUE);
     -- Mise à jour du nombre de points du joueur
-    UPDATE Users SET points = points + (quiz_difficulty * quiz_points) 
+    SET res = (quiz_difficulty * quiz_points);
+    UPDATE Users SET points = points + res 
     WHERE login = login_player;
     -- Mise à jour du compteur de quiz réussis
     UPDATE Users SET success = success + 1 
@@ -263,6 +267,7 @@ BEGIN
     UPDATE Users SET fail = fail + 1 
     WHERE login = login_player;
   END IF;
+  RETURN res;
 END; //
 DELIMITER ;
 
@@ -287,7 +292,7 @@ UPDATE Quiz SET state = "archive" WHERE id = quiz_id;
 
 /* Traitement automatique des quiz en fonction de leurs dates */
 DELIMITER //
-CREATE PROCEDURE crontab_routine ()
+CREATE PROCEDURE cron_routine ()
 BEGIN
   DECLARE end_cursor BOOLEAN DEFAULT FALSE;
   DECLARE quiz_row ROW TYPE OF Quiz; 
