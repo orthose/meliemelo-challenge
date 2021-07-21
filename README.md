@@ -71,91 +71,27 @@ mysql> CALL set_role("nouvel_utilisateur", "role");
 Ce premier utilisateur peut par la suite donner le rôle d'administrateur,
 ou le reprendre à un utilisateur depuis l'interface web directement.
 
+## Enregistrer une tâche de fond avec crontab
+Pour mettre en stock et archiver les quiz, l'application utilise une tâche
+de fond, exécutée de manière régulière grâce à crontab.
+Si vous désirez recevoir les fichiers de log de ces tâches, exécutez les
+commandes suivantes (le mode débogage doit être activé dans php/config.php).
+```
+$ touch log.txt
+$ chmod o+rw log.txt
+```
+Pour enregistrer la tâche de fond exécutez ouvrez d'abord l'éditeur de crontab.
+```
+crontab -e
+```
+Puis entrez la ligne suivante en fin de fichier, qui va exécuter toutes les
+12 heures la routine. Pour exécuter journalièrement on peut aussi remplacer par
+@daily la suite de caractères précédant la commande.
+```
+0 * /12 * * * php -f /var/www/html/meliemelo-challenge/cron.php
+```
+
 # Cahier des charges
-
-## Définition d'un quiz
-Un quiz est un fichier stocké sur le serveur dans le format JSON et dont la
-structure permet d'exprimer les différents types de quiz possibles.
-```
-{
-  "id": 123,
-  "open": "01/06/2021",
-  "close": "01/07/2021",
-  "difficulty": 1,
-  "points": 2,
-  "type": "checkbox",
-  "question": "Parmi ces bâtiments lesquels se trouvent à Paris ?",
-  "response": [
-    {"La Tour Eiffel": true},
-    {"L'arc de triomphe": true},
-    {"Le château de Versailles": false}
-  ]
-  "players": {
-    "login1": ["La Tour Eiffel", "L'arc de triomphe"],
-    "login2": ["Le château de Versailles"],
-  },
-}
-```
-**Contrainte 1** = L'identifiant est le même que dans le nom du fichier. Ici on aurait
-affaire au fichier 123.json. De plus, on part de 0 puis on incrémente de 1 à chaque
-création de quiz.
-
-**Contrainte 2** = La date d'ouverture doit être antérieure à la date de fermeture.
-Quand la date d'expiration est atteinte plus personne ne peut répondre au quiz, et
-il peut être archivé. Un archivage automatique serait encore mieux. C'est le créateur
-du quiz qui décide du nombre de jours de validité du quiz. Par défaut il sera fixé à 10.
-La date d'expiration est alors calculée automatiquement. La date d'ouverture est décidée
-par le système. Tant que le fichier n'est pas ouvert, le champ "open" vaut null.
-
-**Contrainte 3** = Le niveau de difficulté doit être compris entre 1 et 10. 1 étant
-le niveau le plus facile et 10 le plus dur.
-
-**Contrainte 4** = Le nombre de points doit être un entier positif entre 0 et 10.
-Si le joueur répond correctement au quiz son total sera incrémenté d'autant.
-On ne peut pas perdre de points.
-
-**Contrainte 5** = Le champ "type" ne peut avoir que 4 valeurs possibles
-* checkbox = plusieurs choix possibles
-**Contrainte 6** = Il peut y avoir plusieurs true voire que des true comme réponses.
-* radio = un seul choix possible
-```
-{
-  "type": "radio",
-  "question": "Parmi ces bâtiments lesquel ne se trouve pas à Paris ?",
-  "response": [
-    {"La tour Eiffel": false},
-    {"L'arc de triomphe": false},
-    {"Le château de Versailles": true}
-  ]
-}
-```
-**Contrainte 7** = Il ne doit y avoir qu'un seul true pour que le JSON soit valide. 
-* text = champ texte à compléter
-```
-{
-  "type": "text",
-  "question": "Quel est le nom de la tour la plus célèbre de Paris ?"
-  "response": "Eiffel"
-}
-```
-**Contrainte 8** = Le champ "response" ne contient plus qu'une chaîne de caractères.
-L'évaluation de la réponse du joueur devra être insensible à la casse.
-* range = barre à ajuster pour saisir un nombre
-```
-{
-  "type": "range",
-  "question": "De quelle hauteur est la tour Eiffel ?"
-  "response": [324, {"max": 500, "min": 10,"step": 1}]
-}
-```
-**Contrainte 9** = Le champ "response" est un tableau de seulement 2 cases. La première
-est la réponse. La deuxième exprime l'intervalle des nombres possibles parmi lesquels
-le joueur peut choisir.
-
-**Contrainte 10** = Le champ "players" contient les logins des utilisateurs
-ayant répondu, auquel on associe toujours un tableau contenant la/les réponse(s) 
-saisie(s) par le joueur. On peut associer un tableau vide si le joueur n'a rien 
-répondu mais a validé le quiz. Dans ce cas le joueur gagne 0 point.
 
 ## Responsabilités entre client et serveur
 Le client ne doit servir qu'à de la visualisation. Le serveur doit vérifier tout
@@ -200,42 +136,3 @@ d'y répondre.
 Par contre pas de système de récupération de mot de passe car pas la création
 de compte ne nécessite pas d'entrer un mail.
 12. Connexion / Déconnexion / Création de compte
-
-## Données utilisateur
-Le fichier contenant les données utilisateur est un fichier json de la forme :
-```
-{
-  "login1": {...},
-  "login2": {...},
-}
-```
-**Contrainte 11** = Un login ne doit pas apparaître 2 fois. Un nouvel inscrit
-ne doit pas pouvoir écraser un profil en ayant choisi un login préexistant.
-
-Chaque objet associé à un login correspond aux données de l'utilisateur
-et est de la forme :
-```
-{
-  "role": "player",
-  "answered": [123, 456, 789],
-  "created": [],
-  "points": 6,
-  "success": 3,
-  "fail": 0,
-}
-```
-**Contrainte 12** = Le champ role peut prendre les valeurs player ou admin mais
-pas undefined !
-
-**Contraint 13** = Le champ answered est un tableau contenant les identifiants 
-valides des quiz, auxquels a répondu le joueur.
-
-**Contrainte 14** = Le champ created contient la liste des identifiants de quiz
-créés par l'utilisateur. Il ne peut être rempli que si l'utilisateur est admin.
-Mais il doit être présent même si l'utilisateur est un simple joueur (le rôle
-d'admin pourra être révoqué). Un joueur ne peut répondre que à des quiz qu'il n'a
-pas créé.
-
-**Contrainte 15** = Le champ points représente le nombre de points de l'utilisateur.
-Il est initialisé à 0. Le champ success compte le nombre de quiz réussis,
-et fail le nombre de quiz ratés.
