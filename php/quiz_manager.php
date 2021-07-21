@@ -49,17 +49,6 @@ function create_quiz($login, $open, $close, $difficulty, $points, $type, $title,
     }
   }
   
-  // Échec de la création de quiz
-  if (!$res["create_quiz_status"] && isset($res["quiz_id"])) {
-    $sql = "DELETE FROM Quiz WHERE id = :quiz_id";
-    $params = array(":quiz_id" => $res["quiz_id"]);
-    request_database("main_user", $sql, $params, $res);
-    $sql = "DELETE FROM QuizResponses WHERE id = :quiz_id";
-    $params = array(":quiz_id" => $res["quiz_id"]);
-    request_database("main_user", $sql, $params, $res);
-    unset($res["quiz_id"]);
-  }
-  
   return json_encode($res);
 }
 
@@ -110,12 +99,6 @@ function answer_quiz($login, $quiz_id, $responses) {
       $res["points"] = $row[0];
     };
     request_database($_SESSION["role"], $sql, $params, $res, NULL, $fill_res);
-  }
-  // Erreur lors de l'entrée des réponses au quiz
-  else if ($res["request_database_error"][2] !== "Player has already answered this quiz") {
-    $sql = "DELETE FROM PlayerQuizResponses WHERE login = :login AND id = :quiz_id";
-    $params = array(":login" => $login, ":quiz_id" => $quiz_id);
-    request_database("main_user", $sql, $params, $res);
   }
   
   return json_encode($res);

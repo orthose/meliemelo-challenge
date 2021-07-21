@@ -57,6 +57,9 @@ BEGIN
   ELSEIF NEW.state = "stock" 
   AND NOT EXISTS(SELECT * FROM QuizResponses WHERE id = NEW.id AND valid = TRUE) 
   THEN
+    -- Annulation de la création de quiz
+    DELETE FROM QuizResponses WHERE id = NEW.id;
+    DELETE FROM Quiz WHERE id = NEW.id;
     SIGNAL SQLSTATE "45000" 
     SET MESSAGE_TEXT = "Before setting quiz to stock you have to add at least one valid response";
   END IF;
@@ -117,15 +120,24 @@ BEGIN
   IF quiz_type = "radio" AND NEW.valid = TRUE
   AND EXISTS(SELECT * FROM QuizResponses WHERE id = NEW.id AND valid = TRUE) 
   THEN
+    -- Annulation de la création de quiz
+    DELETE FROM QuizResponses WHERE id = NEW.id;
+    DELETE FROM Quiz WHERE id = NEW.id;
     SIGNAL SQLSTATE "45000" 
     SET MESSAGE_TEXT = "Radio quiz must have only one valid response";
   ELSEIF quiz_type = "text" THEN
     IF EXISTS(SELECT * FROM QuizResponses WHERE id = NEW.id) 
     THEN
+      -- Annulation de la création de quiz
+      DELETE FROM QuizResponses WHERE id = NEW.id;
+      DELETE FROM Quiz WHERE id = NEW.id;
       SIGNAL SQLSTATE "45000" 
       SET MESSAGE_TEXT = "Text quiz must have only one response";
     END IF;
     IF NEW.valid = FALSE THEN
+      -- Annulation de la création de quiz
+      DELETE FROM QuizResponses WHERE id = NEW.id;
+      DELETE FROM Quiz WHERE id = NEW.id;
       SIGNAL SQLSTATE "45000" 
       SET MESSAGE_TEXT = "Text quiz must have always valid = TRUE";
     END IF;
@@ -189,7 +201,8 @@ BEGIN
   END IF;
   
   /* On ne peut pas répondre à un quiz qui n'est pas jouable */
-  IF (SELECT state FROM Quiz WHERE id = NEW.id) != "current" THEN
+  IF (SELECT state FROM Quiz WHERE id = NEW.id) != "current" 
+  THEN
     SIGNAL SQLSTATE "45000" 
     SET MESSAGE_TEXT = "Quiz isn't in current state";
   END IF;
@@ -198,7 +211,10 @@ BEGIN
   /* Une réponse doit correspondre à l'id du quiz */
   IF quiz_type != "text" AND NEW.response NOT IN (
     SELECT response FROM QuizResponses 
-    WHERE QuizResponses.id = NEW.id) THEN
+    WHERE QuizResponses.id = NEW.id) 
+  THEN
+    -- Annulation de la réponse du joueur
+    DELETE FROM PlayerQuizResponses WHERE login = NEW.login AND id = NEW.id;
     SIGNAL SQLSTATE "45000" 
     SET MESSAGE_TEXT = "Response doesn't match quiz id";
   END IF;
@@ -214,6 +230,8 @@ BEGIN
   AND EXISTS(SELECT * FROM PlayerQuizResponses 
   WHERE login = NEW.login AND id = NEW.id) 
   THEN
+    -- Annulation de la réponse du joueur
+    DELETE FROM PlayerQuizResponses WHERE login = NEW.login AND id = NEW.id;
     SIGNAL SQLSTATE "45000" 
     SET MESSAGE_TEXT = "Player must give only one answer for radio or text quiz";
   END IF;
