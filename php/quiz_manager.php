@@ -84,7 +84,7 @@ function answer_quiz($login, $quiz_id, $responses) {
   $params = array(":login" => $login, ":quiz_id" => $quiz_id);
   $res = array("login" => $login, "quiz_id" => $quiz_id, "answer_quiz_status" => true, "response" => $responses);
   $error_fun = function($request, &$res) {
-    $res["request_database_error"] = $request->errorInfo();
+    error_fun_default($request, $res);
     $res["answer_quiz_status"] = false;
   };
   foreach ($responses as $response) {
@@ -120,7 +120,7 @@ function cron_routine() {
     $res["stock"] = $res_json["stock"];
     $res["close"] = $res_json["close"];
   };
-  request_database("main_user", $sql, $params, $res, $error_fun, $fill_res);
+  request_database("undefined_user", $sql, $params, $res, $error_fun, $fill_res);
   return json_encode($res);
 }
 

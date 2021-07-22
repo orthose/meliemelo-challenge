@@ -1,6 +1,5 @@
 -- Utilisateur en ligne de commande
 GRANT ALL ON meliemelo_challenge.* TO "meliemelo"@"localhost";
-GRANT EXECUTE ON FUNCTION meliemelo_challenge.cron_routine TO "meliemelo"@"localhost";
 
 -- Utilisateurs non-définis pour le processus de connexion
 -- REVOKE ALL ON meliemelo_challenge.* FROM "undefined_meliemelo"@"localhost";
@@ -8,6 +7,7 @@ GRANT EXECUTE ON PROCEDURE meliemelo_challenge.register_new_user TO "undefined_m
 GRANT EXECUTE ON FUNCTION meliemelo_challenge.get_role TO "undefined_meliemelo"@"localhost";
 GRANT EXECUTE ON FUNCTION meliemelo_challenge.authentication_is_valid TO "undefined_meliemelo"@"localhost";
 GRANT EXECUTE ON FUNCTION meliemelo_challenge.login_exists TO "undefined_meliemelo"@"localhost";
+GRANT EXECUTE ON FUNCTION meliemelo_challenge.cron_routine TO "undefined_meliemelo"@"localhost";
 
 -- Utilisateurs avec role = player
 -- REVOKE ALL ON meliemelo_challenge.* FROM "player_meliemelo"@"localhost";
