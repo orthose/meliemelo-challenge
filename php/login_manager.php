@@ -93,7 +93,7 @@ function unregister($login, $passwd) {
     error_fun_default($request, $res);
     $res["unregistration_status"] = false;
   };
-  request_database($_SESSION["role"], $sql, $params, $res, $error_fun);
+  request_database(get_role(), $sql, $params, $res, $error_fun);
   return json_encode($res);
 }
 
@@ -113,7 +113,7 @@ function set_password($login, $actual_passwd, $new_passwd) {
     error_fun_default($request, $res);
     $res["setting_password_status"] = false;
   };
-  request_database($_SESSION["role"], $sql, $params, $res, $error_fun);
+  request_database(get_role(), $sql, $params, $res, $error_fun);
   return json_encode($res);
 }
 
@@ -131,7 +131,7 @@ function set_role($login, $new_role) {
     error_fun_default($request, $res);
     $res["setting_role_status"] = false;
   };
-  request_database($_SESSION["role"], $sql, $params, $res, $error_fun);
+  request_database(get_role(), $sql, $params, $res, $error_fun);
   return json_encode($res);
 }
 

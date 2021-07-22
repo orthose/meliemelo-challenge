@@ -31,7 +31,7 @@ function create_quiz($login, $open, $close, $difficulty, $points, $type, $title,
     error_fun_default($request, $res);
     $res["create_quiz_status"] = false;
   };
-  request_database($_SESSION["role"], $sql, $params, $res, $error_fun, $fill_res);
+  request_database(get_role(), $sql, $params, $res, $error_fun, $fill_res);
   
   // Ajout des réponses si la création n'a pas échoué
   if ($res["create_quiz_status"]) {
@@ -40,14 +40,14 @@ function create_quiz($login, $open, $close, $difficulty, $points, $type, $title,
       $sql = "CALL add_response(:quiz_id, :response, :valid)";
       $params[":response"] = $response["response"];
       $params[":valid"] = $response["valid"];
-      request_database($_SESSION["role"], $sql, $params, $res, $error_fun);
+      request_database(get_role(), $sql, $params, $res, $error_fun);
       if (!$res["create_quiz_status"]) { break; }
     }
     // Mise en stock du quiz si toujours pas d'échec
     if ($res["create_quiz_status"]) {
       $sql = "CALL stock_quiz(:quiz_id)";
       $params = array(":quiz_id" => $res["quiz_id"]);
-      request_database($_SESSION["role"], $sql, $params, $res, $error_fun);
+      request_database(get_role(), $sql, $params, $res, $error_fun);
     }
   }
   
@@ -67,7 +67,7 @@ function remove_quiz($login, $quiz_id) {
     error_fun_default($request, $res);
     $res["remove_quiz_status"] = false;
   };
-  request_database($_SESSION["role"], $sql, $params, $res, $error_fun);
+  request_database(get_role(), $sql, $params, $res, $error_fun);
   return json_encode($res);
 }
 
@@ -89,7 +89,7 @@ function answer_quiz($login, $quiz_id, $responses) {
   };
   foreach ($responses as $response) {
     $params[":response"] = $response;
-    request_database($_SESSION["role"], $sql, $params, $res, $error_fun);
+    request_database(get_role(), $sql, $params, $res, $error_fun);
     if (!$res["answer_quiz_status"]) { break; }
   }
   
@@ -100,7 +100,7 @@ function answer_quiz($login, $quiz_id, $responses) {
     $fill_res = function($row, &$res) {
       $res["points"] = $row[0];
     };
-    request_database($_SESSION["role"], $sql, $params, $res, NULL, $fill_res);
+    request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
   }
   
   return json_encode($res);
@@ -135,7 +135,7 @@ function high_score() {
   $fill_res = function($row, &$res) {
     array_push($res["high_score"], array($row[0], $row[1], $row[2], $row[3]));
   };
-  request_database($_SESSION["role"], $sql, $params, $res, NULL, $fill_res);
+  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
   return json_encode($res);
 }
 

@@ -2,6 +2,16 @@
 
 require("config.php");
 
+// Renvoie le rôle de l'utilisateur actuel
+function get_role() {
+  if (!isset($_SESSION["role"])) {
+    return "undefined_user";
+  }
+  else {
+    return $_SESSION["role"];
+  }
+}
+
 // Fonction par défaut en cas d'échec de requête
 function error_fun_default($request, &$res) {
   global $config;
