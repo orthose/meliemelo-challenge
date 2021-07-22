@@ -135,4 +135,19 @@ function set_role($login, $new_role) {
   return json_encode($res);
 }
 
+/** 
+ * Renvoie le classement des joueurs
+ * (login, points, success, fail)
+ **/
+function high_score() {
+  $sql = "SELECT * FROM HighScoreView";
+  $params = array();
+  $res = array("high_score" => array());
+  $fill_res = function($row, &$res) {
+    array_push($res["high_score"], array($row[0], $row[1], $row[2], $row[3]));
+  };
+  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
+  return json_encode($res);
+}
+
 ?>

@@ -106,7 +106,12 @@ BEGIN
   IF NOT authentication_is_valid(login_user, passwd) THEN
     SIGNAL SQLSTATE "45000" 
     SET MESSAGE_TEXT = "Authentication has failed";
+  ELSEIF EXISTS(SELECT * FROM Quiz WHERE login_creator = login_user) THEN
+    SIGNAL SQLSTATE "45000" 
+    SET MESSAGE_TEXT = "You cannot unregister because you have created quiz";
   ELSE
+    DELETE FROM PlayerQuizAnswered WHERE login = login_user;
+    DELETE FROM PlayerQuizResponses WHERE login = login_user;
     DELETE FROM Users WHERE login = login_user;
   END IF;
 END; //
