@@ -120,7 +120,7 @@ function cron_routine() {
     $res["stock"] = $res_json["stock"];
     $res["close"] = $res_json["close"];
   };
-  request_database("undefined_user", $sql, $params, $res, $error_fun, $fill_res);
+  request_database("undefined", $sql, $params, $res, $error_fun, $fill_res);
   return json_encode($res);
 }
 

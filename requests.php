@@ -45,6 +45,13 @@ else if ($request === "disconnection") {
   request_template($valid, $doc, $fun);
 }
 
+else if ($request === "check_session") {
+  $valid = true;
+  $doc = "check_session()";
+  $fun = function() { return check_session(); };
+  request_template($valid, $doc, $fun);
+}
+
 else if ($request === "register") {
   $valid = (isset($_REQUEST["login"]) && isset($_REQUEST["passwd"]));
   $doc = "register(login, passwd)";

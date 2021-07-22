@@ -1,0 +1,94 @@
+/* Téléphone toute la largeur de l'écran */
+@media (max-width < 500px) {
+  body {
+    width: 100%;
+  }
+}
+
+/* Ordinateur taille maximale de 500px */
+@media (width >= 500px){
+  body {
+    width: 500px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+body {
+  font-family: "Ubuntu";
+}
+
+strong {
+  font-weight: bolder;
+  color: mediumblue;
+}
+
+h1, h2 {
+  color: mediumblue;
+  text-decoration: underline;
+  text-align: center;
+}
+
+header, main, section, footer {
+  background: lightskyblue;
+  border: medium solid white;
+}
+
+footer {
+  text-align: center;
+}
+
+footer a {
+  display: inline-block;
+}
+
+p {
+  text-align: center;
+  border: medium dotted royalblue;
+  margin: 5px 0px;
+}
+
+p.error {
+  color: red;
+  border: medium dotted red;
+}
+
+button {
+  font-weight: normal;
+}
+
+input, button, a[href="index.php"] {
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 1px 0px;
+  padding: 0px 0px;
+  width: 100%;
+}
+
+input, button, a {
+  font-size: medium;
+  text-decoration: none;
+  background-color: white;
+  border: medium solid deepskyblue;
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button, a {
+  border-radius: 10px;
+} 
+
+input[type=password] {
+  text-align: left;
+}
+
+input[type=submit]:hover, a:hover, label:hover, button:hover {
+  background-color: deepskyblue;
+}
+
+input:focus {
+  outline: none;
+}

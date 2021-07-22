@@ -20,16 +20,16 @@ function connection($login, $passwd) {
   // Ne renvoie qu'un seul résultat car login unique
   $fill_res = function($row, &$res) {
     $res["connection_status"] = $row[0] === "1";
-    if ($res["connection_status"]) { $res["user_role"] = $row[1]; }
+    if ($res["connection_status"]) { $res["role"] = $row[1]; }
   };
   
   // Appel du schéma de requête de base de données
-  request_database("undefined_user", $sql, $params, $res, NULL, $fill_res);
+  request_database("undefined", $sql, $params, $res, NULL, $fill_res);
   
   // Démarrage de la session
   if ($res["connection_status"]) {
     $_SESSION["login"] = $login;
-    $_SESSION["role"] = $res["user_role"]."_user";
+    $_SESSION["role"] = $res["role"];
     $res["login"] = $login;
   }
   return json_encode($res);
@@ -42,6 +42,17 @@ function disconnection() {
   if (isset($_SESSION["role"])) { unset($_SESSION["role"]); $res = true; }
   if ($res) { session_destroy(); }
   return json_encode(array("disconnection_status" => $res));
+}
+
+// Vérifie qu'une session est activée
+function check_session() {
+  $session_isset = isset($_SESSION["login"]) && isset($_SESSION["role"]);
+  $res = array("connection_status" => $session_isset);
+  if ($session_isset) {
+    $res["login"] = $_SESSION["login"];
+    $res["role"] = $_SESSION["role"];
+  }
+  return json_encode($res);
 }
 
 /**
@@ -57,7 +68,7 @@ function exists($login) {
   $fill_res = function($row, &$res) {
     $res["already_used"] = $row[0] === "1";
   };
-  request_database("undefined_user", $sql, $params, $res, NULL, $fill_res);
+  request_database("undefined", $sql, $params, $res, NULL, $fill_res);
   return json_encode($res);
 }
 
@@ -76,7 +87,7 @@ function register($login, $passwd) {
     error_fun_default($request, $res);
     $res["registration_status"] = false;
   };
-  request_database("undefined_user", $sql, $params, $res, $error_fun);
+  request_database("undefined", $sql, $params, $res, $error_fun);
   return json_encode($res);
 }
 
