@@ -2,6 +2,16 @@
 
 require("config.php");
 
+// Renvoie le login de l'utilisateur acuel
+function get_login() {
+  if (!isset($_SESSION["login"])) {
+    return "";
+  }
+  else {
+    return $_SESSION["login"];
+  }
+}
+
 // Renvoie le rôle de l'utilisateur actuel
 function get_role() {
   if (!isset($_SESSION["role"])) {

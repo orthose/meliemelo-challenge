@@ -81,14 +81,14 @@ function register($login, $passwd) {
 }
 
 /**
- * Suppression d'un utilisateur inscrit
+ * Suppression d'un utilisateur inscrit et déjà connecté
  * @return: JSON avec champ unregistration_status = true
  * si la suppression réussie et le login associé
  **/
-function unregister($login, $passwd) {
+function unregister($passwd) {
   $sql = "CALL unregister_user(:login, :passwd)";
-  $params = array(":login" => $login, ":passwd" => $passwd);
-  $res = array("login" => $login, "unregistration_status" => true);
+  $params = array(":login" => get_login(), ":passwd" => $passwd);
+  $res = array("login" => get_login(), "unregistration_status" => true);
   $error_fun = function($request, &$res) {
     error_fun_default($request, $res);
     $res["unregistration_status"] = false;
@@ -102,13 +102,13 @@ function unregister($login, $passwd) {
  * @return: JSON avec champ setting_password_status = true si la mise 
  * à jour est un succès et le login associé
  **/
-function set_password($login, $actual_passwd, $new_passwd) {
+function set_password($actual_passwd, $new_passwd) {
   $sql = "CALL set_password(:login, :actual_passwd, :new_passwd)";
   $params = array(
-    ":login" => $login, 
+    ":login" => get_login(), 
     ":actual_passwd" => $actual_passwd,
     ":new_passwd" => $new_passwd);
-  $res = array("login" => $login, "setting_password_status" => true);
+  $res = array("login" => get_login(), "setting_password_status" => true);
   $error_fun = function($request, &$res) {
     error_fun_default($request, $res);
     $res["setting_password_status"] = false;

@@ -9,12 +9,12 @@ require_once("connect_mariadb.php");
  * @return: JSON avec champ create_quiz_status = true si le quiz a bien été 
  * créé et le login du créateur
  **/
-function create_quiz($login, $open, $close, $difficulty, $points, $type, $title, $question, $responses) {
+function create_quiz($open, $close, $difficulty, $points, $type, $title, $question, $responses) {
   
   // Création des métadonnées du quiz
   $sql = "SELECT create_quiz(:login, :open, :close, :difficulty, :points, :type, :title, :question)";
   $params = array(
-    ":login" => $login, 
+    ":login" => get_login(), 
     ":open" => $open,
     ":close" => $close,
     ":difficulty" => $difficulty,
@@ -23,7 +23,7 @@ function create_quiz($login, $open, $close, $difficulty, $points, $type, $title,
     ":title" => $title,
     ":question" => $question
   );
-  $res = array("login" => $login, "create_quiz_status" => true);
+  $res = array("login" => get_login(), "create_quiz_status" => true);
   $fill_res = function($row, &$res) {
     $res["quiz_id"] = $row[0];
   };
@@ -59,10 +59,10 @@ function create_quiz($login, $open, $close, $difficulty, $points, $type, $title,
  * @return: JSON avec champ create_quiz_status = true si le quiz a bien été 
  * créé, le login de l'utilisateur et l'id du quiz
  **/
-function remove_quiz($login, $quiz_id) {
+function remove_quiz($quiz_id) {
   $sql = "CALL remove_quiz(:login, :quiz_id)";
-  $params = array(":login" => $login, ":quiz_id" => $quiz_id);
-  $res = array("login" => $login, "quiz_id" => $quiz_id, "remove_quiz_status" => true);
+  $params = array(":login" => get_login(), ":quiz_id" => $quiz_id);
+  $res = array("login" => get_login(), "quiz_id" => $quiz_id, "remove_quiz_status" => true);
   $error_fun = function($request, &$res) {
     error_fun_default($request, $res);
     $res["remove_quiz_status"] = false;
@@ -77,12 +77,12 @@ function remove_quiz($login, $quiz_id) {
  * @return: JSON avec champ answer_quiz_status = true si pas d'erreur,
  * le login de l'utilisateur, l'id du quiz et la réponse choisie
  **/
-function answer_quiz($login, $quiz_id, $responses) {
+function answer_quiz($quiz_id, $responses) {
   
   // Ajout des réponses
   $sql = "CALL answer_quiz(:login, :quiz_id, :response)";
-  $params = array(":login" => $login, ":quiz_id" => $quiz_id);
-  $res = array("login" => $login, "quiz_id" => $quiz_id, "answer_quiz_status" => true, "response" => $responses);
+  $params = array(":login" => get_login(), ":quiz_id" => $quiz_id);
+  $res = array("login" => get_login(), "quiz_id" => $quiz_id, "answer_quiz_status" => true, "response" => $responses);
   $error_fun = function($request, &$res) {
     error_fun_default($request, $res);
     $res["answer_quiz_status"] = false;
@@ -96,7 +96,7 @@ function answer_quiz($login, $quiz_id, $responses) {
   // Calcul du nombre de points
   if ($res["answer_quiz_status"]) {
     $sql = "SELECT check_answer(:login, :quiz_id)";
-    $params = array(":login" => $login, ":quiz_id" => $quiz_id);
+    $params = array(":login" => get_login(), ":quiz_id" => $quiz_id);
     $fill_res = function($row, &$res) {
       $res["points"] = $row[0];
     };
