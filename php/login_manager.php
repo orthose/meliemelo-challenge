@@ -4,7 +4,7 @@
 /* Fonctions du système d'authentification */
 /*******************************************/
 
-require("connect_mariadb.php");
+require_once("connect_mariadb.php");
 
 /**
  * Le couple (login, passwd) est-il valide ?

@@ -1,6 +1,6 @@
 <?php
 
-require("connect_mariadb.php");
+require_once("connect_mariadb.php");
 
 /**
  * Création de quiz par un administrateur
@@ -121,6 +121,21 @@ function cron_routine() {
     $res["close"] = $res_json["close"];
   };
   request_database("undefined_user", $sql, $params, $res, $error_fun, $fill_res);
+  return json_encode($res);
+}
+
+/** 
+ * Renvoie le classement des joueurs
+ * (login, points, success, fail)
+ **/
+function high_score() {
+  $sql = "SELECT * FROM HighScoreView";
+  $params = array();
+  $res = array("high_score" => array());
+  $fill_res = function($row, &$res) {
+    array_push($res["high_score"], array($row[0], $row[1], $row[2], $row[3]));
+  };
+  request_database($_SESSION["role"], $sql, $params, $res, NULL, $fill_res);
   return json_encode($res);
 }
 
