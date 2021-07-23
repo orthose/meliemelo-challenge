@@ -59,6 +59,14 @@ p.success {
   border: medium dotted green;
 }
 
+.valid {
+  color: green;
+}
+
+.invalid {
+  color: red;
+}
+
 div.select_quiz {
   border: medium solid royalblue;
   margin: 5px 0px;

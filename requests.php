@@ -168,6 +168,13 @@ else if ($request === "quiz_current") {
   request_template($valid, $doc, $fun);
 }
 
+else if ($request === "quiz_archive") {
+  $valid = true;
+  $doc = "quiz_archive()";
+  $fun = function() { return quiz_archive(); };
+  request_template($valid, $doc, $fun);
+}
+
 // Action non-répertoriée
 else {
   $valid = false;

@@ -43,6 +43,41 @@ function quiz_current() {
   })
 }
 
+function quiz_archive() {
+  $.ajax({
+    method: "POST",
+    url: config["serverURL"] + "/meliemelo-challenge/requests.php",
+    dataType: "json",
+    data: {
+      "request": "quiz_archive"
+    }
+  }).done(function(json) {
+    if (config["debug"]) { console.log(json); }
+    json["quiz_current"].forEach(function(row) {
+      const line = $("<div class='select_quiz'>");
+      line.append($(`<button onclick="show_quiz(this)">` + row[7] + `</button>`));
+      line.append($(`
+        <div hidden>
+        <table>
+        <tr><th>Numéro</th><th>Auteur</th></tr>
+        <tr><td>` + row[0] + `</td><td>` + row[1] + `</td></tr>
+        <tr><th>Ouverture</th><th>Fermeture</th></tr>
+        <tr><td>` + row[2] + `</td><td>` + row[3] + `</td></tr>
+        <tr><th>Difficulté</th><th>Points</th></tr>
+        <tr><td>` + row[4] + `</td><td>` + row[5] + `</td></tr>
+        </table>
+        <button class="answer">Voir les réponses</button>
+        </div>
+        `));
+      line.find("button.answer").on("click", function() { show_quiz_page(row[0], row[6], row[7], row[8], json["responses"][row[0]]); });
+      $("main").append(line);
+    });
+  }).fail(function(e) {
+    if (config["debug"]) { console.log(e); }
+    document.location.href = "index.php";
+  })
+}
+
 function answer_quiz(quiz_id) {
   const input = $("main input[name='quiz']:checked");
   let responses = [];

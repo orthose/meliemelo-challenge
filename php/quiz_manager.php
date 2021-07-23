@@ -149,4 +149,29 @@ function quiz_current() {
   return json_encode($res);
 }
 
+/**
+ * Renvoie les quiz jouables (dans l'état archive)
+ * avec les infos principales et les réponses valides et invalides
+ **/
+function quiz_archive() {
+  // Sélection des infos principales
+  $sql = "SELECT * FROM QuizArchiveView";
+  $params = array();
+  $res = array("quiz_current" => array(), "responses" => array());
+  $fill_res = function($row, &$res) {
+    array_push($res["quiz_current"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8]));
+  };
+  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
+  // Sélection des réponses
+  $sql = "SELECT * FROM QuizResponsesArchiveView";
+  $fill_res = function($row, &$res) {
+    if (!isset($res["responses"][$row[0]])) {
+      $res["responses"][$row[0]] = array();
+    }
+    array_push($res["responses"][$row[0]], array($row[1], $row[2]));
+  };
+  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
+  return json_encode($res);
+}
+
 ?>
