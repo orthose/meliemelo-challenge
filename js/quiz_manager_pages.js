@@ -100,3 +100,60 @@ function show_quiz_page(quiz_id, type, title, question, responses) {
     }
   }
 }
+
+function show_range_value(tag) {
+  let text = $(tag).prev().text();
+  $(tag).prev().html(text.replace(new RegExp("[0-9]+"), $(tag).val()));
+}
+
+function add_choice(tag) {
+  if ($(tag).prev().prev().val() !== "") {
+    $(tag).prev().prev().attr("disabled", "");
+    $(tag).prev().attr("disabled", "");
+    $(tag).before($(`
+      <input class="response" type="text" name="quiz">
+      <select name="quiz">
+        <option value="0">Faux</option>
+        <option value="1">Vrai</option>
+      </select>
+      `));
+  }
+}
+
+function create_quiz_page() {
+  if (user_login !== "" && user_role !== "undefined") {
+    const page = $(`
+      <h2>Création de quiz</h2>
+      <div class="create_quiz">
+      <p>Titre</p>
+      <input id="title" type="text" name="quiz"><br>
+      <p>Question</p>
+      <textarea id="question" name="quiz"></textarea><br><br>
+      <p>Date d'ouverture</p>
+      <input id="open" type="date" name="quiz"><br>
+      <p>Date de fermeture</p>
+      <input id="close" type="date" name="quiz"><br>
+      <p>Difficulté (1)</p>
+      <input id="difficulty" onchange="show_range_value(this)" type="range" name="quiz" min="1" max="10" value="1"><br>
+      <p>Points (1)</p>
+      <input id="points" onchange="show_range_value(this)" type="range" name="quiz" min="0" max="10" value="1"><br>
+      <p>Type</p>
+      <select id="type" name="quiz">
+        <option value="checkbox">Choix multiples</option>
+        <option value="radio">Choix unique</option>
+        <option value="text">Texte</option>
+      </select><br>
+      <p>Réponses</p>
+      <input class="response" type="text" name="quiz">
+      <select name="quiz">
+        <option value="0">Faux</option>
+        <option value="1">Vrai</option>
+      </select>
+      <button onclick="add_choice(this)">Ajouter une réponse</button><br>
+      <button onclick="create_quiz()">Créer le quiz</button>
+      </div>
+      <p class="error" hidden></p>
+      `);
+    $("main").html(page);
+  }
+}

@@ -121,3 +121,69 @@ function answer_quiz(quiz_id) {
     document.location.href = "index.php";
   })
 }
+
+function create_quiz() {
+  const title = $("main input#title").val();
+  const question = $("main textarea#question").val();
+  const open = $("main input#open").val();
+  const close = $("main input#close").val();
+  const difficulty = $("main input#difficulty").val();
+  const points = $("main input#points").val();
+  const type = $("main select#type").val();
+  let responses = [];
+  let responses_jquery = $("main .response:disabled");
+  for (let i = 0; i < responses_jquery["length"]; i++) {
+    const response = $(responses_jquery[i]).val();
+    const valid = $(responses_jquery[i]).next().val();
+    responses.push({"response": response, "valid": valid});
+  }
+  console.log(responses);
+  if (title === "") {
+    $("main p.error").show();
+    $("main p.error").html("Veuillez entrer un titre.");
+  }
+  else if (question === "") {
+    $("main p.error").show();
+    $("main p.error").html("Veuillez entrer une question.");
+  }
+  else if (open === "" || close === "") {
+    $("main p.error").show();
+    $("main p.error").html("Veuillez entrer les dates d'ouverture et de fermeture.");
+  }
+  else if (responses.length === 0) {
+    $("main p.error").show();
+    $("main p.error").html("Veuillez entrer au moins une réponse valide.");
+  }
+  else {
+    $.ajax({
+      method: "POST",
+      url: config["serverURL"] + "/meliemelo-challenge/requests.php",
+      dataType: "json",
+      data: {
+        "request": "create_quiz",
+        "open": open,
+        "close": close,
+        "difficulty": difficulty,
+        "points": points,
+        "type": type,
+        "title": title,
+        "question": question,
+        "responses": responses
+      }
+    }).done(function(json) {
+      if (config["debug"]) { console.log(json); }
+      if (!json["create_quiz_status"]) {
+        $("main p.error").show();
+        $("main p.error").html("La création du quiz a échoué.");
+      }
+      else {
+        welcome_page();
+      }
+    }).fail(function(e) {
+      if (config["debug"]) { console.log(e); }
+      $("main p.error").show();
+      $("main p.error").html("Une erreur inattendue est survenue.");
+      document.location.href = "index.php";
+    })
+  }
+}
