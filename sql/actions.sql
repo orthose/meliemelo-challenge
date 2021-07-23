@@ -161,13 +161,13 @@ END; //
 DELIMITER ;
 
 /* Vue pour obtenir les quiz en stock */
-CREATE VIEW QuizStockView AS SELECT * FROM Quiz WHERE state = "stock";
+CREATE VIEW QuizStockView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "stock";
 
 /* Vue pour obtenir les quiz courants */
-CREATE VIEW QuizCurrentView AS SELECT * FROM Quiz WHERE state = "current";
+CREATE VIEW QuizCurrentView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "current";
 
 /* Vue pour obtenir les quiz archivés */
-CREATE VIEW QuizArchiveView AS SELECT * FROM Quiz WHERE state = "archive";
+CREATE VIEW QuizArchiveView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "archive";
 
 /* Ajouter un choix de réponse possible à un quiz */
 CREATE PROCEDURE add_response (

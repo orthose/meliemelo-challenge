@@ -27,7 +27,7 @@ function register() {
         $("main p.error").html("Le login est déjà pris ou le mot de passe est trop court.");
       }
       else {
-        welcome_page();
+        connection_page();
       }
     }).fail(function(e) {
       if (config["debug"]) { console.log(e); }
@@ -54,7 +54,6 @@ function check_session() {
     }
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
-    return false;
   })
 }
 
@@ -104,11 +103,11 @@ function disconnection() {
     }
   }).done(function(json) {
     if (config["debug"]) { console.log(json); }
-    if (json["disconnection_status"]) {
-      user_login = "";
-      user_role = "undefined";
-      document.location.href = "index.php";
-    }
+    // Si la déconnexion n'a pas fonctionné c'est que la session a expiré
+    // Dans tous les cas on n'a pas besoin de regarder disconnection_status
+    user_login = "";
+    user_role = "undefined";
+    document.location.href = "index.php";
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
   })
@@ -149,6 +148,7 @@ function set_password() {
       if (config["debug"]) { console.log(e); }
       $("main p.error").show();
       $("main p.error").html("Une erreur inattendue est survenue.");
+      document.location.href = "index.php";
     })
   }
 }
@@ -181,6 +181,7 @@ function unregister() {
       if (config["debug"]) { console.log(e); }
       $("main p.error").show();
       $("main p.error").html("Une erreur inattendue est survenue.");
+      document.location.href = "index.php";
     })
   }
 }
@@ -204,5 +205,6 @@ function high_score() {
     });
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
+    document.location.href = "index.php";
   })
 }

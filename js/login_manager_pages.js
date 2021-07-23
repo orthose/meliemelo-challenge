@@ -41,10 +41,10 @@ function welcome_page() {
       <button onclick="quiz_archive_page()">Quiz archivés</button>
       `;
     if (user_role === "player") {
-      $("section#manage_account p").html("Bienvenue <strong>" + user_login + "</strong> heureux de vous revoir, amusez-vous bien !");
+      $("section#manage_account p").html("Bienvenue <strong>" + user_login + "</strong> heureux de vous revoir, amusez-vous bien&nbsp;!");
     }
     else if (user_role === "admin") {
-      $("section#manage_account p").html("Bienvenue <strong>" + user_login + "</strong> heureux de vous revoir ! Quels quiz allez-vous inventer aujourd'hui ?");
+      $("section#manage_account p").html("Bienvenue <strong>" + user_login + "</strong> heureux de vous revoir&nbsp;! Quels quiz allez-vous inventer aujourd'hui&nbsp;?");
       page += `
         <button onclick="quiz_stock_page()">Quiz en stock</button>
         <button onclick="create_quiz_page()">Créer un quiz</button>

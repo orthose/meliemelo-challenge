@@ -15,6 +15,8 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="js/login_manager_pages.js"></script>
   <script src="js/login_manager_ajax.js"></script>
+  <script src="js/quiz_manager_pages.js"></script>
+  <script src="js/quiz_manager_ajax.js"></script>
   <script>
     // Variables globales de session
     let user_login = "";
@@ -36,7 +38,7 @@
   </header>
   <section id="manage_account"></section>
   <main>
-    <p>Bienvenue sur <strong>MelieMelo Challenge</strong>, l'application en ligne de quiz de folie !</p>
+    <p>Bienvenue sur <strong>MelieMelo Challenge</strong>, l'application en ligne de quiz de folie&nbsp;!</p>
     <button onclick="register_page()">Créer un Compte</button>
     <button onclick="connection_page()">Se Connecter</button>
   </main>

@@ -15,7 +15,7 @@ function get_login() {
 // Renvoie le rôle de l'utilisateur actuel
 function get_role() {
   if (!isset($_SESSION["role"])) {
-    return "undefined_user";
+    return "undefined";
   }
   else {
     return $_SESSION["role"];

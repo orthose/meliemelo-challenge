@@ -54,6 +54,16 @@ p.error, p.warning {
   border: medium dotted red;
 }
 
+p.success {
+  color: green;
+  border: medium dotted green;
+}
+
+div.select_quiz {
+  border: medium solid royalblue;
+  margin: 5px 0px;
+}
+
 table {
   border: medium solid lightskyblue;
   border-collapse: collapse;
@@ -62,9 +72,8 @@ table {
 
 td {
   text-align: center;
-  box-sizing: border-box;
   background-color: deepskyblue;
-  border: medium solid lightskyblue/*mediumblue*/;
+  border: medium solid lightskyblue;
 }
 
 th {
@@ -74,6 +83,12 @@ th {
 
 button {
   font-weight: normal;
+}
+
+input[type="checkbox"], input[type="radio"] {
+  display: inline-block;
+  width: auto;
+  margin: 8px 5px;
 }
 
 input, button, a[href="index.php"] {
@@ -91,7 +106,6 @@ input, button, a {
   background-color: white;
   border: medium solid deepskyblue;
   color: black;
-  text-decoration: none;
   cursor: pointer;
 }
 
@@ -103,7 +117,7 @@ input[type=password] {
   text-align: left;
 }
 
-input[type=submit]:hover, a:hover, label:hover, button:hover {
+input[type=submit]:hover, a:hover, button:hover {
   background-color: deepskyblue;
 }
 

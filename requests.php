@@ -127,7 +127,7 @@ else if ($request === "create_quiz") {
     $question = htmlspecialchars(trim($_REQUEST["question"]));
     $responses = $_REQUEST["responses"];
     for($i = 0; $i < count($responses); $i++) {
-      $responses[$i]["response"] = htmlspecialchars(trim($responses[$i]["response"]));
+      $responses[$i]["response"] = htmlspecialchars(trim($responses[$i]["response"]), ENT_QUOTES);
     }
     return create_quiz($open, $close, $difficulty, $points, $type, $title, $question, $responses);
   };
@@ -145,16 +145,26 @@ else if ($request === "remove_quiz") {
 }
 
 else if ($request === "answer_quiz") {
-  $valid = (isset($_REQUEST["quiz_id"]) && isset($_REQUEST["responses"]));
-  $doc = "answer_quiz(quiz_id, responses)";
+  $valid = (isset($_REQUEST["quiz_id"]));
+  $doc = "answer_quiz(quiz_id, responses = array())";
   $fun = function() {
     $quiz_id = $_REQUEST["quiz_id"];
-    $responses = $_REQUEST["responses"];
+    $responses = array();
+    if (isset($_REQUEST["responses"])) {
+      $responses = $_REQUEST["responses"];
+    }
     for($i = 0; $i < count($responses); $i++) {
-      $responses[$i] = htmlspecialchars(trim($responses[$i]));
+      $responses[$i] = htmlspecialchars(trim($responses[$i]), ENT_QUOTES);
     }
     return answer_quiz($quiz_id, $responses);
   };
+  request_template($valid, $doc, $fun);
+}
+
+else if ($request === "quiz_current") {
+  $valid = true;
+  $doc = "quiz_current()";
+  $fun = function() { return quiz_current(); };
   request_template($valid, $doc, $fun);
 }
 
