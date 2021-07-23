@@ -175,6 +175,13 @@ else if ($request === "quiz_archive") {
   request_template($valid, $doc, $fun);
 }
 
+else if ($request === "quiz_stock") {
+  $valid = true;
+  $doc = "quiz_stock()";
+  $fun = function() { return quiz_stock(); };
+  request_template($valid, $doc, $fun);
+}
+
 // Action non-répertoriée
 else {
   $valid = false;

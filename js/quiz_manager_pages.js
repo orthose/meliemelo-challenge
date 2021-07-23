@@ -20,6 +20,17 @@ function quiz_archive_page() {
   }
 }
 
+function quiz_stock_page() {
+  if (user_login !== "" && user_role !== "undefined") {
+    const page = $(`
+      <h2>Quiz en stock</h2>
+      <p>Choisissez un quiz parmi ceux en stock.</p>
+      `);
+    $("main").html(page);
+    quiz_stock();
+  }
+}
+
 function answer_quiz_page(quiz_id, type, title, question, responses) {
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`

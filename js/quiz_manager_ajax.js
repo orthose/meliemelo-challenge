@@ -43,13 +43,13 @@ function quiz_current() {
   })
 }
 
-function quiz_archive() {
+function quiz_stock_archive(state) {
   $.ajax({
     method: "POST",
     url: config["serverURL"] + "/meliemelo-challenge/requests.php",
     dataType: "json",
     data: {
-      "request": "quiz_archive"
+      "request": "quiz_" + state
     }
   }).done(function(json) {
     if (config["debug"]) { console.log(json); }
@@ -76,6 +76,14 @@ function quiz_archive() {
     if (config["debug"]) { console.log(e); }
     document.location.href = "index.php";
   })
+}
+
+function quiz_archive() {
+  quiz_stock_archive("archive");
+}
+
+function quiz_stock() {
+  quiz_stock_archive("stock");
 }
 
 function answer_quiz(quiz_id) {

@@ -149,13 +149,10 @@ function quiz_current() {
   return json_encode($res);
 }
 
-/**
- * Renvoie les quiz jouables (dans l'état archive)
- * avec les infos principales et les réponses valides et invalides
- **/
-function quiz_archive() {
+// Factorisation de deux requête quasi-identiques
+function quiz_stock_archive($table1, $table2) {
   // Sélection des infos principales
-  $sql = "SELECT * FROM QuizArchiveView";
+  $sql = "SELECT * FROM ".$table1;
   $params = array();
   $res = array("quiz_current" => array(), "responses" => array());
   $fill_res = function($row, &$res) {
@@ -163,7 +160,7 @@ function quiz_archive() {
   };
   request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
   // Sélection des réponses
-  $sql = "SELECT * FROM QuizResponsesArchiveView";
+  $sql = "SELECT * FROM ".$table2;
   $fill_res = function($row, &$res) {
     if (!isset($res["responses"][$row[0]])) {
       $res["responses"][$row[0]] = array();
@@ -172,6 +169,22 @@ function quiz_archive() {
   };
   request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
   return json_encode($res);
+}
+
+/**
+ * Renvoie les quiz jouables (dans l'état archive)
+ * avec les infos principales et les réponses valides et invalides
+ **/
+function quiz_archive() {
+  return quiz_stock_archive("QuizArchiveView", "QuizResponsesArchiveView");
+}
+
+/**
+ * Renvoie les quiz en stock (dans l'état stock)
+ * avec les infos principales et les réponses valides et invalides
+ **/
+function quiz_stock() {
+  return quiz_stock_archive("QuizStockView", "QuizResponsesStockView");
 }
 
 ?>
