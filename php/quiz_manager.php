@@ -100,7 +100,7 @@ function answer_quiz($quiz_id, $responses) {
     $fill_res = function($row, &$res) {
       $res["points"] = $row[0];
     };
-    request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
+    request_database(get_role(), $sql, $params, $res, $error_fun, $fill_res);
   }
   
   return json_encode($res);
@@ -121,6 +121,31 @@ function cron_routine() {
     $res["close"] = $res_json["close"];
   };
   request_database("undefined", $sql, $params, $res, $error_fun, $fill_res);
+  return json_encode($res);
+}
+
+/**
+ * Renvoie les quiz jouables (dans l'état current)
+ * avec les infos principales et les réponses
+ **/
+function quiz_current() {
+  // Sélection des infos principales
+  $sql = "SELECT * FROM QuizCurrentView WHERE login_creator != :login AND NOT EXISTS (SELECT * FROM PlayerQuizAnswered WHERE login = :login AND PlayerQuizAnswered.id = QuizCurrentView.id)";
+  $params = array(":login" => get_login());
+  $res = array("quiz_current" => array(), "responses" => array());
+  $fill_res = function($row, &$res) {
+    array_push($res["quiz_current"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8]));
+  };
+  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
+  // Sélection des réponses
+  $sql = "SELECT id, response FROM QuizResponsesCurrentView";
+  $fill_res = function($row, &$res) {
+    if (!isset($res["responses"][$row[0]])) {
+      $res["responses"][$row[0]] = array();
+    }
+    array_push($res["responses"][$row[0]], $row[1]);
+  };
+  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
   return json_encode($res);
 }
 
