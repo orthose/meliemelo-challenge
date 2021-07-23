@@ -113,3 +113,96 @@ function disconnection() {
     if (config["debug"]) { console.log(e); }
   })
 }
+
+function set_password() {
+  const passwd_actual = $($("main input[type='password']")[0]).val();
+  const passwd1 = $($("main input[type='password']")[1]).val();
+  const passwd2 = $($("main input[type='password']")[2]).val();
+  if (passwd_actual === "" || passwd1 === "") {
+    $("main p.error").show();
+    $("main p.error").html("Veuillez entrer un mot de passe.");
+  }
+  else if (passwd1 !== passwd2) {
+    $("main p.error").show();
+    $("main p.error").html("Les mots de passe ne correspondent pas.");
+  }
+  else {
+    $.ajax({
+      method: "POST",
+      url: config["serverURL"] + "/meliemelo-challenge/requests.php",
+      dataType: "json",
+      data: {
+        "request": "set_password",
+        "actual": passwd_actual,
+        "new": passwd1
+      }
+    }).done(function(json) {
+      if (config["debug"]) { console.log(json); }
+      if (!json["setting_password_status"]) {
+        $("main p.error").show();
+        $("main p.error").html("Le changement de mot de passe a échoué.");
+      }
+      else {
+        welcome_page();
+      }
+    }).fail(function(e) {
+      if (config["debug"]) { console.log(e); }
+      $("main p.error").show();
+      $("main p.error").html("Une erreur inattendue est survenue.");
+    })
+  }
+}
+
+function unregister() {
+  const passwd = $("main input[type='password']").val();
+  if (passwd === "") {
+    $("main p.error").show();
+    $("main p.error").html("Veuillez entrer un mot de passe.");
+  }
+  else {
+    $.ajax({
+      method: "POST",
+      url: config["serverURL"] + "/meliemelo-challenge/requests.php",
+      dataType: "json",
+      data: {
+        "request": "unregister",
+        "passwd": passwd
+      }
+    }).done(function(json) {
+      if (config["debug"]) { console.log(json); }
+      if (!json["unregistration_status"]) {
+        $("main p.error").show();
+        $("main p.error").html("Le suppression du compte a échoué.");
+      }
+      else {
+        disconnection();
+      }
+    }).fail(function(e) {
+      if (config["debug"]) { console.log(e); }
+      $("main p.error").show();
+      $("main p.error").html("Une erreur inattendue est survenue.");
+    })
+  }
+}
+
+function high_score() {
+  $.ajax({
+    method: "POST",
+    url: config["serverURL"] + "/meliemelo-challenge/requests.php",
+    dataType: "json",
+    data: {
+      "request": "high_score"
+    }
+  }).done(function(json) {
+    if (config["debug"]) { console.log(json); }
+    json["high_score"].forEach(function(row) {
+      const line = $("<tr>");
+      for (let i = 0; i < 4; i++) {
+        line.append($("<td>").append(row[i]));
+      }
+      $("main table").append(line);
+    });
+  }).fail(function(e) {
+    if (config["debug"]) { console.log(e); }
+  })
+}

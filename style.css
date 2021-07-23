@@ -49,9 +49,27 @@ p {
   margin: 5px 0px;
 }
 
-p.error {
+p.error, p.warning {
   color: red;
   border: medium dotted red;
+}
+
+table {
+  border: medium solid lightskyblue;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td {
+  text-align: center;
+  box-sizing: border-box;
+  background-color: deepskyblue;
+  border: medium solid lightskyblue/*mediumblue*/;
+}
+
+th {
+  color: white;
+  background-color: mediumblue;
 }
 
 button {
@@ -91,4 +109,8 @@ input[type=submit]:hover, a:hover, label:hover, button:hover {
 
 input:focus {
   outline: none;
+}
+
+button {
+  margin: 5px 0px;
 }

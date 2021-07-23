@@ -75,7 +75,7 @@ else if ($request === "unregister") {
 
 else if ($request === "set_password") {
   $valid = (isset($_REQUEST["actual"]) && isset($_REQUEST["new"]));
-  $doc = "set_password(actual_passwd, new_passwd)";
+  $doc = "set_password(actual, new)";
   $fun = function() {
     $actual_passwd = $_REQUEST["actual"];
     $new_passwd = $_REQUEST["new"];
