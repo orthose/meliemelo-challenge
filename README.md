@@ -91,6 +91,16 @@ Puis entrez la ligne suivante en fin de fichier, qui va exécuter toutes les
 0 * /12 * * * php -f /var/www/html/meliemelo-challenge/cron.php
 ```
 
+## Sauvegarde de la base
+Commande pour faire une sauvegarde de la base de données.
+```
+$ mysqldump -u meliemelo -p meliemelo_challenge > ~/meliemelo_challenge_backup_$(date +%F).sql
+```
+Commande pour restaurer la base de données à partir d'une sauvegarde.
+```
+$ mysqldump -u meliemelo -p meliemelo_challenge < ~/meliemelo_challenge_backup.sql
+```
+
 # Cahier des charges
 
 ## Responsabilités entre client et serveur
