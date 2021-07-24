@@ -41,7 +41,7 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
       <p class="error" hidden></p>
       `);
     $("main").html(page);
-    $("main button").on("click", function() { answer_quiz(quiz_id); });
+    $("main button").on("click", function() { answer_quiz(type, quiz_id); });
     if (type === "checkbox") {
       responses.forEach(function(response) {
         $("main form").append($(`
@@ -52,7 +52,7 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
     else if (type === "radio") {
       responses.forEach(function(response) {
         $("main form").append($(`
-          <label for="quiz"><input type="radio" name="quiz" value="` + response + `">` + response + `</label>
+          <div><input type="radio" name="quiz" value="` + response + `"><label>` + response + `</label></div>
           `));
       });
     }
@@ -62,13 +62,23 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
   }
 }
 
-function show_quiz_page(quiz_id, type, title, question, responses) {
+function show_quiz_page(state, quiz_id, type, title, question, responses) {
+  
+  function button_quiz_page(state) {
+    if (state === "archive") {
+      return `<button onclick="quiz_archive_page()">Quiz archivés</button>`;
+    }
+    else if (state === "stock") {
+      return `<button onclick="quiz_stock_page()">Quiz en stock</button>`;
+    }
+  }
+  
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>` + title + `</h2>
       <p>` + question + `</p>
       <form></form><br>
-      <button onclick="quiz_archive_page()">Quiz archivés</button>
+      ` + button_quiz_page(state) + `
       `);
     $("main").html(page);
     
@@ -124,6 +134,7 @@ function create_quiz_page() {
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>Création de quiz</h2>
+      <p>Veuillez compléter tous les champs ci-dessous.</p>
       <div class="create_quiz">
       <p>Titre</p>
       <input id="title" type="text" name="quiz"><br>
@@ -153,7 +164,23 @@ function create_quiz_page() {
       <button onclick="create_quiz()">Créer le quiz</button>
       </div>
       <p class="error" hidden></p>
+      <ul> 
+        <li>La date d'ouverture doit être antérieure à la date de fermeture.</li>
+        <li>Un quiz valide doit obligatoirement avoir au moins une réponse vraie.</li>
+        <li>Le nombre de points total correspond à la difficulté multipliée par le nombre de points.</li>
+      </ul>
       `);
     $("main").html(page);
+  }
+}
+
+function remove_quiz_page() {
+  if (user_login !== "" && user_role !== "undefined") {
+    const page = $(`
+      <h2>Quiz en stock</h2>
+      <p>Choisissez un quiz parmi ceux en stock.</p>
+      `);
+    $("main").html(page);
+    quiz_stock_remove();
   }
 }
