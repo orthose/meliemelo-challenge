@@ -6,8 +6,8 @@
   <!-- Responsive Web Site for smartphone -->
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <!-- Icônes -->
-  <!--<link rel="icon" type="image/ico" href="favicon-180.ico" sizes="180x180">
-  <link rel="apple-touch-icon" type="image/png" href="favicon-180.png" sizes="180x180">-->
+  <link rel="icon" type="image/png" href="favicon.png" sizes="512x512">
+  <link rel="apple-touch-icon" type="image/png" href="favicon.png" sizes="512x512">
   <!-- Feuilles de style -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ubuntu">
   <link href='style.css' rel='stylesheet'>
