@@ -51,7 +51,7 @@ function create_quiz($open, $close, $difficulty, $points, $type, $title, $questi
     }
   }
   
-  return json_encode($res);
+  return $res;
 }
 
 /**
@@ -68,7 +68,7 @@ function remove_quiz($quiz_id) {
     $res["remove_quiz_status"] = false;
   };
   request_database(get_role(), $sql, $params, $res, $error_fun);
-  return json_encode($res);
+  return $res;
 }
 
 /**
@@ -103,7 +103,7 @@ function answer_quiz($quiz_id, $responses) {
     request_database(get_role(), $sql, $params, $res, $error_fun, $fill_res);
   }
   
-  return json_encode($res);
+  return $res;
 }
 
 // Routine à exécuter avec crontab de manière régulière
@@ -121,7 +121,7 @@ function cron_routine() {
     $res["close"] = $res_json["close"];
   };
   request_database("undefined", $sql, $params, $res, $error_fun, $fill_res);
-  return json_encode($res);
+  return $res;
 }
 
 /**
@@ -146,7 +146,7 @@ function quiz_current() {
     array_push($res["responses"][$row[0]], $row[1]);
   };
   request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
-  return json_encode($res);
+  return $res;
 }
 
 // Factorisation de deux requête quasi-identiques
@@ -168,7 +168,7 @@ function quiz_stock_archive($table1, $table2) {
     array_push($res["responses"][$row[0]], array($row[1], $row[2]));
   };
   request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
-  return json_encode($res);
+  return $res;
 }
 
 /**

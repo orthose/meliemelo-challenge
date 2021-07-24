@@ -32,7 +32,7 @@ function connection($login, $passwd) {
     $_SESSION["role"] = $res["role"];
     $res["login"] = $login;
   }
-  return json_encode($res);
+  return $res;
 }
 
 // Déconnexion et fermeture de session
@@ -41,7 +41,7 @@ function disconnection() {
   if (isset($_SESSION["login"])) { unset($_SESSION["login"]); $res = true; }
   if (isset($_SESSION["role"])) { unset($_SESSION["role"]); $res = true; }
   if ($res) { session_destroy(); }
-  return json_encode(array("disconnection_status" => $res));
+  return array("disconnection_status" => $res);
 }
 
 // Vérifie qu'une session est activée
@@ -52,7 +52,7 @@ function check_session() {
     $res["login"] = $_SESSION["login"];
     $res["role"] = $_SESSION["role"];
   }
-  return json_encode($res);
+  return $res;
 }
 
 /**
@@ -69,7 +69,7 @@ function exists($login) {
     $res["already_used"] = $row[0] === "1";
   };
   request_database("undefined", $sql, $params, $res, NULL, $fill_res);
-  return json_encode($res);
+  return $res;
 }
 
 /**
@@ -88,7 +88,7 @@ function register($login, $passwd) {
     $res["registration_status"] = false;
   };
   request_database("undefined", $sql, $params, $res, $error_fun);
-  return json_encode($res);
+  return $res;
 }
 
 /**
@@ -105,7 +105,7 @@ function unregister($passwd) {
     $res["unregistration_status"] = false;
   };
   request_database(get_role(), $sql, $params, $res, $error_fun);
-  return json_encode($res);
+  return $res;
 }
 
 /**
@@ -125,7 +125,7 @@ function set_password($actual_passwd, $new_passwd) {
     $res["setting_password_status"] = false;
   };
   request_database(get_role(), $sql, $params, $res, $error_fun);
-  return json_encode($res);
+  return $res;
 }
 
 /**
@@ -143,7 +143,7 @@ function set_role($login, $new_role) {
     $res["setting_role_status"] = false;
   };
   request_database(get_role(), $sql, $params, $res, $error_fun);
-  return json_encode($res);
+  return $res;
 }
 
 /** 
@@ -158,7 +158,7 @@ function high_score() {
     array_push($res["high_score"], array($row[0], $row[1], $row[2], $row[3]));
   };
   request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
-  return json_encode($res);
+  return $res;
 }
 
 ?>

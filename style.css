@@ -49,7 +49,7 @@ p {
   margin: 5px 0px;
 }
 
-.create_quiz p, p.form {
+p.form {
   color: white;
   background-color: mediumblue;
   border: none;

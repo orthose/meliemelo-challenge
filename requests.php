@@ -10,12 +10,14 @@ require("php/quiz_manager.php");
  * @param fun: Fonction à exécuter sans paramètre
  **/
 function request_template($valid, $doc, $fun) {
+  $status_session = (isset($_SESSION["login"]) && isset($_SESSION["role"]));
   if ($valid) {
     $res = $fun();
-    echo $res;
+    $res["status_session"] = $status_session;
+    echo json_encode($res);
   }
   else {
-    echo json_encode(array("parameters_error" => $doc));
+    echo json_encode(array("parameters_error" => $doc, "status_session" =>  $status_session));
   }
 }
 

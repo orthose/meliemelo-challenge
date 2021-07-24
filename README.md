@@ -66,7 +66,7 @@ Pour cela rendez-vous sur le site web et créez un nouveau compte.
 Une fois créé, rendez-vous sur votre base de données.
 ```
 $ mysql -u meliemelo -D meliemelo_challenge -p
-mysql> CALL set_role("nouvel_utilisateur", "role");
+mysql> CALL set_role("nouvel_utilisateur", "admin");
 ```
 Ce premier utilisateur peut par la suite donner le rôle d'administrateur,
 ou le reprendre à un utilisateur depuis l'interface web directement.
@@ -88,7 +88,7 @@ Puis entrez la ligne suivante en fin de fichier, qui va exécuter toutes les
 12 heures la routine. Pour exécuter journalièrement on peut aussi remplacer par
 @daily la suite de caractères précédant la commande.
 ```
-0 * /12 * * * php -f /var/www/html/meliemelo-challenge/cron.php
+0 */12 * * * php -f /var/www/html/meliemelo-challenge/cron.php
 ```
 
 ## Sauvegarde de la base

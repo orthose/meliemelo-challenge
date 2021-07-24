@@ -37,6 +37,7 @@ function quiz_current() {
       line.find("button.answer").on("click", function() { answer_quiz_page(row[0], row[6], row[7], row[8], json["responses"][row[0]]); });
       $("main").append(line);
     });
+    session_is_alive(json);
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
     document.location.href = "index.php";
@@ -85,6 +86,7 @@ function quiz_stock_archive(state, action) {
       }
       $("main").append(line);
     });
+    session_is_alive(json);
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
     document.location.href = "index.php";
@@ -138,10 +140,9 @@ function answer_quiz(type, quiz_id) {
       $("main p.success").html("Votre réponse a été enregistrée. Vous avez gagné " + json["points"] + " point(s).");
     }
     $("main button").replaceWith($(`<button onclick="quiz_current_page()">Quiz jouables</button>`));
+    session_is_alive(json);
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
-    $("main p.error").show();
-    $("main p.error").html("Une erreur inattendue est survenue.");
     document.location.href = "index.php";
   })
 }
@@ -202,10 +203,9 @@ function create_quiz() {
       else {
         welcome_page();
       }
+      session_is_alive(json);
     }).fail(function(e) {
       if (config["debug"]) { console.log(e); }
-      $("main p.error").show();
-      $("main p.error").html("Une erreur inattendue est survenue.");
       document.location.href = "index.php";
     })
   }
@@ -229,10 +229,9 @@ function remove_quiz(tag, quiz_id) {
     else {
       $("main #"+quiz_id).remove();
     }
+    session_is_alive(json);
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
-    $("main p.error").show();
-    $("main p.error").html("Une erreur inattendue est survenue.");
     document.location.href = "index.php";
   })
 }

@@ -1,3 +1,9 @@
+function session_is_alive(json) {
+  if(!json["status_session"]) {
+    connection_page();
+  } 
+}
+
 function register() {
   const login = $("main input[type='text']").val();
   const passwd1 = $($("main input[type='password']")[0]).val();
@@ -110,6 +116,7 @@ function disconnection() {
     document.location.href = "index.php";
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
+    document.location.href = "index.php";
   })
 }
 
@@ -144,10 +151,9 @@ function set_password() {
       else {
         welcome_page();
       }
+      session_is_alive(json);
     }).fail(function(e) {
       if (config["debug"]) { console.log(e); }
-      $("main p.error").show();
-      $("main p.error").html("Une erreur inattendue est survenue.");
       document.location.href = "index.php";
     })
   }
@@ -177,10 +183,9 @@ function unregister() {
       else {
         disconnection();
       }
+      session_is_alive(json);
     }).fail(function(e) {
       if (config["debug"]) { console.log(e); }
-      $("main p.error").show();
-      $("main p.error").html("Une erreur inattendue est survenue.");
       document.location.href = "index.php";
     })
   }
@@ -216,10 +221,9 @@ function set_role() {
         $("main p#info_status").attr("class", "success");
         $("main p#info_status").html("Rôle modifié avec succès.");
       }
+      session_is_alive(json);
     }).fail(function(e) {
       if (config["debug"]) { console.log(e); }
-      $("main p.error").show();
-      $("main p.error").html("Une erreur inattendue est survenue.");
       document.location.href = "index.php";
     })
   }
@@ -242,6 +246,7 @@ function high_score() {
       }
       $("main table").append(line);
     });
+    session_is_alive(json);
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
     document.location.href = "index.php";

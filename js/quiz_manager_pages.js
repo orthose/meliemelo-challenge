@@ -136,25 +136,28 @@ function create_quiz_page() {
       <h2>Création de quiz</h2>
       <p>Veuillez compléter tous les champs ci-dessous.</p>
       <div class="create_quiz">
-      <p>Titre</p>
+      <p class="form">Titre</p>
       <input id="title" type="text" name="quiz"><br>
-      <p>Question</p>
+      <p class="form">Question</p>
       <textarea id="question" name="quiz"></textarea><br><br>
-      <p>Date d'ouverture</p>
+      <p>La date d'ouverture doit être antérieure à la date de fermeture.</p>
+      <p class="form">Date d'ouverture</p>
       <input id="open" type="date" name="quiz"><br>
-      <p>Date de fermeture</p>
+      <p class="form">Date de fermeture</p>
       <input id="close" type="date" name="quiz"><br>
-      <p>Difficulté (1)</p>
+      <p>Le nombre de points total correspond à la difficulté multipliée par le nombre de points.</p>
+      <p class="form">Difficulté (1)</p>
       <input id="difficulty" onchange="show_range_value(this)" type="range" name="quiz" min="1" max="10" value="1"><br>
-      <p>Points (1)</p>
+      <p class="form">Points (1)</p>
       <input id="points" onchange="show_range_value(this)" type="range" name="quiz" min="0" max="10" value="1"><br>
-      <p>Type</p>
+      <p class="form">Type</p>
       <select id="type" name="quiz">
         <option value="checkbox">Choix multiples</option>
         <option value="radio">Choix unique</option>
         <option value="text">Texte</option>
       </select><br>
-      <p>Réponses</p>
+      <p>Un quiz valide doit obligatoirement avoir au moins une réponse vraie.</p>
+      <p class="form">Réponses</p>
       <input class="response" type="text" name="quiz">
       <select name="quiz">
         <option value="0">Faux</option>
@@ -164,11 +167,6 @@ function create_quiz_page() {
       <button onclick="create_quiz()">Créer le quiz</button>
       </div>
       <p class="error" hidden></p>
-      <ul> 
-        <li>La date d'ouverture doit être antérieure à la date de fermeture.</li>
-        <li>Un quiz valide doit obligatoirement avoir au moins une réponse vraie.</li>
-        <li>Le nombre de points total correspond à la difficulté multipliée par le nombre de points.</li>
-      </ul>
       `);
     $("main").html(page);
   }
