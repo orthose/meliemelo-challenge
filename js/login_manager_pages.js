@@ -87,6 +87,24 @@ function unregister_page() {
   }
 }
 
+function set_role_page() {
+  if (user_login !== "" && user_role !== "undefined") {
+    const page = $(`
+      <h2>Changement de rôle</h2>
+      <p class="form">Utilisateur</p>
+      <input type="text">
+      <p class="form">Autorisations</p>
+      <select>
+        <option value="player">Joueur</option>
+        <option value="admin">Administrateur</option>
+      </select>
+      <button onclick="set_role()">Confirmer</button>
+      <p id="info_status" hidden></p>
+      `);
+    $("main").html(page);
+  }
+}
+
 function high_score_page() {
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`

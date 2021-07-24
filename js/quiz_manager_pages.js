@@ -177,7 +177,7 @@ function create_quiz_page() {
 function remove_quiz_page() {
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
-      <h2>Quiz en stock</h2>
+      <h2>Quiz supprimables</h2>
       <p>Choisissez un quiz parmi ceux en stock.</p>
       `);
     $("main").html(page);

@@ -186,6 +186,45 @@ function unregister() {
   }
 }
 
+function set_role() {
+  const login = $("input[type='text']").val();
+  const new_role = $("select").val();
+  if (login === "") {
+    $("main p#info_status").show();
+    $("main p#info_status").attr("class", "error");
+    $("main p#info_status").html("Veuillez entrer un login.");
+  }
+  else {
+    $.ajax({
+      method: "POST",
+      url: config["serverURL"] + "/meliemelo-challenge/requests.php",
+      dataType: "json",
+      data: {
+        "request": "set_role",
+        "login": login,
+        "new_role": new_role
+      }
+    }).done(function(json) {
+      if (config["debug"]) { console.log(json); }
+      if (!json["setting_role_status"]) {
+        $("main p#info_status").show();
+        $("main p#info_status").attr("class", "error");
+        $("main p#info_status").html("La modification de rôle a échoué.");
+      }
+      else {
+        $("main p#info_status").show();
+        $("main p#info_status").attr("class", "success");
+        $("main p#info_status").html("Rôle modifié avec succès.");
+      }
+    }).fail(function(e) {
+      if (config["debug"]) { console.log(e); }
+      $("main p.error").show();
+      $("main p.error").html("Une erreur inattendue est survenue.");
+      document.location.href = "index.php";
+    })
+  }
+}
+
 function high_score() {
   $.ajax({
     method: "POST",

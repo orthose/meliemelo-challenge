@@ -68,12 +68,22 @@ END; //
 DELIMITER ;
 
 /* Changer le rôle d'un utilisateur */
+DELIMITER //
 CREATE PROCEDURE set_role (
   login_user TYPE OF Users.login,
   new_role TYPE OF Users.role
 )
-UPDATE Users SET role = new_role 
-WHERE login = login_user;
+BEGIN
+  IF NOT login_exists(login_user) 
+  THEN
+    SIGNAL SQLSTATE "45000" 
+    SET MESSAGE_TEXT = "Invalid login";
+  ELSE
+    UPDATE Users SET role = new_role 
+    WHERE login = login_user;
+  END IF;
+END; //
+DELIMITER ;
 
 /* Changer le mot de passe */
 DELIMITER //
