@@ -7,8 +7,8 @@ $res = cron_routine();
 
 // Enregistrement des logs de cron
 if ($config["debug"]) {
-  $log = "[".date('Y-m-d H:i:s')."] ".$res."\n";
-  file_put_contents("./log.txt", $log, FILE_APPEND);
+  $log = "[".date('Y-m-d H:i:s')."] ".json_encode($res)."\n";
+  file_put_contents($config["absolutePath"]."log.txt", $log, FILE_APPEND);
 }
 
 ?>

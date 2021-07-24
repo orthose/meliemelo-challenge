@@ -90,6 +90,11 @@ Puis entrez la ligne suivante en fin de fichier, qui va exécuter toutes les
 ```
 0 */12 * * * php -f /var/www/html/meliemelo-challenge/cron.php
 ```
+Si on veut quelque chose de plus réactif, on peut opter pour une actualisation
+toutes les 5 minutes.
+```
+*/5 * * * * php -f /var/www/html/meliemelo-challenge/cron.php
+```
 
 ## Sauvegarde de la base
 Commande pour faire une sauvegarde de la base de données.

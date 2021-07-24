@@ -3,6 +3,7 @@
 // Garder ce fichier secret et s'assurer qu'il est inaccessible sur le Web
 $config = array(
   "debug" => true, // Mettre à false en production
+  "absolutePath" => "/var/www/html/meliemelo-challenge/",
   "serverURL" => "", // MODIFIER
   "dbname" => "meliemelo_challenge",
   "host" => "localhost",
