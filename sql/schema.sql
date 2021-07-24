@@ -58,9 +58,7 @@ BEGIN
   AND NOT EXISTS(SELECT * FROM QuizResponses WHERE id = NEW.id AND valid = TRUE) 
   THEN
     -- Annulation de la création de quiz
-    DELETE FROM QuizResponses WHERE id = NEW.id;
-    DELETE FROM Quiz WHERE id = NEW.id;
-    SIGNAL SQLSTATE "45000" 
+    SIGNAL SQLSTATE "45001" 
     SET MESSAGE_TEXT = "Before setting quiz to stock you have to add at least one valid response";
   END IF;
 END; //
@@ -121,24 +119,18 @@ BEGIN
   AND EXISTS(SELECT * FROM QuizResponses WHERE id = NEW.id AND valid = TRUE) 
   THEN
     -- Annulation de la création de quiz
-    DELETE FROM QuizResponses WHERE id = NEW.id;
-    DELETE FROM Quiz WHERE id = NEW.id;
-    SIGNAL SQLSTATE "45000" 
+    SIGNAL SQLSTATE "45001" 
     SET MESSAGE_TEXT = "Radio quiz must have only one valid response";
   ELSEIF quiz_type = "text" THEN
     IF EXISTS(SELECT * FROM QuizResponses WHERE id = NEW.id) 
     THEN
       -- Annulation de la création de quiz
-      DELETE FROM QuizResponses WHERE id = NEW.id;
-      DELETE FROM Quiz WHERE id = NEW.id;
-      SIGNAL SQLSTATE "45000" 
+      SIGNAL SQLSTATE "45001" 
       SET MESSAGE_TEXT = "Text quiz must have only one response";
     END IF;
     IF NEW.valid = FALSE THEN
       -- Annulation de la création de quiz
-      DELETE FROM QuizResponses WHERE id = NEW.id;
-      DELETE FROM Quiz WHERE id = NEW.id;
-      SIGNAL SQLSTATE "45000" 
+      SIGNAL SQLSTATE "45001" 
       SET MESSAGE_TEXT = "Text quiz must have always valid = TRUE";
     END IF;
   END IF;
@@ -214,8 +206,7 @@ BEGIN
     WHERE QuizResponses.id = NEW.id) 
   THEN
     -- Annulation de la réponse du joueur
-    DELETE FROM PlayerQuizResponses WHERE login = NEW.login AND id = NEW.id;
-    SIGNAL SQLSTATE "45000" 
+    SIGNAL SQLSTATE "45001" 
     SET MESSAGE_TEXT = "Response doesn't match quiz id";
   END IF;
   
@@ -231,8 +222,7 @@ BEGIN
   WHERE login = NEW.login AND id = NEW.id) 
   THEN
     -- Annulation de la réponse du joueur
-    DELETE FROM PlayerQuizResponses WHERE login = NEW.login AND id = NEW.id;
-    SIGNAL SQLSTATE "45000" 
+    SIGNAL SQLSTATE "45001" 
     SET MESSAGE_TEXT = "Player must give only one answer for radio or text quiz";
   END IF;
 END; //

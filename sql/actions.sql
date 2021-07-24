@@ -170,12 +170,23 @@ CREATE VIEW QuizCurrentView AS SELECT id, login_creator, open, close, difficulty
 CREATE VIEW QuizArchiveView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "archive";
 
 /* Ajouter un choix de réponse possible à un quiz */
+DELIMITER //
 CREATE PROCEDURE add_response (
   quiz_id TYPE OF QuizResponses.id,
   new_response TYPE OF QuizResponses.response,
   is_valid TYPE OF QuizResponses.valid
 )
-INSERT INTO QuizResponses VALUES (quiz_id, new_response, is_valid);
+BEGIN
+  -- Annulation de la création du quiz
+  DECLARE EXIT HANDLER FOR SQLSTATE "45001"
+  BEGIN
+    DELETE FROM QuizResponses WHERE id = quiz_id;
+    DELETE FROM Quiz WHERE id = quiz_id;
+    RESIGNAL;
+  END;
+  INSERT INTO QuizResponses VALUES (quiz_id, new_response, is_valid);
+END; //
+DELIMITER ;
 
 /* Vue pour les réponses des quiz en stock */
 CREATE VIEW QuizResponsesStockView AS 
@@ -193,12 +204,22 @@ SELECT QuizResponses.* FROM QuizResponses, Quiz
 WHERE Quiz.state = "archive" AND Quiz.id = QuizResponses.id;
 
 /* Répondre à un quiz */
+DELIMITER //
 CREATE PROCEDURE answer_quiz (
   login_player TYPE OF PlayerQuizResponses.login,
   quiz_id TYPE OF PlayerQuizResponses.id,
   response TYPE OF PlayerQuizResponses.response
 )
-INSERT INTO PlayerQuizResponses (login, id, response) VALUES (login_player, quiz_id, response);
+BEGIN
+  -- Annulation de la réponse du joueur
+  DECLARE EXIT HANDLER FOR SQLSTATE "45001"
+  BEGIN
+    DELETE FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id;
+    RESIGNAL;
+  END;
+  INSERT INTO PlayerQuizResponses (login, id, response) VALUES (login_player, quiz_id, response);
+END; //
+DELIMITER ;
 
 /**
  * Procédure à appeler après avoir répondu à un quiz
@@ -278,10 +299,21 @@ DELIMITER ;
 
 /* Mettre le quiz en stock après avoir complété 
 toutes les réponses possibles du quiz */
+DELIMITER //
 CREATE PROCEDURE stock_quiz (
   quiz_id TYPE OF Quiz.id
 )
-UPDATE Quiz SET state = "stock" WHERE id = quiz_id;
+BEGIN
+  -- Annulation de la création du quiz
+  DECLARE EXIT HANDLER FOR SQLSTATE "45001"
+  BEGIN
+    DELETE FROM QuizResponses WHERE id = quiz_id;
+    DELETE FROM Quiz WHERE id = quiz_id;
+    RESIGNAL;
+  END;
+  UPDATE Quiz SET state = "stock" WHERE id = quiz_id;
+END; //
+DELIMITER ;
 
 /* Rendre le quiz jouable */
 CREATE PROCEDURE open_quiz (
