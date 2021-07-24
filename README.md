@@ -18,6 +18,7 @@ mysql> CREATE DATABASE meliemelo_challenge;
 * L'utilisateur principal est meliemelo à n'utiliser qu'en ligne de commande et pour cron.php.
 ```
 mysql> CREATE USER "meliemelo"@"localhost" IDENTIFIED BY "mot_de_passe";
+mysql> GRANT ALL ON meliemelo_challenge.* TO "meliemelo"@"localhost";
 ```
 * L'utilisateur admin_meliemelo correspond aux droits des utilisateurs dont
 le rôle est fixé à admin.
