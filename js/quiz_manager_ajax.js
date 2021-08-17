@@ -156,11 +156,13 @@ function create_quiz() {
   const points = $("main input#points").val();
   const type = $("main select#type").val();
   let responses = [];
-  let responses_jquery = $("main .response:disabled");
+  let responses_jquery = $("main .response");
   for (let i = 0; i < responses_jquery["length"]; i++) {
     const response = $(responses_jquery[i]).val();
-    const valid = $(responses_jquery[i]).next().val();
-    responses.push({"response": response, "valid": valid});
+    if (response !== "") {
+      const valid = $(responses_jquery[i]).next().val();
+      responses.push({"response": response, "valid": valid});
+    }
   }
   if (title === "") {
     $("main p.error").show();

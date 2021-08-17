@@ -118,8 +118,7 @@ function show_range_value(tag) {
 
 function add_choice(tag) {
   if ($(tag).prev().prev().val() !== "") {
-    $(tag).prev().prev().attr("disabled", "");
-    $(tag).prev().attr("disabled", "");
+    $(tag).prev().prev().css("border", "medium solid mediumblue");
     $(tag).before($(`
       <input class="response" type="text" name="quiz">
       <select name="quiz">
