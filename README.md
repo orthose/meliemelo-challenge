@@ -107,6 +107,37 @@ Commande pour restaurer la base de données à partir d'une sauvegarde.
 $ mysqldump -u meliemelo -p meliemelo_challenge < ~/meliemelo_challenge_backup.sql
 ```
 
+## Mettre à jour le schéma de la base
+Il peut être nécessaire de mettre à jour la base de données
+comme les procédures stockées.
+Pour cela il faut commencer par éteindre le serveur web.
+```
+$ sudo systemctl stop nginx
+```
+Il faut ensuite entrer dans la base de données en tant que super-utilisateur
+et mettre à jour la liste des procédures.
+```
+$ cd sql
+$ sudo mysql -D meliemelo_challenge
+mysql> source actions.sql;
+mysql> EXIT;
+```
+Il ne reste plus qu'à redémarrer le serveur web.
+```
+$ sudo systemctl start nginx
+```
+
+## Changer le mot de passe d'un utilisateur
+Si un utilisateur oublie son mot de passe, l'administrateur du serveur
+peut changer le mot de passe de l'utilisateur grâce à une procédure d'urgence.
+```
+$ mysql -u meliemelo -D meliemelo_challenge -p
+mysql> CALL emergency_set_password("login", "new_password");
+mysql> EXIT;
+```
+L'utilisateur peut toujours par la suite modifier de nouveau son mot de passe
+par l'interface web. 
+
 # Cahier des charges
 
 ## Responsabilités entre client et serveur

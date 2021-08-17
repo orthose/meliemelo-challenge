@@ -1,6 +1,6 @@
 /* Enregistrer un nouvel utilisateur */
 DELIMITER //
-CREATE PROCEDURE register_new_user (
+CREATE OR REPLACE PROCEDURE register_new_user (
   new_login TYPE OF Users.login, 
   new_passwd VARCHAR(2048)
 )
@@ -21,7 +21,7 @@ DELIMITER ;
 
 /* Récupérer le rôle de l'utilisateur */
 DELIMITER //
-CREATE FUNCTION get_role (
+CREATE OR REPLACE FUNCTION get_role (
   login_user TYPE OF Users.login
 ) RETURNS ENUM("player", "admin")
 BEGIN
@@ -36,7 +36,7 @@ DELIMITER ;
  * @return TRUE si la connexion est valide 
  **/
 DELIMITER //
-CREATE FUNCTION authentication_is_valid (
+CREATE OR REPLACE FUNCTION authentication_is_valid (
   login_user TYPE OF Users.login,
   passwd_user VARCHAR(2048)
 ) RETURNS BOOLEAN
@@ -54,7 +54,7 @@ DELIMITER ;
  * @return TRUE si le login existe déjà 
  **/
 DELIMITER //
-CREATE FUNCTION login_exists (
+CREATE OR REPLACE FUNCTION login_exists (
   login_user TYPE OF Users.login
 ) RETURNS BOOLEAN
 BEGIN
@@ -69,7 +69,7 @@ DELIMITER ;
 
 /* Changer le rôle d'un utilisateur */
 DELIMITER //
-CREATE PROCEDURE set_role (
+CREATE OR REPLACE PROCEDURE set_role (
   login_user TYPE OF Users.login,
   new_role TYPE OF Users.role
 )
@@ -106,9 +106,34 @@ BEGIN
 END; //
 DELIMITER ;
 
+/** 
+ * Procédure de modification d'urgence du mot de passe pour l'usage
+ * de l'administrateur du serveur
+ * ATTENTION : Cette procédure ne doit pas avoir d'interface web et est
+ * réservée à la ligne de commande
+ **/
+DELIMITER //
+CREATE OR REPLACE PROCEDURE emergency_set_password (
+  login_user TYPE OF Users.login,
+  new_passwd VARCHAR(2048)
+)
+BEGIN
+  IF LENGTH(new_passwd) < 8 THEN
+    SIGNAL SQLSTATE "45000" 
+    SET MESSAGE_TEXT = "Password must have length >= 8";
+  ELSEIF NOT login_exists(login_user) THEN
+    SIGNAL SQLSTATE "45000" 
+    SET MESSAGE_TEXT = "Login doesn't exist";
+  ELSE
+    UPDATE Users SET password = SHA2(CONCAT(new_passwd, salt), 256) 
+    WHERE login = login_user;
+  END IF;
+END; //
+DELIMITER ;
+
 /* Supprimer un utilisateur */
 DELIMITER //
-CREATE PROCEDURE unregister_user (
+CREATE OR REPLACE PROCEDURE unregister_user (
   login_user TYPE OF Users.login,
   passwd VARCHAR(2048)
 )
@@ -128,13 +153,13 @@ END; //
 DELIMITER ;
 
 /* Vue pour la table des scores */
-CREATE VIEW HighScoreView AS
+CREATE OR REPLACE VIEW HighScoreView AS
 SELECT login, points, success, fail FROM Users
 ORDER BY points DESC;
 
 /* Créer un nouveau quiz */
 DELIMITER //
-CREATE FUNCTION create_quiz (
+CREATE OR REPLACE FUNCTION create_quiz (
   login TYPE OF Quiz.login_creator,
   open TYPE OF Quiz.open,
   close TYPE OF Quiz.close,
@@ -155,7 +180,7 @@ DELIMITER ;
 
 /* Supprimer un quiz existant en stock */
 DELIMITER //
-CREATE PROCEDURE remove_quiz (
+CREATE OR REPLACE PROCEDURE remove_quiz (
   login TYPE OF Quiz.login_creator,
   quiz_id TYPE OF Quiz.id
 )
@@ -171,17 +196,17 @@ END; //
 DELIMITER ;
 
 /* Vue pour obtenir les quiz en stock */
-CREATE VIEW QuizStockView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "stock";
+CREATE OR REPLACE VIEW QuizStockView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "stock";
 
 /* Vue pour obtenir les quiz courants */
-CREATE VIEW QuizCurrentView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "current";
+CREATE OR REPLACE VIEW QuizCurrentView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "current";
 
 /* Vue pour obtenir les quiz archivés */
-CREATE VIEW QuizArchiveView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "archive";
+CREATE OR REPLACE VIEW QuizArchiveView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "archive";
 
 /* Ajouter un choix de réponse possible à un quiz */
 DELIMITER //
-CREATE PROCEDURE add_response (
+CREATE OR REPLACE PROCEDURE add_response (
   quiz_id TYPE OF QuizResponses.id,
   new_response TYPE OF QuizResponses.response,
   is_valid TYPE OF QuizResponses.valid
@@ -199,23 +224,23 @@ END; //
 DELIMITER ;
 
 /* Vue pour les réponses des quiz en stock */
-CREATE VIEW QuizResponsesStockView AS 
+CREATE OR REPLACE VIEW QuizResponsesStockView AS 
 SELECT QuizResponses.* FROM QuizResponses, Quiz 
 WHERE Quiz.state = "stock" AND Quiz.id = QuizResponses.id;
 
 /* Vue pour les réponses des quiz jouables */
-CREATE VIEW QuizResponsesCurrentView AS 
+CREATE OR REPLACE VIEW QuizResponsesCurrentView AS 
 SELECT QuizResponses.* FROM QuizResponses, Quiz 
 WHERE Quiz.state = "current" AND Quiz.id = QuizResponses.id;
 
 /* Vue pour les réponses des quiz archivés */
-CREATE VIEW QuizResponsesArchiveView AS 
+CREATE OR REPLACE VIEW QuizResponsesArchiveView AS 
 SELECT QuizResponses.* FROM QuizResponses, Quiz 
 WHERE Quiz.state = "archive" AND Quiz.id = QuizResponses.id;
 
 /* Répondre à un quiz */
 DELIMITER //
-CREATE PROCEDURE answer_quiz (
+CREATE OR REPLACE PROCEDURE answer_quiz (
   login_player TYPE OF PlayerQuizResponses.login,
   quiz_id TYPE OF PlayerQuizResponses.id,
   response TYPE OF PlayerQuizResponses.response
@@ -238,7 +263,7 @@ DELIMITER ;
  * @return Nombre de points ajoutés au score du joueur
  **/
 DELIMITER //
-CREATE FUNCTION check_answer (
+CREATE OR REPLACE FUNCTION check_answer (
   login_player TYPE OF PlayerQuizResponses.login,
   quiz_id TYPE OF PlayerQuizResponses.id
 ) RETURNS INT
@@ -310,7 +335,7 @@ DELIMITER ;
 /* Mettre le quiz en stock après avoir complété 
 toutes les réponses possibles du quiz */
 DELIMITER //
-CREATE PROCEDURE stock_quiz (
+CREATE OR REPLACE PROCEDURE stock_quiz (
   quiz_id TYPE OF Quiz.id
 )
 BEGIN
@@ -326,20 +351,20 @@ END; //
 DELIMITER ;
 
 /* Rendre le quiz jouable */
-CREATE PROCEDURE open_quiz (
+CREATE OR REPLACE PROCEDURE open_quiz (
   quiz_id TYPE OF Quiz.id
 )
 UPDATE Quiz SET state = "current" WHERE id = quiz_id;
 
 /* Archiver le quiz */
-CREATE PROCEDURE close_quiz (
+CREATE OR REPLACE PROCEDURE close_quiz (
   quiz_id TYPE OF Quiz.id
 )
 UPDATE Quiz SET state = "archive" WHERE id = quiz_id;
 
 /* Traitement automatique des quiz en fonction de leurs dates */
 DELIMITER //
-CREATE FUNCTION cron_routine () RETURNS JSON
+CREATE OR REPLACE FUNCTION cron_routine () RETURNS JSON
 BEGIN
   DECLARE res ROW (stock INT, close INT);
   DECLARE res_json JSON;
