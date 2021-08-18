@@ -196,13 +196,13 @@ END; //
 DELIMITER ;
 
 /* Vue pour obtenir les quiz en stock */
-CREATE OR REPLACE VIEW QuizStockView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "stock";
+CREATE OR REPLACE VIEW QuizStockView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "stock" ORDER BY open ASC, close ASC;
 
 /* Vue pour obtenir les quiz courants */
-CREATE OR REPLACE VIEW QuizCurrentView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "current";
+CREATE OR REPLACE VIEW QuizCurrentView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "current" ORDER BY close ASC, open ASC ;
 
 /* Vue pour obtenir les quiz archivés */
-CREATE OR REPLACE VIEW QuizArchiveView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "archive";
+CREATE OR REPLACE VIEW QuizArchiveView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "archive" ORDER BY close DESC, open DESC;
 
 /* Ajouter un choix de réponse possible à un quiz */
 DELIMITER //
