@@ -150,10 +150,9 @@ function quiz_current() {
 }
 
 // Factorisation de deux requête quasi-identiques
-function quiz_stock_archive($table1, $table2) {
+function quiz_stock_archive($table1, $table2, $params) {
   // Sélection des infos principales
   $sql = "SELECT * FROM ".$table1;
-  $params = array();
   $res = array("quiz_current" => array(), "responses" => array());
   $fill_res = function($row, &$res) {
     array_push($res["quiz_current"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8]));
@@ -176,7 +175,7 @@ function quiz_stock_archive($table1, $table2) {
  * avec les infos principales et les réponses valides et invalides
  **/
 function quiz_archive() {
-  return quiz_stock_archive("QuizArchiveView", "QuizResponsesArchiveView");
+  return quiz_stock_archive("QuizArchiveView", "QuizResponsesArchiveView", array());
 }
 
 /**
@@ -184,7 +183,7 @@ function quiz_archive() {
  * avec les infos principales et les réponses valides et invalides
  **/
 function quiz_stock() {
-  return quiz_stock_archive("QuizStockView", "QuizResponsesStockView");
+  return quiz_stock_archive("QuizStockView WHERE login_creator = :login", "QuizResponsesStockView WHERE login_creator = :login", array(":login" => get_login()));
 }
 
 ?>

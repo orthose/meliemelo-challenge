@@ -29,7 +29,6 @@ window.onpopstate = function(event) {
   // Fond de pile atteint si null
   if (event.state !== null) {
     let state = event.state;
-    console.log(state)
     if (state.page === 0) {
       window.location.href = "index.php";
     }
