@@ -39,9 +39,11 @@ function main_menu_page() {
       `));
     let page = `
       <p>Sélectionnez une action parmi celles ci-dessous.</p>
+      <hr>
       <button onclick="high_score_page()">Classement</button>
       <button onclick="quiz_current_page()">Quiz jouables</button>
       <button onclick="quiz_archive_page()">Quiz archivés</button>
+      <hr>
       `;
     if (user_role === "player") {
       $("section#manage_account p").html("Bienvenue <strong>" + user_login + "</strong> heureux de vous revoir, amusez-vous bien&nbsp;!");
@@ -51,9 +53,12 @@ function main_menu_page() {
       page += `
         <button onclick="quiz_stock_page()">Quiz en stock</button>
         <button onclick="quiz_current_not_playable_page()">Quiz jouables par les autres</button>
+        <hr>
         <button onclick="create_quiz_page()">Créer un quiz</button>
         <button onclick="remove_quiz_page()">Supprimer un quiz</button>
+        <hr>
         <button onclick="set_role_page()">Changer de rôle</button>
+        <hr>
         `;
     }
     $("main").html($(page));

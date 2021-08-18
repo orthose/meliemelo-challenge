@@ -24,6 +24,10 @@ strong {
   color: mediumblue;
 }
 
+hr {
+  border: 1px mediumblue solid;
+}
+
 h1, h2 {
   color: mediumblue;
   text-decoration: underline;
