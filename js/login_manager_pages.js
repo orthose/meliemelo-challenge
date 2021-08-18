@@ -50,6 +50,7 @@ function main_menu_page() {
       $("section#manage_account p").html("Bienvenue <strong>" + user_login + "</strong> heureux de vous revoir&nbsp;! Quels quiz allez-vous inventer aujourd'hui&nbsp;?");
       page += `
         <button onclick="quiz_stock_page()">Quiz en stock</button>
+        <button onclick="quiz_current_not_playable_page()">Quiz jouables par les autres</button>
         <button onclick="create_quiz_page()">Créer un quiz</button>
         <button onclick="remove_quiz_page()">Supprimer un quiz</button>
         <button onclick="set_role_page()">Changer de rôle</button>

@@ -7,46 +7,13 @@ function hide_quiz(tag) {
   $(tag).next().hide();
   $(tag).attr("onclick", "show_quiz(this)");
 }
-    
-function quiz_current() {
-  $.ajax({
-    method: "POST",
-    url: config["serverURL"] + "/meliemelo-challenge/requests.php",
-    dataType: "json",
-    data: {
-      "request": "quiz_current"
-    }
-  }).done(function(json) {
-    if (config["debug"]) { console.log(json); }
-    json["quiz_current"].forEach(function(row) {
-      const line = $("<div class='select_quiz'>");
-      line.append($(`<button onclick="show_quiz(this)">` + row[7] + `</button>`));
-      line.append($(`
-        <div hidden>
-        <table>
-        <tr><th>Numéro</th><th>Auteur</th></tr>
-        <tr><td>` + row[0] + `</td><td>` + row[1] + `</td></tr>
-        <tr><th>Ouverture</th><th>Fermeture</th></tr>
-        <tr><td>` + row[2] + `</td><td>` + row[3] + `</td></tr>
-        <tr><th>Difficulté</th><th>Points</th></tr>
-        <tr><td>` + row[4] + `</td><td>` + row[5] + `</td></tr>
-        </table>
-        <button class="answer">Répondre</button>
-        </div>
-        `));
-      line.find("button.answer").on("click", function() { answer_quiz_page(row[0], row[6], row[7], row[8], json["responses"][row[0]]); });
-      $("main").append(line);
-    });
-    session_is_alive(json);
-  }).fail(function(e) {
-    if (config["debug"]) { console.log(e); }
-    document.location.href = "index.php";
-  })
-}
 
-function quiz_stock_archive(state, action) {
+function list_quiz(state, action) {
   function text_button_action(action) {
-    if (action === "show") {
+    if (action === "answer") {
+      return `<button class="answer">Répondre</button>`;
+    }
+    else if (action === "show") {
       return `<button class="show">Voir les réponses</button>`;
     }
     else if (action === "remove") {
@@ -62,7 +29,7 @@ function quiz_stock_archive(state, action) {
     }
   }).done(function(json) {
     if (config["debug"]) { console.log(json); }
-    json["quiz_current"].forEach(function(row) {
+    json["quiz"].forEach(function(row) {
       const line = $(`<div class='select_quiz' id="` + row[0] + `">`);
       line.append($(`<button onclick="show_quiz(this)">` + row[7] + `</button>`));
       line.append($(`
@@ -78,7 +45,10 @@ function quiz_stock_archive(state, action) {
         ` + text_button_action(action) + `
         </div>
         `));
-      if (action === "show") {
+      if (action === "answer") {
+        line.find("button.answer").on("click", function() { answer_quiz_page(row[0], row[6], row[7], row[8], json["responses"][row[0]]); });
+      }
+      else if (action === "show") {
         line.find("button.show").on("click", function() { show_quiz_page(state, row[0], row[6], row[7], row[8], json["responses"][row[0]]); });
       }
       else if (action === "remove") {
@@ -93,16 +63,24 @@ function quiz_stock_archive(state, action) {
   })
 }
 
+function quiz_current() {
+  list_quiz("current", "answer");
+}
+
 function quiz_archive() {
-  quiz_stock_archive("archive", "show");
+  list_quiz("archive", "show");
 }
 
 function quiz_stock() {
-  quiz_stock_archive("stock", "show");
+  list_quiz("stock", "show");
 }
 
 function quiz_stock_remove() {
-  quiz_stock_archive("stock", "remove");
+  list_quiz("stock", "remove");
+}
+
+function quiz_current_not_playable() {
+  list_quiz("current_not_playable", "show");
 }
 
 function answer_quiz(type, quiz_id) {

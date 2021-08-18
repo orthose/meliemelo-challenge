@@ -230,7 +230,7 @@ WHERE Quiz.state = "stock" AND Quiz.id = QuizResponses.id;
 
 /* Vue pour les réponses des quiz jouables */
 CREATE OR REPLACE VIEW QuizResponsesCurrentView AS 
-SELECT QuizResponses.* FROM QuizResponses, Quiz 
+SELECT QuizResponses.*, login_creator FROM QuizResponses, Quiz 
 WHERE Quiz.state = "current" AND Quiz.id = QuizResponses.id;
 
 /* Vue pour les réponses des quiz archivés */

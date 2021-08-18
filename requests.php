@@ -170,6 +170,14 @@ else if ($request === "quiz_current") {
   request_template($valid, $doc, $fun);
 }
 
+else if ($request === "quiz_current_not_playable") {
+  // La base de données ne gère pas cette permission
+  $valid = isset($_SESSION["role"]) && $_SESSION["role"] === "admin" ;
+  $doc = "quiz_current_not_playable()";
+  $fun = function() { return quiz_current_not_playable(); };
+  request_template($valid, $doc, $fun);
+}
+
 else if ($request === "quiz_archive") {
   $valid = true;
   $doc = "quiz_archive()";

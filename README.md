@@ -120,6 +120,7 @@ et mettre à jour la liste des procédures.
 $ cd sql
 $ sudo mysql -D meliemelo_challenge
 mysql> source actions.sql;
+mysql> source rules.sql;
 mysql> EXIT;
 ```
 Il ne reste plus qu'à redémarrer le serveur web.

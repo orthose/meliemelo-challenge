@@ -10,6 +10,18 @@ function quiz_current_page() {
   }
 }
 
+function quiz_current_not_playable_page() {
+  push_state(15);
+  if (user_login !== "" && user_role !== "undefined") {
+    const page = $(`
+      <h2>Quiz en jeu créés par ` + user_login + `</h2>
+      <p>Choisissez un quiz parmi ceux disponibles.</p>
+      `);
+    $("main").html(page);
+    quiz_current_not_playable();
+  }
+}
+
 function quiz_archive_page() {
   push_state(9);
   if (user_login !== "" && user_role !== "undefined") {
@@ -74,6 +86,9 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
     }
     else if (state === "stock") {
       return `<button onclick="quiz_stock_page()">Quiz en stock</button>`;
+    }
+    else if (state === "current_not_playable") {
+      return `<button onclick="quiz_current_not_playable_page()">Quiz jouables par les autres</button>`;
     }
   }
   

@@ -132,9 +132,9 @@ function quiz_current() {
   // Sélection des infos principales
   $sql = "SELECT * FROM QuizCurrentView WHERE login_creator != :login AND NOT EXISTS (SELECT * FROM PlayerQuizAnswered WHERE login = :login AND PlayerQuizAnswered.id = QuizCurrentView.id)";
   $params = array(":login" => get_login());
-  $res = array("quiz_current" => array(), "responses" => array());
+  $res = array("quiz" => array(), "responses" => array());
   $fill_res = function($row, &$res) {
-    array_push($res["quiz_current"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8]));
+    array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8]));
   };
   request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
   // Sélection des réponses
@@ -153,13 +153,35 @@ function quiz_current() {
 function quiz_stock_archive($table1, $table2, $params) {
   // Sélection des infos principales
   $sql = "SELECT * FROM ".$table1;
-  $res = array("quiz_current" => array(), "responses" => array());
+  $res = array("quiz" => array(), "responses" => array());
   $fill_res = function($row, &$res) {
-    array_push($res["quiz_current"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8]));
+    array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8]));
   };
   request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
   // Sélection des réponses
   $sql = "SELECT * FROM ".$table2;
+  $fill_res = function($row, &$res) {
+    if (!isset($res["responses"][$row[0]])) {
+      $res["responses"][$row[0]] = array();
+    }
+    array_push($res["responses"][$row[0]], array($row[1], $row[2]));
+  };
+  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
+  return $res;
+}
+
+// Quiz jouables par les autres (pas par son créateur)
+function quiz_current_not_playable() {
+  // Sélection des infos principales
+  $sql = "SELECT * FROM QuizCurrentView WHERE login_creator = :login";
+  $params = array(":login" => get_login());
+  $res = array("quiz" => array(), "responses" => array());
+  $fill_res = function($row, &$res) {
+    array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8]));
+  };
+  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
+  // Sélection des réponses
+  $sql = "SELECT * FROM QuizResponsesCurrentView WHERE login_creator = :login";
   $fill_res = function($row, &$res) {
     if (!isset($res["responses"][$row[0]])) {
       $res["responses"][$row[0]] = array();
