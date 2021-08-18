@@ -155,7 +155,7 @@ DELIMITER ;
 /* Vue pour la table des scores */
 CREATE OR REPLACE VIEW HighScoreView AS
 SELECT login, points, success, fail FROM Users
-ORDER BY points DESC;
+ORDER BY points DESC, success DESC, fail ASC;
 
 /* Créer un nouveau quiz */
 DELIMITER //
