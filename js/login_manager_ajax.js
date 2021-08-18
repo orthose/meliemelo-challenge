@@ -57,7 +57,7 @@ function check_session() {
     if (json["connection_status"]) {
       user_login = json["login"];
       user_role = json["role"];
-      welcome_page();
+      main_menu_page();
     }
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
@@ -86,7 +86,7 @@ function connection() {
       if (json["connection_status"]) {
         user_login = json["login"];
         user_role = json["role"];
-        welcome_page();
+        main_menu_page();
       }
       else {
         $("main p.error").show();
@@ -150,7 +150,7 @@ function set_password() {
         $("main p.error").html("Le changement de mot de passe a échoué.");
       }
       else {
-        welcome_page();
+        main_menu_page();
       }
       session_is_alive(json);
     }).fail(function(e) {

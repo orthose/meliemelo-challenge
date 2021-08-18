@@ -1,4 +1,5 @@
 function register_page() {
+  push_state(1);
   const page = $(`
     <p>Entrez un pseudonyme</p>
     <input type="text">
@@ -13,6 +14,7 @@ function register_page() {
 }
 
 function connection_page() {
+  push_state(2);
   check_session();
   const page = $(`
     <p>Entrez votre login</p>
@@ -25,11 +27,12 @@ function connection_page() {
   $("main").html(page);
 }
 
-function welcome_page() {
+function main_menu_page() {
+  push_state(3);
   if (user_login !== "" && user_role !== "undefined") {
     $("section#manage_account").html($(`
       <p></p>
-      <button onclick="welcome_page()">Menu principal</button>
+      <button onclick="main_menu_page()">Menu principal</button>
       <button onclick="disconnection()">Se déconnecter</button>
       <button onclick="set_password_page()">Changer de mot de passe</button>
       <button onclick="unregister_page()">Supprimer le compte</button>
@@ -57,6 +60,7 @@ function welcome_page() {
 }
 
 function set_password_page() {
+  push_state(4);
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>Changement de mot de passe</h2>
@@ -74,6 +78,7 @@ function set_password_page() {
 }
 
 function unregister_page() {
+  push_state(5);
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>Suppression du compte</h2>
@@ -88,6 +93,7 @@ function unregister_page() {
 }
 
 function set_role_page() {
+  push_state(6);
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>Changement de rôle</h2>
@@ -106,6 +112,7 @@ function set_role_page() {
 }
 
 function high_score_page() {
+  push_state(7);
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>Classement des joueurs</h2>

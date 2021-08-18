@@ -1,4 +1,5 @@
 function quiz_current_page() {
+  push_state(8);
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>Quiz en jeu</h2>
@@ -10,6 +11,7 @@ function quiz_current_page() {
 }
 
 function quiz_archive_page() {
+  push_state(9);
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>Quiz archivés</h2>
@@ -21,6 +23,7 @@ function quiz_archive_page() {
 }
 
 function quiz_stock_page() {
+  push_state(10);
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>Quiz en stock</h2>
@@ -32,6 +35,7 @@ function quiz_stock_page() {
 }
 
 function answer_quiz_page(quiz_id, type, title, question, responses) {
+  push_state(11);
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>` + title + `</h2>
@@ -63,7 +67,7 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
 }
 
 function show_quiz_page(state, quiz_id, type, title, question, responses) {
-  
+  push_state(12);
   function button_quiz_page(state) {
     if (state === "archive") {
       return `<button onclick="quiz_archive_page()">Quiz archivés</button>`;
@@ -130,6 +134,7 @@ function add_choice(tag) {
 }
 
 function create_quiz_page() {
+  push_state(13);
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>Création de quiz</h2>
@@ -172,6 +177,7 @@ function create_quiz_page() {
 }
 
 function remove_quiz_page() {
+  push_state(14);
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>Quiz supprimables</h2>

@@ -203,7 +203,7 @@ function create_quiz() {
         $("main p.error").html("La création du quiz a échoué.");
       }
       else {
-        welcome_page();
+        main_menu_page();
       }
       session_is_alive(json);
     }).fail(function(e) {

@@ -13,6 +13,7 @@
   <link href='style.css' rel='stylesheet'>
   <!-- Scripts -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="js/popstate.js"></script>
   <script src="js/login_manager_pages.js"></script>
   <script src="js/login_manager_ajax.js"></script>
   <script src="js/quiz_manager_pages.js"></script>
