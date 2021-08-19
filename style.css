@@ -77,6 +77,14 @@ p.success {
   color: red;
 }
 
+.answered .valid {
+  color: mediumblue;
+}
+
+.answered .invalid {
+  color: black;
+}
+
 div.select_quiz {
   border: medium solid royalblue;
   margin: 5px 0px;

@@ -192,6 +192,13 @@ else if ($request === "quiz_stock") {
   request_template($valid, $doc, $fun);
 }
 
+else if ($request === "quiz_answered") {
+  $valid = true;
+  $doc = "quiz_answered()";
+  $fun = function() { return quiz_answered(); };
+  request_template($valid, $doc, $fun);
+}
+
 // Action non-répertoriée
 else {
   $valid = false;

@@ -150,13 +150,16 @@ function quiz_current() {
 }
 
 // Factorisation de deux requête quasi-identiques
-function quiz_stock_archive($table1, $table2, $params) {
+function list_quiz($table1, $table2, $params, $opt_fill_res = null) {
   // Sélection des infos principales
   $sql = "SELECT * FROM ".$table1;
   $res = array("quiz" => array(), "responses" => array());
   $fill_res = function($row, &$res) {
     array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8]));
   };
+  if ($opt_fill_res !== null) {
+    $fill_res = $opt_fill_res;
+  }
   request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
   // Sélection des réponses
   $sql = "SELECT * FROM ".$table2;
@@ -197,7 +200,7 @@ function quiz_current_not_playable() {
  * avec les infos principales et les réponses valides et invalides
  **/
 function quiz_archive() {
-  return quiz_stock_archive("QuizArchiveView", "QuizResponsesArchiveView", array());
+  return list_quiz("QuizArchiveView", "QuizResponsesArchiveView", array());
 }
 
 /**
@@ -205,7 +208,24 @@ function quiz_archive() {
  * avec les infos principales et les réponses valides et invalides
  **/
 function quiz_stock() {
-  return quiz_stock_archive("QuizStockView WHERE login_creator = :login", "QuizResponsesStockView WHERE login_creator = :login", array(":login" => get_login()));
+  return list_quiz("QuizStockView WHERE login_creator = :login", "QuizResponsesStockView WHERE login_creator = :login", array(":login" => get_login()));
+}
+
+/**
+ * Renvoie les quiz auxquels a répondu le joueur
+ * avec les infos principales et les réponses "valides" qui sont celles
+ * sélectionnées par le joueur et "invalides" celles non-sélectionnées
+ * ATTENTION: Ce ne sont donc pas les réponses valides et invalides au sens propre
+ **/
+function quiz_answered() {
+  return list_quiz(
+    "QuizAnsweredView WHERE login = :login", 
+    "QuizResponsesAnsweredView WHERE login = :login", 
+    array(":login" => get_login()),
+    function($row, &$res) {
+      array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8], $row[10]));
+    }
+  );
 }
 
 ?>

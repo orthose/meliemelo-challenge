@@ -16,7 +16,8 @@ function push_state(num_page) {
     "Voir quiz",
     "Créer quiz",
     "Supprimer quiz",
-    "Quiz jouables par les autres"
+    "Quiz jouables par les autres",
+    "Voir mes réponses"
   ];
   if (window.history.state !== null && window.history.state.page != num_page) {
     history.pushState({"page": num_page}, book[num_page]);
@@ -81,6 +82,9 @@ window.onpopstate = function(event) {
     }
     else if (state.page === 15) {
       quiz_current_not_playable_page();
+    }
+    else if (state.page === 16) {
+      quiz_answered_page();
     }
   }
 };

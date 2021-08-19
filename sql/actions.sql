@@ -199,10 +199,13 @@ DELIMITER ;
 CREATE OR REPLACE VIEW QuizStockView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "stock" ORDER BY open ASC, close ASC;
 
 /* Vue pour obtenir les quiz courants */
-CREATE OR REPLACE VIEW QuizCurrentView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "current" ORDER BY close ASC, open ASC ;
+CREATE OR REPLACE VIEW QuizCurrentView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "current" ORDER BY close ASC, open ASC;
 
 /* Vue pour obtenir les quiz archivés */
 CREATE OR REPLACE VIEW QuizArchiveView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "archive" ORDER BY close DESC, open DESC;
+
+/* Vue pour obtenir les quiz auxquels ont répondu les joueurs */
+CREATE OR REPLACE VIEW QuizAnsweredView AS SELECT Quiz.id, login_creator, open, close, difficulty, points, type, title, question, PlayerQuizAnswered.login, success FROM Quiz, PlayerQuizAnswered WHERE Quiz.id = PlayerQuizAnswered.id ORDER BY open DESC, close DESC;
 
 /* Ajouter un choix de réponse possible à un quiz */
 DELIMITER //
@@ -237,6 +240,13 @@ WHERE Quiz.state = "current" AND Quiz.id = QuizResponses.id;
 CREATE OR REPLACE VIEW QuizResponsesArchiveView AS 
 SELECT QuizResponses.* FROM QuizResponses, Quiz 
 WHERE Quiz.state = "archive" AND Quiz.id = QuizResponses.id;
+
+/* Vue pour les réponses des joueurs */
+CREATE OR REPLACE VIEW QuizResponsesAnsweredView AS
+(SELECT id, response, 1 AS valid, login FROM PlayerQuizResponses) 
+UNION 
+(SELECT a.* FROM ((SELECT id, response, 0, login FROM QuizResponses, Users) 
+  EXCEPT (SELECT id, response, 0, login FROM PlayerQuizResponses)) AS a);
 
 /* Répondre à un quiz */
 DELIMITER //

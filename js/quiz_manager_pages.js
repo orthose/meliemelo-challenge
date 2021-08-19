@@ -78,6 +78,18 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
   }
 }
 
+function quiz_answered_page() {
+  push_state(16);
+  if (user_login !== "" && user_role !== "undefined") {
+    const page = $(`
+      <h2>Vos réponses aux quiz</h2>
+      <p>Choisissez un quiz parmi ceux auxquels vous avez répondu.</p>
+      `);
+    $("main").html(page);
+    quiz_answered();
+  }
+}
+
 function show_quiz_page(state, quiz_id, type, title, question, responses) {
   push_state(12);
   function button_quiz_page(state) {
@@ -90,6 +102,9 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
     else if (state === "current_not_playable") {
       return `<button onclick="quiz_current_not_playable_page()">Quiz jouables par les autres</button>`;
     }
+    else if (state === "answered") {
+      return `<button onclick="quiz_answered_page()">Voir mes réponses</button>`;
+    }
   }
   
   if (user_login !== "" && user_role !== "undefined") {
@@ -100,6 +115,10 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
       ` + button_quiz_page(state) + `
       `);
     $("main").html(page);
+    
+    if (state === "answered") {
+      $("main form").addClass("answered");
+    }
     
     function class_response(valid) {
       if (valid == 0) {
@@ -126,6 +145,10 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
     }
     else if (type === "text") {
       $("main form").append($(`<input type="text" name="quiz" value="` + responses[0][0] + `" disabled>`));
+    }
+    
+    if (state === "answered") {
+      $(".valid").prev().attr("checked", "");
     }
   }
 }

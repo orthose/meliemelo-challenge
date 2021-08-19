@@ -41,8 +41,10 @@ function main_menu_page() {
       <p>Sélectionnez une action parmi celles ci-dessous.</p>
       <hr>
       <button onclick="high_score_page()">Classement</button>
+      <hr>
       <button onclick="quiz_current_page()">Quiz jouables</button>
       <button onclick="quiz_archive_page()">Quiz archivés</button>
+      <button onclick="quiz_answered_page()">Voir mes réponses</button>
       <hr>
       `;
     if (user_role === "player") {

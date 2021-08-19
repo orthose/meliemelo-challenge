@@ -31,7 +31,19 @@ function list_quiz(state, action) {
     if (config["debug"]) { console.log(json); }
     json["quiz"].forEach(function(row) {
       const line = $(`<div class='select_quiz' id="` + row[0] + `">`);
-      line.append($(`<button onclick="show_quiz(this)">` + row[7] + `</button>`));
+      if (state === "answered") {
+        let button = $(`<button onclick="show_quiz(this)">` + row[7] + `</button>`);
+        if (row[9] == 0) {
+          button.addClass("invalid");
+        }
+        else if (row[9] == 1) {
+          button.addClass("valid");
+        }
+        line.append(button);
+      }
+      else {
+        line.append($(`<button onclick="show_quiz(this)">` + row[7] + `</button>`));
+      }
       line.append($(`
         <div hidden>
         <table>
@@ -81,6 +93,10 @@ function quiz_stock_remove() {
 
 function quiz_current_not_playable() {
   list_quiz("current_not_playable", "show");
+}
+
+function quiz_answered() {
+  list_quiz("answered", "show");
 }
 
 function answer_quiz(type, quiz_id) {
