@@ -20,7 +20,7 @@ function connection_page() {
     <p>Entrez votre login</p>
     <input type="text">
     <p>Entrez votre mot de passe</p>
-    <input type="password"><br>
+    <input type="password" onkeypress="(function(event) {if (event.keyCode === 13) {connection();}})(event)"><br>
     <button onclick="connection()">Connexion</button>
     <p class="error" hidden></p>
     `);
