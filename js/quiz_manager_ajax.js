@@ -13,6 +13,9 @@ function list_quiz(state, action) {
     if (action === "answer") {
       return `<button class="answer">Répondre</button>`;
     }
+    else if (state === "answered" && action === "show") {
+      return `<button class="show">Mes réponses</button>`;
+    }
     else if (action === "show") {
       return `<button class="show">Voir les réponses</button>`;
     }
