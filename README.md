@@ -184,3 +184,27 @@ d'y répondre.
 Par contre pas de système de récupération de mot de passe car pas la création
 de compte ne nécessite pas d'entrer un mail.
 12. Connexion / Déconnexion / Création de compte
+
+## Manuel des fonctionnalités
+Toutes les fonctionnalités sont assez intuitives d'utilisation, et la plupart 
+ne seront pas détaillées. En revanche, certains points peuvent être accompagnés
+d'explications supplémentaires.
+
+# Création de quiz
+La création de quiz est réservée aux administrateurs. Plusieurs champs doivent
+être remplis avant d'envoyer le quiz au serveur pour vérification.
+
+Le champ question, et les champs réponses doivent contenir du texte. Toute balise
+HTML sera automatiquement échappée par le serveur. En revanche, il est possible
+d'ajouter des balises markdown pour contourner cette sécurité.
+Ainsi, les liens, la mise en gras et la balise code sont implémentées pour ces champs.
+Une fois le quiz affiché, les éléments markdown sont convertis en éléments HTML.
+
+Notez que la coloration syntaxique de la balise code est gérée par un programme tierce
+disponible sur ce [site](https://highlightjs.org/).
+
+Lorsqu'on ajoute une réponse, la réponse ajoutée voit son cadre mis en bleu foncé.
+Il est ensuite possible de modifier la réponse, et sa valeur de vérité (Vrai/Faux).
+Cependant, si le texte de la réponse est supprimé après coup et laissé vide,
+la réponse ne sera pas considérée. Cela peut être un bon moyen de supprimer une
+réponse erronée.

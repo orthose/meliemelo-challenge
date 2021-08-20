@@ -51,7 +51,7 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>` + title + `</h2>
-      <p>` + question + `</p>
+      <div class="question">` + convert_md(question) + `</div>
       <form></form><br>
       <button>Envoyer la réponse</button>
       <p class="error" hidden></p>
@@ -61,14 +61,14 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
     if (type === "checkbox") {
       responses.forEach(function(response) {
         $("main form").append($(`
-          <div><input type="checkbox" name="quiz" value="` + response + `"><label>` + response + `</label></div>
+          <div><input type="checkbox" name="quiz" value="` + response + `"><label>` + convert_md(response) + `</label></div>
           `));
       });
     }
     else if (type === "radio") {
       responses.forEach(function(response) {
         $("main form").append($(`
-          <div><input type="radio" name="quiz" value="` + response + `"><label>` + response + `</label></div>
+          <div><input type="radio" name="quiz" value="` + response + `"><label>` + convert_md(response) + `</label></div>
           `));
       });
     }
@@ -76,6 +76,8 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
       $("main form").append($(`<input type="text" name="quiz">`));
     }
   }
+  // Coloration syntaxique éventuelle des balises code
+  hljs.highlightAll();
 }
 
 function quiz_answered_page() {
@@ -110,7 +112,7 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
   if (user_login !== "" && user_role !== "undefined") {
     const page = $(`
       <h2>` + title + `</h2>
-      <p>` + question + `</p>
+      <div class="question">` + convert_md(question) + `</div>
       <form></form><br>
       ` + button_quiz_page(state) + `
       `);
@@ -132,14 +134,14 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
     if (type === "checkbox") {
       responses.forEach(function([response, valid]) {
         $("main form").append($(`
-          <div><input type="checkbox" name="quiz" value="` + response + `"><label class="` + class_response(valid) + `">` + response + `</label></div>
+          <div><input type="checkbox" name="quiz" value="` + response + `"><label class="` + class_response(valid) + `">` + convert_md(response) + `</label></div>
           `));
       });
     }
     else if (type === "radio") {
       responses.forEach(function([response, valid]) {
         $("main form").append($(`
-          <div><input type="radio" name="quiz" value="` + response + `"><label class="` + class_response(valid) + `">` + response + `</label></div>
+          <div><input type="radio" name="quiz" value="` + response + `"><label class="` + class_response(valid) + `">` + convert_md(response) + `</label></div>
           `));
       });
     }
@@ -151,6 +153,8 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
       $(".valid").prev().attr("checked", "");
     }
   }
+  // Coloration syntaxique éventuelle des balises code
+  hljs.highlightAll();
 }
 
 function show_range_value(tag) {

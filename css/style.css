@@ -47,10 +47,22 @@ footer a {
   display: inline-block;
 }
 
-p {
+div a {
+  display: inline-block;
+  padding: 0px 3px;
+}
+
+pre {
+  text-align: left;
+  border: thin solid black;
+  margin: 3px 3px;
+}
+
+p, div.question {
   text-align: center;
   border: medium dotted royalblue;
   margin: 5px 0px;
+  padding: 3px 3px;
 }
 
 p.form {
@@ -69,11 +81,11 @@ p.success {
   border: medium dotted green;
 }
 
-.valid {
+.valid, .valid strong {
   color: green;
 }
 
-.invalid {
+.invalid, .invalid strong {
   color: red;
 }
 

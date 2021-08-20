@@ -10,14 +10,17 @@
   <link rel="apple-touch-icon" type="image/png" href="favicon.png" sizes="512x512">
   <!-- Feuilles de style -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ubuntu">
-  <link href='style.css' rel='stylesheet'>
+  <link href='css/style.css' rel='stylesheet'>
+  <link href='css/a11y-light.min.css' rel='stylesheet'>
   <!-- Scripts -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="js/popstate.js"></script>
+  <script src="js/convert_markdown.js"></script>
   <script src="js/login_manager_pages.js"></script>
   <script src="js/login_manager_ajax.js"></script>
   <script src="js/quiz_manager_pages.js"></script>
   <script src="js/quiz_manager_ajax.js"></script>
+  <script src="js/highlight.min.js"></script>
   <script>
     // Variables globales de session
     let user_login = "";
