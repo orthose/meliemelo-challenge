@@ -172,7 +172,7 @@ else if ($request === "quiz_current") {
 
 else if ($request === "quiz_current_not_playable") {
   // La base de données ne gère pas cette permission
-  $valid = isset($_SESSION["role"]) && $_SESSION["role"] === "admin" ;
+  $valid = isset($_SESSION["role"]) && $_SESSION["role"] === "admin";
   $doc = "quiz_current_not_playable()";
   $fun = function() { return quiz_current_not_playable(); };
   request_template($valid, $doc, $fun);
@@ -196,6 +196,19 @@ else if ($request === "quiz_answered") {
   $valid = true;
   $doc = "quiz_answered()";
   $fun = function() { return quiz_answered(); };
+  request_template($valid, $doc, $fun);
+}
+
+else if ($request === "set_daily_msg") {
+  // La base de données ne gère pas cette permission
+  $valid = isset($_REQUEST["msg"]) && isset($_SESSION["role"]) && $_SESSION["role"] === "admin";
+  $doc = "set_daily_msg(msg)";
+  $fun = function() {
+    $msg = htmlspecialchars(trim($_REQUEST["msg"]));
+    $res = array();
+    $res["set_daily_msg_status"] = (file_put_contents("public_data/daily_msg.txt", $msg) !== false);
+    return $res;
+  };
   request_template($valid, $doc, $fun);
 }
 

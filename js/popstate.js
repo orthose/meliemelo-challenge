@@ -17,7 +17,8 @@ function push_state(num_page) {
     "Créer quiz",
     "Supprimer quiz",
     "Quiz jouables par les autres",
-    "Voir mes réponses"
+    "Voir mes réponses",
+    "Modification de message du jour"
   ];
   if (window.history.state !== null && window.history.state.page != num_page) {
     history.pushState({"page": num_page}, book[num_page]);
@@ -85,6 +86,9 @@ window.onpopstate = function(event) {
     }
     else if (state.page === 16) {
       quiz_answered_page();
+    }
+    else if (state.page === 17) {
+      set_daily_msg_page();
     }
   }
 };

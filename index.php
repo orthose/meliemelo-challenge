@@ -16,6 +16,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="js/popstate.js"></script>
   <script src="js/convert_markdown.js"></script>
+  <script src="js/daily_msg.js"></script>
   <script src="js/login_manager_pages.js"></script>
   <script src="js/login_manager_ajax.js"></script>
   <script src="js/quiz_manager_pages.js"></script>
@@ -40,7 +41,9 @@
     <h1>MelieMelo Challenge WebApp</h1>
     <a href="index.php">Revenir à l'Accueil</a>
   </header>
-  <section id="manage_account"></section>
+  <section id="manage_account">
+    <?php $daily_msg = file_get_contents("public_data/daily_msg.txt"); if ($daily_msg !== "") { echo "<p>".$daily_msg."</p>"; } ?>
+  </section>
   <main>
     <p>Bienvenue sur <strong>MelieMelo Challenge</strong>, l'application en ligne de quiz de folie&nbsp;!</p>
     <button onclick="register_page()">Créer un Compte</button>
