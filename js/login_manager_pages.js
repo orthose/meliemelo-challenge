@@ -28,8 +28,8 @@ function connection_page() {
 }
 
 function main_menu_page() {
-  push_state(3);
   if (user_login !== "" && user_role !== "undefined") {
+    push_state(3);
     $("section#manage_account").html($(`
       <p></p>
       <button onclick="main_menu_page()">Menu principal</button>
@@ -70,8 +70,8 @@ function main_menu_page() {
 }
 
 function set_password_page() {
-  push_state(4);
   if (user_login !== "" && user_role !== "undefined") {
+    push_state(4);
     const page = $(`
       <h2>Changement de mot de passe</h2>
       <p>Entrez votre mot de passe actuel</p>
@@ -88,8 +88,8 @@ function set_password_page() {
 }
 
 function unregister_page() {
-  push_state(5);
   if (user_login !== "" && user_role !== "undefined") {
+    push_state(5);
     const page = $(`
       <h2>Suppression du compte</h2>
       <p class="warning">Attention, si vous continuez vous perdrez toutes vos données. La suppression de votre compte est définitive. Notez que la suppression du compte est impossible si vous avez créé des quiz.</p>
@@ -103,8 +103,8 @@ function unregister_page() {
 }
 
 function set_role_page() {
-  push_state(6);
   if (user_login !== "" && user_role !== "undefined") {
+    push_state(6);
     const page = $(`
       <h2>Changement de rôle</h2>
       <p class="form">Utilisateur</p>
@@ -122,8 +122,8 @@ function set_role_page() {
 }
 
 function high_score_page() {
-  push_state(7);
   if (user_login !== "" && user_role !== "undefined") {
+    push_state(7);
     const page = $(`
       <h2>Classement des joueurs</h2>
       <table>

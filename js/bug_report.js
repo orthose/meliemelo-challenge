@@ -1,6 +1,6 @@
 function bug_report_page() {
-  push_state(18);
   if (user_login !== "" && user_role !== "undefined") {
+    push_state(18);
     const page = $(`
       <h2>Report de bogue</h2>
       <p>

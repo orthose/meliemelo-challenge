@@ -1,6 +1,6 @@
 function set_daily_msg_page() {
-  push_state(17);
   if (user_login !== "" && user_role !== "undefined") {
+    push_state(17);
     const page = $(`
       <h2>Modification du message d'accueil</h2>
       <p class="form">Nouveau message</p>
