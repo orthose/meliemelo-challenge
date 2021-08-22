@@ -139,6 +139,17 @@ mysql> EXIT;
 L'utilisateur peut toujours par la suite modifier de nouveau son mot de passe
 par l'interface web. 
 
+## Créer les fichiers de données publiques
+Le dossier public_data contient l'ensemble des données publiques, qui peuvent être
+accédées par n'importe qui. Si ce n'est pas déjà fait créez les fichiers nécessaires
+pour le message du jour, et les rapports de bogue.
+```
+$ cd public_data/
+$ touch daily_msg.txt
+$ echo "[]" > bug_report.json
+$ chmod o+rw daily_msg.txt bug_report.json
+```
+
 # Cahier des charges
 
 ## Responsabilités entre client et serveur

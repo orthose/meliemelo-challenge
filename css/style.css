@@ -102,6 +102,21 @@ div.select_quiz {
   margin: 5px 0px;
 }
 
+div.bug_report {
+  border: medium solid mediumblue;
+  padding: 3px 5px;
+  margin: 5px 0px;
+}
+
+div.bug_report p {
+  text-align: left;
+}
+
+p.bug_msg, p.bug_response {
+  border: medium solid mediumblue;
+  background-color: beige;
+}
+
 table {
   border: medium solid lightskyblue;
   border-collapse: collapse;

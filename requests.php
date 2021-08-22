@@ -2,6 +2,7 @@
 
 require("php/login_manager.php");
 require("php/quiz_manager.php");
+require("php/bug_report.php");
 
 /**
  * Modèle pour vérifier que les bons paramètres sont donnés
@@ -208,6 +209,38 @@ else if ($request === "set_daily_msg") {
     $res = array();
     $res["set_daily_msg_status"] = (file_put_contents("public_data/daily_msg.txt", $msg) !== false);
     return $res;
+  };
+  request_template($valid, $doc, $fun);
+}
+
+else if ($request === "bug_reported") {
+  // La base de données ne gère pas cette permission
+  $valid = isset($_SESSION["role"]) && ($_SESSION["role"] === "admin" || $_SESSION["role"] === "player");
+  $doc = "bug_reported()";
+  $fun = function() { return bug_reported(); };
+  request_template($valid, $doc, $fun);
+}
+
+else if ($request === "bug_report") {
+  // La base de données ne gère pas cette permission
+  $valid = isset($_REQUEST["bug"]) && $_REQUEST["bug"] !== "" && isset($_SESSION["role"]) && isset($_SESSION["login"]) && ($_SESSION["role"] === "admin" || $_SESSION["role"] === "player");
+  $doc = "bug_report(bug)";
+  $fun = function() {
+    $bug = htmlspecialchars(trim($_REQUEST["bug"]));
+    $bug = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $bug);
+    return bug_report($bug); 
+  };
+  request_template($valid, $doc, $fun);
+}
+
+else if ($request === "answer_bug") {
+  // La base de données ne gère pas cette permission
+  $valid = isset($_REQUEST["id"]) && isset($_REQUEST["response"]) && $_REQUEST["response"] !== "" && isset($_SESSION["role"]) && isset($_SESSION["login"]) && ($_SESSION["role"] === "admin" || $_SESSION["role"] === "player");
+  $doc = "answer_bug(response)";
+  $fun = function() { 
+    $response = htmlspecialchars(trim($_REQUEST["response"]));
+    $response = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $response);
+    return answer_bug($_REQUEST["id"], $response); 
   };
   request_template($valid, $doc, $fun);
 }

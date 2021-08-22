@@ -2,7 +2,7 @@
 
 require("config.php");
 
-// Renvoie le login de l'utilisateur acuel
+// Renvoie le login de l'utilisateur actuel
 function get_login() {
   if (!isset($_SESSION["login"])) {
     return "";

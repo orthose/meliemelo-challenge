@@ -21,6 +21,7 @@
   <script src="js/login_manager_ajax.js"></script>
   <script src="js/quiz_manager_pages.js"></script>
   <script src="js/quiz_manager_ajax.js"></script>
+  <script src="js/bug_report.js"></script>
   <script src="js/highlight.min.js"></script>
   <script>
     // Variables globales de session

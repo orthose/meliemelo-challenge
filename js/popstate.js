@@ -18,7 +18,8 @@ function push_state(num_page) {
     "Supprimer quiz",
     "Quiz jouables par les autres",
     "Voir mes réponses",
-    "Modification de message du jour"
+    "Modification message du jour",
+    "Reporter bogue"
   ];
   if (window.history.state !== null && window.history.state.page != num_page) {
     history.pushState({"page": num_page}, book[num_page]);
@@ -89,6 +90,9 @@ window.onpopstate = function(event) {
     }
     else if (state.page === 17) {
       set_daily_msg_page();
+    }
+    else if (state.page === 18) {
+      bug_report_page();
     }
   }
 };
