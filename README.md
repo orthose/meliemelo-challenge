@@ -196,12 +196,12 @@ Par contre pas de système de récupération de mot de passe car pas la créatio
 de compte ne nécessite pas d'entrer un mail.
 12. Connexion / Déconnexion / Création de compte
 
-## Manuel des fonctionnalités
+# Manuel des fonctionnalités
 Toutes les fonctionnalités sont assez intuitives d'utilisation, et la plupart 
 ne seront pas détaillées. En revanche, certains points peuvent être accompagnés
 d'explications supplémentaires.
 
-# Création de quiz
+## Création de quiz
 La création de quiz est réservée aux administrateurs. Plusieurs champs doivent
 être remplis avant d'envoyer le quiz au serveur pour vérification.
 
@@ -219,3 +219,20 @@ Il est ensuite possible de modifier la réponse, et sa valeur de vérité (Vrai/
 Cependant, si le texte de la réponse est supprimé après coup et laissé vide,
 la réponse ne sera pas considérée. Cela peut être un bon moyen de supprimer une
 réponse erronée.
+
+# Correction de bogues
+
+## Problème de cache des séquences de MariaDB
+Quand on redémarre la base de données, si les séquences utilisent le cache, par défaut
+elles sont incrémentées de 1000. Ce qui est un comportement ignoble.
+Pour résoudre le bogue, il n'y a pas d'autre choix que de recréer la séquence incriminée
+en repartant de l'identifiant de quiz le plus élevé.
+Ici, on suppose que l'identifiant le plus élevé est 1007, donc on repart de 1008.
+```
+$ sudo systemctl stop nginx
+$ mysql -u meliemelo -D meliemelo_challenge -p
+mysql> DROP SEQUENCE QuizSequence;
+mysql> CREATE SEQUENCE QuizSequence START WITH 1008 INCREMENT BY 1 CACHE 0;
+mysql> EXIT;
+$ sudo systemctl start nginx
+```

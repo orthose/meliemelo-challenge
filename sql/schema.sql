@@ -14,7 +14,7 @@ CREATE TABLE Users (
   fail INT NOT NULL DEFAULT 0 -- Nombre de quiz échoués
 );
 
-CREATE SEQUENCE QuizSequence START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE QuizSequence START WITH 1 INCREMENT BY 1 CACHE 0;
 
 /**
  * Informations principales d'un quiz
