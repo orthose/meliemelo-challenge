@@ -1,10 +1,12 @@
 function show_quiz(tag) {
   $(tag).next().show();
+  $(tag).parent().attr("class", "select_quiz_unfolded");
   $(tag).attr("onclick", "hide_quiz(this)");
 }
 
 function hide_quiz(tag) {
   $(tag).next().hide();
+  $(tag).parent().attr("class", "select_quiz_folded");
   $(tag).attr("onclick", "show_quiz(this)");
 }
 
@@ -33,7 +35,7 @@ function list_quiz(state, action) {
   }).done(function(json) {
     if (config["debug"]) { console.log(json); }
     json["quiz"].forEach(function(row) {
-      const line = $(`<div class='select_quiz' id="` + row[0] + `">`);
+      const line = $(`<div class='select_quiz_folded' id="` + row[0] + `">`);
       if (state === "answered") {
         let button = $(`<button onclick="show_quiz(this)">` + row[7] + `</button>`);
         if (row[9] == 0) {

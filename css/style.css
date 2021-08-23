@@ -97,10 +97,18 @@ p.success {
   color: black;
 }
 
-div.select_quiz {
-  border: medium solid royalblue;
+div.select_quiz_unfolded, div.select_quiz_folded {
   margin: 5px 0px;
 }
+
+div.select_quiz_unfolded {
+  border: medium solid royalblue;
+}
+
+div.select_quiz_folded {
+  border: none;
+}
+
 
 div.bug_report {
   border: medium solid mediumblue;
