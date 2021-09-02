@@ -10,11 +10,8 @@ function bug_report_page() {
         améliorations qui pourraient être apportées à l'application.
       </p>
       <p class="form">Bogue à reporter</p>
-      <textarea id="bug_report">`
-      + `1. Quel est mon bogue (brièvement) et est-il critique ?\n`
-      + `2. Quelle action étais-je en train de réaliser ?\n`
-      + `3. Quel enchaînement d'actions est susceptible de le déclencher ?\n`
-      + `4. Ai-je une idée de comment le résoudre ?</textarea>
+      <p>Décrivez votre problème dans le cadre ci-dessous.</p>
+      <textarea id="bug_report"></textarea>
       <button onclick="bug_report()">Envoyer le rapport de bogue</button>
       <p class="error" hidden></p>
       `);
