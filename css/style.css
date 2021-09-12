@@ -1,12 +1,13 @@
 /* Téléphone toute la largeur de l'écran */
-@media (max-width < 500px) {
+@media only screen and (max-width: 499px) {
   body {
     width: 100%;
+    margin: 0px;
   }
 }
 
 /* Ordinateur taille maximale de 500px */
-@media (width >= 500px){
+@media only screen and (min-width: 500px) {
   body {
     width: 500px;
     display: block;
