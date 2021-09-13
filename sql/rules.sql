@@ -18,6 +18,7 @@ GRANT SELECT ON meliemelo_challenge.QuizCurrentView TO "player_meliemelo"@"local
 GRANT SELECT ON meliemelo_challenge.QuizArchiveView TO "player_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizAnsweredView TO "player_meliemelo"@"localhost";
 GRANT SELECT (id, response) ON meliemelo_challenge.QuizResponsesCurrentView TO "player_meliemelo"@"localhost";
+GRANT SELECT ON meliemelo_challenge.PlayerQuizAnswered TO "player_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizResponsesArchiveView TO "player_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizResponsesAnsweredView TO "player_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.answer_quiz TO "player_meliemelo"@"localhost";
@@ -34,6 +35,7 @@ GRANT SELECT ON meliemelo_challenge.QuizArchiveView TO "admin_meliemelo"@"localh
 GRANT SELECT ON meliemelo_challenge.QuizAnsweredView TO "admin_meliemelo"@"localhost";
 -- On a besoin de (id, response, valid) pour quiz_current_not_playable
 GRANT SELECT ON meliemelo_challenge.QuizResponsesCurrentView TO "admin_meliemelo"@"localhost";
+GRANT SELECT ON meliemelo_challenge.PlayerQuizAnswered TO "admin_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizResponsesArchiveView TO "admin_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizResponsesAnsweredView TO "admin_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.answer_quiz TO "admin_meliemelo"@"localhost";
