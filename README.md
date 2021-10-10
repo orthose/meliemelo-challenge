@@ -236,3 +236,44 @@ mysql> CREATE SEQUENCE QuizSequence START WITH 1008 INCREMENT BY 1 CACHE 0;
 mysql> EXIT;
 $ sudo systemctl start nginx
 ```
+
+## Modifier une question
+On peut modifier une question depuis MariaDB mais pas depuis l'interface web.
+On commence par éteindre le serveur web.
+`sudo systemctl stop nginx`
+
+Par exemple supposons que j'ai fait une erreur sur plusieurs quiz.
+Je peux alors les sélectionner pour vérifier ce qui ne va pas.
+`SELECT id, question FROM Quiz WHERE id >= 1157 AND login_creator = 'Maxime'`
+
+Si les quiz concernés sont encore en stock il faut supprimer temporairement un trigger.
+`DROP TRIGGER QuizUpdateTrigger`
+
+Puis on peut par exemple remplacer un mot par un autre dans toutes les questions.
+`UPDATE Quiz SET question = REPLACE(question, 'nimbostratus', 'nimbostratus.ddns.net') WHERE id >= 1157 and login_creator = 'Maxime'`
+
+Enfin il faut recréer le trigger en regardant le code source de sql/schema.sql.
+`CREATE TRIGGER ...`
+
+Et on redémarre le serveur web.
+`sudo systemctl start nginx`
+
+# Suggestions d'amélioration
+
+## Rendre plus souple la base de données
+Supprimer les triggers trop restrictifs et préférer l'utilisation de transactions
+pour empêcher d'écrire dans la base en cas de problème sur les données injectées.
+```
+DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+BEGIN
+      ROLLBACK;
+END;
+
+START TRANSACTION;
+...
+IF ... THEN
+    SIGNAL SQLSTATE '45000' SET  MESSAGE_TXT = '...'
+ELSE
+    COMMIT;
+END IF;
+```
