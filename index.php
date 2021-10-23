@@ -10,7 +10,8 @@
   <link rel="apple-touch-icon" type="image/png" href="favicon.png" sizes="512x512">
   <!-- Feuilles de style -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ubuntu">
-  <link href='css/style.css' rel='stylesheet'>
+  <!--<link href='css/style.css' rel='stylesheet'>-->
+  <link href='css/halloween.css' rel='stylesheet'>
   <link href='css/a11y-light.min.css' rel='stylesheet'>
   <!-- Scripts -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

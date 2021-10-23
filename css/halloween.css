@@ -1,0 +1,204 @@
+/* Téléphone toute la largeur de l'écran */
+@media only screen and (max-width: 499px) {
+  body {
+    width: 100%;
+    margin: 0px;
+  }
+}
+
+/* Ordinateur taille maximale de 500px */
+@media only screen and (min-width: 500px) {
+  body {
+    width: 500px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+body {
+  font-family: "Ubuntu";
+  background-image: url("../images/halloween-background.jpeg");
+}
+
+strong {
+  font-weight: bolder;
+  color: firebrick;
+}
+
+hr {
+  border: 1px firebrick solid;
+}
+
+h1, h2 {
+  color: firebrick;
+  text-decoration: underline;
+  text-align: center;
+}
+
+header, main, section, footer {
+  background: orange;
+  margin: 10px 10px;
+  border: medium solid rgba(255, 255, 255, 0);
+}
+
+footer {
+  text-align: center;
+}
+
+footer a {
+  display: inline-block;
+}
+
+div a {
+  display: inline-block;
+  padding: 0px 3px;
+}
+
+pre {
+  text-align: left;
+  border: thin solid black;
+  margin: 3px 3px;
+}
+
+p, div.question {
+  text-align: center;
+  border: medium dotted firebrick;
+  margin: 5px 0px;
+  padding: 3px 3px;
+}
+
+p.form {
+  color: white;
+  background-color: firebrick;
+  border: none;
+}
+
+p.error, p.warning {
+  color: red;
+  border: medium dotted red;
+}
+
+p.success {
+  color: green;
+  border: medium dotted green;
+}
+
+.valid, .valid strong {
+  color: green;
+}
+
+.invalid, .invalid strong {
+  color: red;
+}
+
+.answered .valid {
+  color: firebrick;
+}
+
+.answered .invalid {
+  color: black;
+}
+
+div.select_quiz_unfolded, div.select_quiz_folded {
+  margin: 5px 0px;
+}
+
+div.select_quiz_unfolded {
+  border: medium solid firebrick;
+}
+
+div.select_quiz_folded {
+  border: none;
+}
+
+
+div.bug_report {
+  border: medium solid firebrick;
+  padding: 3px 5px;
+  margin: 5px 0px;
+}
+
+div.bug_report p {
+  text-align: left;
+}
+
+p.bug_msg, p.bug_response {
+  border: medium solid firebrick;
+  background-color: rgb(255, 255, 150);
+}
+
+table {
+  border: medium solid orange;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td {
+  text-align: center;
+  background-color: orangered;
+  border: medium solid orange;
+}
+
+th {
+  color: white;
+  background-color: firebrick;
+}
+
+button, input {
+  font-weight: normal;
+}
+
+input[type="checkbox"], input[type="radio"] {
+  display: inline-block;
+  width: auto;
+  margin: 8px 5px;
+}
+
+input, button, a[href="index.php"], select {
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  margin: 1px 0px;
+  padding: 0px 0px;
+  width: 100%;
+}
+
+input, button, a {
+  font-size: medium;
+  text-decoration: none;
+  background-color: rgb(255, 255, 150);
+  border: medium solid orangered;
+  color: black;
+  cursor: pointer;
+}
+
+button, a, input[type="submit"] {
+  border-radius: 10px;
+} 
+
+input[type=password] {
+  text-align: left;
+}
+
+input[type=submit]:hover, a:hover, button:hover {
+  background-color: orangered;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+}
+
+button {
+  margin: 5px 0px;
+}
+
+textarea {
+  background: rgb(255, 255, 150);
+  box-sizing: border-box;
+  border: medium solid orangered;
+  resize: none;
+  width: 100%;
+  height: 100px;
+  text-align: left;
+}
