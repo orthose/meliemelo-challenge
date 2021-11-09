@@ -40,7 +40,8 @@ function main_menu_page() {
     let page = `
       <p>Sélectionnez une action parmi celles ci-dessous.</p>
       <hr>
-      <button onclick="high_score_page()">Classement</button>
+      <button onclick="high_score_page()">Classement général</button>
+      <button onclick="high_score_quiz_title_page()">Classement par quiz</button>
       <button onclick="bug_report_page()">Reporter un bogue</button>
       <hr>
       <button onclick="quiz_current_page()">Quiz jouables</button>
@@ -132,5 +133,26 @@ function high_score_page() {
       `);
     $("main").html(page);
     high_score();
+  }
+}
+
+function high_score_quiz_title_page() {
+  if (user_login !== "" && user_role !== "undefined") {
+    push_state(19);
+    const page = $(`
+      <h2>Classement par quiz</h2>
+      <p class="form">Titre de quiz</p>
+      <input id="title" type="text">
+      <p class="form">Date de début</p>
+      <input id="begin_date" type="date">
+      <p class="form">Date de fin</p>
+      <input id="end_date" type="date"><br>
+      <button onclick="high_score_quiz_title()">Voir le classement</button>
+      <table hidden>
+      <tr><th>Login</th><th>Points</th><th>Succès</th><th>Échecs</th></tr>
+      </table>
+      <p id="info_status" hidden></p>
+      `);
+    $("main").html(page);
   }
 }

@@ -8,7 +8,7 @@ function push_state(num_page) {
     "Modification mot de passe",
     "Suppression compte",
     "Modification rôle",
-    "Classement",
+    "Classement général",
     "Quiz jouables",
     "Quiz archivés", 
     "Quiz stockés",
@@ -19,7 +19,8 @@ function push_state(num_page) {
     "Quiz jouables par les autres",
     "Voir mes réponses",
     "Modification message du jour",
-    "Reporter bogue"
+    "Reporter bogue",
+    "Classement par quiz"
   ];
   if (window.history.state !== null && window.history.state.page != num_page) {
     history.pushState({"page": num_page}, book[num_page]);
@@ -93,6 +94,9 @@ window.onpopstate = function(event) {
     }
     else if (state.page === 18) {
       bug_report_page();
+    }
+    else if (state.page === 19) {
+      high_score_quiz_title_page();
     }
   }
 };

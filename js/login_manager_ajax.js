@@ -253,3 +253,47 @@ function high_score() {
     document.location.href = "index.php";
   })
 }
+
+function high_score_quiz_title() {
+  const title = $("input[type='text']#title").val();
+  const begin_date = $("input[type='date']#begin_date").val();
+  const end_date = $("input[type='date']#end_date").val();
+  if (title === "") {
+    $("main p#info_status").show();
+    $("main p#info_status").attr("class", "error");
+    $("main p#info_status").html("Veuillez entrer un titre de quiz.");
+  }
+  else {
+    $("main p#info_status").hide();
+    $.ajax({
+      method: "POST",
+      url: config["serverURL"] + "/meliemelo-challenge/requests.php",
+      dataType: "json",
+      data: {
+        "request": "high_score_quiz_title",
+        "title": title,
+        "begin_date": begin_date,
+        "end_date": end_date
+      }
+    }).done(function(json) {
+      if (config["debug"]) { console.log(json); }
+      $("main table tr.results").remove(); // Vider la table 
+      json["high_score_quiz_title"].forEach(function(row) {
+        const line = $("<tr>").attr("class", "results");
+        for (let i = 0; i < 4; i++) {
+          line.append($("<td>").append(row[i]));
+        }
+        $("main table").append(line);
+      });
+      // Aucun résultat
+      if (json["high_score_quiz_title"].length == 0) {
+        $("main table").append($("<tr class='results'><td colspan='4'>Aucun résultat trouvé</td></tr>"));
+      }
+      $("main table").show();
+      session_is_alive(json);
+    }).fail(function(e) {
+      if (config["debug"]) { console.log(e); }
+      document.location.href = "index.php";
+    })
+  }
+}

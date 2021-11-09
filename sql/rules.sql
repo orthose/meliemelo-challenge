@@ -14,6 +14,7 @@ GRANT EXECUTE ON FUNCTION meliemelo_challenge.cron_routine TO "undefined_melieme
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.set_password TO "player_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.unregister_user TO "player_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.HighScoreView TO "player_meliemelo"@"localhost";
+GRANT SELECT (id, title, difficulty, points, open, close) ON meliemelo_challenge.Quiz TO "player_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizCurrentView TO "player_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizArchiveView TO "player_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizAnsweredView TO "player_meliemelo"@"localhost";
@@ -30,6 +31,7 @@ GRANT EXECUTE ON FUNCTION meliemelo_challenge.check_answer TO "player_meliemelo"
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.set_password TO "admin_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.unregister_user TO "admin_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.HighScoreView TO "admin_meliemelo"@"localhost";
+GRANT SELECT (id, title, difficulty, points, open, close) ON meliemelo_challenge.Quiz TO "admin_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizCurrentView TO "admin_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizArchiveView TO "admin_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizAnsweredView TO "admin_meliemelo"@"localhost";

@@ -107,6 +107,26 @@ else if ($request === "high_score") {
   request_template($valid, $doc, $fun);
 }
 
+else if ($request === "high_score_quiz_title") {
+  $valid = (isset($_REQUEST["title"]) && isset($_REQUEST["begin_date"]) && isset($_REQUEST["end_date"]));
+  $doc = "high_score_quiz_title(title, begin_date, end_date)";
+  $fun = function() {
+    // Pas protégé pour permettre regex
+    $title = $_REQUEST["title"];
+    // Pas de filtrage temporel
+    if ($_REQUEST["begin_date"] === "" || $_REQUEST["end_date"] === "") {
+      $begin_date = NULL;
+      $end_date = NULL;
+    }
+    else {
+      $begin_date = $_REQUEST["begin_date"];
+      $end_date = $_REQUEST["end_date"];
+    }
+    return high_score_quiz_title($title, $begin_date, $end_date);
+  };
+  request_template($valid, $doc, $fun);
+}
+
 // Actions de quiz_manager
 else if ($request === "create_quiz") {
   $valid = (

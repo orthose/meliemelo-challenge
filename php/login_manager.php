@@ -161,4 +161,37 @@ function high_score() {
   return $res;
 }
 
+/**
+ * Classement des joueurs pour ensemble de quiz
+ * @param title: Titre des quiz (regex)
+ * @param begin_date, end_date: Plage temporelle de filtrage
+ * Si NULL pas de filtrage sur la date
+ * @return: Table (login, points)
+ **/
+function high_score_quiz_title($title, $begin_date=NULL, $end_date=NULL) {
+  $params = array(":title" => $title);
+  $sql = 
+    " SELECT PlayerQuizAnswered.login, "
+    ." SUM(CASE WHEN PlayerQuizAnswered.success = 1 THEN (Quiz.difficulty * Quiz.points) ELSE 0 END) AS points, "
+    ." SUM(CASE WHEN PlayerQuizAnswered.success = 1 THEN 1 ELSE 0 END) AS success, "
+    ." SUM(CASE WHEN PlayerQuizAnswered.success = 0 THEN 1 ELSE 0 END) AS fail "
+    ." FROM Quiz, PlayerQuizAnswered "
+    ." WHERE Quiz.title REGEXP :title AND Quiz.id = PlayerQuizAnswered.id ";
+  // Ajout filtrage temporel
+  if (!is_null($begin_date) && !is_null($end_date)) {
+    $sql .= 
+      " AND ((:begin_date <= Quiz.open AND Quiz.open <= :end_date) "
+      ." OR (:begin_date <= Quiz.close AND Quiz.close <= :end_date)) ";
+    $params[":begin_date"] = $begin_date;
+    $params[":end_date"] = $end_date;
+  }
+  $sql .= " GROUP BY PlayerQuizAnswered.login ORDER BY points DESC, success DESC, fail ASC ";
+  $res = array("high_score_quiz_title" => array());
+  $fill_res = function($row, &$res) {
+    array_push($res["high_score_quiz_title"], array($row[0], $row[1], $row[2], $row[3]));
+  };
+  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
+  return $res;
+}
+
 ?>
