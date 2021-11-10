@@ -36,15 +36,15 @@
       echo "serverURL: '".$config["serverURL"]."',";
     ?>
   };
+  const daily_msg = `<?php $daily_msg = file_get_contents("public_data/daily_msg.txt"); if ($daily_msg !== "") { echo str_replace("`", "\`", $daily_msg); } ?>`;
   </script>
 </head>
-<body>
+<body onload="convert_md_daily_msg()">
   <header>
     <h1>MelieMelo Challenge WebApp</h1>
     <a href="index.php">Revenir à l'Accueil</a>
   </header>
   <section id="manage_account">
-    <?php $daily_msg = file_get_contents("public_data/daily_msg.txt"); if ($daily_msg !== "") { echo "<p>".$daily_msg."</p>"; } ?>
   </section>
   <main>
     <p>Bienvenue sur <strong>MelieMelo Challenge</strong>, l'application en ligne de quiz de folie&nbsp;!</p>

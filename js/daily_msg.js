@@ -38,3 +38,9 @@ function set_daily_msg() {
     document.location.href = "index.php";
   })
 }
+
+function convert_md_daily_msg() {
+  $("section#manage_account").html($(`<p>`+convert_md(daily_msg)+`</p>`));
+  // Coloration syntaxique éventuelle des balises code
+  hljs.highlightAll();
+}
