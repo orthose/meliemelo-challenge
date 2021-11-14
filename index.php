@@ -10,9 +10,19 @@
   <link rel="apple-touch-icon" type="image/png" href="favicon.png" sizes="512x512">
   <!-- Feuilles de style -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ubuntu">
-  <!--<link href='css/style.css' rel='stylesheet'>-->
-  <link href='css/halloween.css' rel='stylesheet'>
   <link href='css/a11y-light.min.css' rel='stylesheet'>
+  <?php
+    require("php/config.php");
+    $styles = array("default_style", "halloween", "christmas");
+    // Style par défaut
+    if (!isset($config["theme"]) || !in_array($config["theme"], $styles)) {
+      echo "<link href='css/default_style.css' rel='stylesheet'>";
+    }
+    // Style personnalisé
+    else {
+      echo "<link href='css/".$config["theme"].".css' rel='stylesheet'>";
+    }
+  ?>
   <!-- Scripts -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="js/popstate.js"></script>
@@ -47,7 +57,7 @@
   <section id="manage_account">
   </section>
   <main>
-    <p>Bienvenue sur <strong>MelieMelo Challenge</strong>, l'application en ligne de quiz de folie&nbsp;!</p>
+    <p>Bienvenue sur <strong>MelieMelo Challenge</strong>, l'application en ligne de quiz en folie&nbsp;!</p>
     <button onclick="register_page()">Créer un Compte</button>
     <button onclick="connection_page()">Se Connecter</button>
   </main>
