@@ -134,7 +134,8 @@ function quiz_current() {
   $params = array(":login" => get_login());
   $res = array("quiz" => array(), "responses" => array());
   $fill_res = function($row, &$res) {
-    array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8]));
+    $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
+    array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question));
   };
   request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
   // Sélection des réponses
@@ -155,7 +156,8 @@ function list_quiz($table1, $table2, $params, $opt_fill_res = null) {
   $sql = "SELECT * FROM ".$table1;
   $res = array("quiz" => array(), "responses" => array());
   $fill_res = function($row, &$res) {
-    array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8]));
+    $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
+    array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question));
   };
   if ($opt_fill_res !== null) {
     $fill_res = $opt_fill_res;
@@ -180,7 +182,8 @@ function quiz_current_not_playable() {
   $params = array(":login" => get_login());
   $res = array("quiz" => array(), "responses" => array());
   $fill_res = function($row, &$res) {
-    array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8]));
+    $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
+    array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question));
   };
   request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
   // Sélection des réponses
@@ -223,7 +226,8 @@ function quiz_answered() {
     "QuizResponsesAnsweredView WHERE login = :login", 
     array(":login" => get_login()),
     function($row, &$res) {
-      array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8], $row[10]));
+      $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
+      array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question, $row[10]));
     }
   );
 }
