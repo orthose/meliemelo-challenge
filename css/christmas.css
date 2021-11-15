@@ -42,6 +42,7 @@ h1, h2 {
   color: lightskyblue;
   text-decoration: underline;
   text-align: center;
+  text-shadow: 0 0 5px black;
 }
 
 header, main, section, footer {
@@ -107,7 +108,6 @@ p.success {
 
 button.valid, button.invalid {
   background-color: lightskyblue;
-  text-shadow: none;
 }
 
 .answered .valid, .answered .invalid {
@@ -194,14 +194,12 @@ input, button, a {
   background-color: lightskyblue;
   border: medium solid lightskyblue;
   color: mediumblue;
-  text-shadow: 0 0 5px mediumblue;
   cursor: pointer;
 }
 
 input[type=text], input[type=password] {
   background-color: snow;
   border: medium solid snow;
-  text-shadow: none;
 }
 
 button, a, input[type="submit"] {
