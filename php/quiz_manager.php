@@ -124,62 +124,55 @@ function cron_routine() {
   return $res;
 }
 
-/**
- * Renvoie les quiz jouables (dans l'état current)
- * avec les infos principales et les réponses
- **/
-function quiz_current() {
-  // Sélection des infos principales
-  $sql = "SELECT * FROM QuizCurrentView WHERE login_creator != :login AND NOT EXISTS (SELECT * FROM PlayerQuizAnswered WHERE login = :login AND PlayerQuizAnswered.id = QuizCurrentView.id)";
-  $params = array(":login" => get_login());
-  $res = array("quiz" => array(), "responses" => array());
-  $fill_res = function($row, &$res) {
-    $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
-    array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question));
-  };
-  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
-  // Sélection des réponses
-  $sql = "SELECT id, response FROM QuizResponsesCurrentView";
-  $fill_res = function($row, &$res) {
-    if (!isset($res["responses"][$row[0]])) {
-      $res["responses"][$row[0]] = array();
-    }
-    array_push($res["responses"][$row[0]], $row[1]);
-  };
-  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
-  return $res;
-}
-
 // Factorisation de requêtes
-function list_quiz($table1, $table2, $params, $opt_fill_res = NULL) {
+function list_quiz($sql1, $sql2, $params, $fill_res1 = NULL, $fill_res2 = NULL) {
   // Sélection des infos principales
-  $sql = "SELECT * FROM ".$table1;
   $res = array("quiz" => array(), "responses" => array());
   $fill_res = function($row, &$res) {
     $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
     array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question));
   };
-  if ($opt_fill_res !== NULL) {
-    $fill_res = $opt_fill_res;
+  if ($fill_res1 !== NULL) {
+    $fill_res = $fill_res1;
   }
-  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
+  request_database(get_role(), $sql1, $params, $res, NULL, $fill_res);
   // Sélection des réponses
-  $sql = "SELECT * FROM ".$table2;
   $fill_res = function($row, &$res) {
     if (!isset($res["responses"][$row[0]])) {
       $res["responses"][$row[0]] = array();
     }
     array_push($res["responses"][$row[0]], array($row[1], $row[2]));
   };
-  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
+  if ($fill_res2 !== NULL) {
+    $fill_res = $fill_res2;
+  }
+  request_database(get_role(), $sql2, $params, $res, NULL, $fill_res);
   return $res;
+}
+
+/**
+ * Renvoie les quiz jouables (dans l'état current)
+ * avec les infos principales et les réponses
+ **/
+function quiz_current() {
+  return list_quiz(
+    "SELECT * FROM QuizCurrentView WHERE login_creator != :login AND NOT EXISTS (SELECT * FROM PlayerQuizAnswered WHERE login = :login AND PlayerQuizAnswered.id = QuizCurrentView.id)",
+    "SELECT id, response FROM QuizResponsesCurrentView",
+    array(":login" => get_login()), NULL,
+    $fill_res = function($row, &$res) {
+      if (!isset($res["responses"][$row[0]])) {
+        $res["responses"][$row[0]] = array();
+      }
+      array_push($res["responses"][$row[0]], $row[1]);
+    }
+  );
 }
 
 // Quiz jouables par les autres (pas par son créateur)
 function quiz_current_not_playable() {
   return list_quiz(
-    "QuizCurrentView WHERE login_creator = :login",
-    "QuizResponsesCurrentView WHERE login_creator = :login",
+    "SELECT * FROM QuizCurrentView WHERE login_creator = :login",
+    "SELECT * FROM QuizResponsesCurrentView WHERE login_creator = :login",
     array(":login" => get_login())
   );
 }
@@ -189,7 +182,7 @@ function quiz_current_not_playable() {
  * avec les infos principales et les réponses valides et invalides
  **/
 function quiz_archive() {
-  return list_quiz("QuizArchiveView", "QuizResponsesArchiveView", array());
+  return list_quiz("SELECT * FROM QuizArchiveView", "SELECT * FROM QuizResponsesArchiveView", array());
 }
 
 /**
@@ -197,7 +190,11 @@ function quiz_archive() {
  * avec les infos principales et les réponses valides et invalides
  **/
 function quiz_stock() {
-  return list_quiz("QuizStockView WHERE login_creator = :login", "QuizResponsesStockView WHERE login_creator = :login", array(":login" => get_login()));
+  return list_quiz(
+    "SELECT * FROM QuizStockView WHERE login_creator = :login", 
+    "SELECT * FROM QuizResponsesStockView WHERE login_creator = :login", 
+    array(":login" => get_login())
+  );
 }
 
 /**
@@ -208,8 +205,8 @@ function quiz_stock() {
  **/
 function quiz_answered() {
   return list_quiz(
-    "QuizAnsweredView WHERE login = :login", 
-    "QuizResponsesAnsweredView WHERE login = :login", 
+    "SELECT * FROM QuizAnsweredView WHERE login = :login", 
+    "SELECT * FROM QuizResponsesAnsweredView WHERE login = :login", 
     array(":login" => get_login()),
     function($row, &$res) {
       $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
