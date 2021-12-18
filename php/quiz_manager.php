@@ -150,8 +150,8 @@ function quiz_current() {
   return $res;
 }
 
-// Factorisation de deux requête quasi-identiques
-function list_quiz($table1, $table2, $params, $opt_fill_res = null) {
+// Factorisation de requêtes
+function list_quiz($table1, $table2, $params, $opt_fill_res = NULL) {
   // Sélection des infos principales
   $sql = "SELECT * FROM ".$table1;
   $res = array("quiz" => array(), "responses" => array());
@@ -159,7 +159,7 @@ function list_quiz($table1, $table2, $params, $opt_fill_res = null) {
     $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
     array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question));
   };
-  if ($opt_fill_res !== null) {
+  if ($opt_fill_res !== NULL) {
     $fill_res = $opt_fill_res;
   }
   request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
@@ -177,25 +177,11 @@ function list_quiz($table1, $table2, $params, $opt_fill_res = null) {
 
 // Quiz jouables par les autres (pas par son créateur)
 function quiz_current_not_playable() {
-  // Sélection des infos principales
-  $sql = "SELECT * FROM QuizCurrentView WHERE login_creator = :login";
-  $params = array(":login" => get_login());
-  $res = array("quiz" => array(), "responses" => array());
-  $fill_res = function($row, &$res) {
-    $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
-    array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question));
-  };
-  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
-  // Sélection des réponses
-  $sql = "SELECT * FROM QuizResponsesCurrentView WHERE login_creator = :login";
-  $fill_res = function($row, &$res) {
-    if (!isset($res["responses"][$row[0]])) {
-      $res["responses"][$row[0]] = array();
-    }
-    array_push($res["responses"][$row[0]], array($row[1], $row[2]));
-  };
-  request_database(get_role(), $sql, $params, $res, NULL, $fill_res);
-  return $res;
+  return list_quiz(
+    "QuizCurrentView WHERE login_creator = :login",
+    "QuizResponsesCurrentView WHERE login_creator = :login",
+    array(":login" => get_login())
+  );
 }
 
 /**
