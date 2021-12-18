@@ -156,8 +156,17 @@ function list_quiz($sql1, $sql2, $params, $fill_res1 = NULL, $fill_res2 = NULL) 
  **/
 function quiz_current() {
   return list_quiz(
-    "SELECT * FROM QuizCurrentView WHERE login_creator != :login AND NOT EXISTS (SELECT * FROM PlayerQuizAnswered WHERE login = :login AND PlayerQuizAnswered.id = QuizCurrentView.id)",
-    "SELECT id, response FROM QuizResponsesCurrentView",
+    "SELECT * FROM QuizCurrentView "
+    ."WHERE login_creator != :login "
+    ."AND NOT EXISTS (SELECT * FROM PlayerQuizAnswered "
+      ."WHERE login = :login AND PlayerQuizAnswered.id = QuizCurrentView.id)",
+    "SELECT qrcv.id, qrcv.response FROM QuizCurrentView AS qcv, QuizResponsesCurrentView AS qrcv "
+    ."WHERE qcv.login_creator != :login "
+    // La réponse des quiz text ne doit pas être envoyée
+    ."AND qcv.type != 'text' "
+    ."AND qcv.id = qrcv.id "
+    ."AND NOT EXISTS (SELECT * FROM PlayerQuizAnswered "
+      ."WHERE login = :login AND PlayerQuizAnswered.id = qcv.id)",
     array(":login" => get_login()), NULL,
     $fill_res = function($row, &$res) {
       if (!isset($res["responses"][$row[0]])) {
