@@ -157,7 +157,16 @@ CREATE OR REPLACE VIEW HighScoreView AS
 SELECT login, points, success, fail FROM Users
 ORDER BY points DESC, success DESC, fail ASC;
 
-/* Créer un nouveau quiz */
+/**
+ * Créer un nouveau quiz
+ * @implementation
+ * Une séquence n'est pas gapless et s'incrémente à chaque lecture
+ * Une séquence ne prend pas en compte les transactions
+ * Une séquence est performante et gère la concurrence
+ * Une fonction n'autorise pas les transactions
+ * @throws Exceptions sur les contraintes de Quiz
+ * @return Identifiant du quiz créé
+ **/
 DELIMITER //
 CREATE OR REPLACE FUNCTION create_quiz (
   login TYPE OF Quiz.login_creator,
@@ -171,7 +180,8 @@ CREATE OR REPLACE FUNCTION create_quiz (
 ) RETURNS INT
 BEGIN
   DECLARE quiz_id INT;
-  SELECT NEXTVAl(QuizSequence) INTO quiz_id;
+  SELECT NEXTVAL(QuizSequence) INTO quiz_id;
+  -- Peut renvoyer des exceptions
   INSERT INTO Quiz (id, login_creator, open, close, difficulty, points, type, title, question)
   VALUES (quiz_id, login, open, close, difficulty, points, type, title, question);
   RETURN quiz_id;
