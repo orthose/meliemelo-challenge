@@ -1,11 +1,11 @@
 /**
  * Données utilisateur principales
- * (login, password) le mot de passe est chiffré avec MD5
+ * (login, password) le mot de passe est chiffré avec SHA2
  * Le role influence les actions réalisables par l'utilisateur
  * Les autres informations concernent les statistiques
  **/
 CREATE TABLE Users (
-  login VARCHAR(16) PRIMARY KEY,
+  login VARCHAR(16) PRIMARY KEY COLLATE 'latin1_general_cs', -- Sensible à la casse
   password CHAR(64) NOT NULL,
   salt CHAR(16) NOT NULL CHECK(LENGTH(salt) = 16),
   role ENUM("player", "admin") NOT NULL DEFAULT "player",
@@ -27,7 +27,7 @@ CREATE SEQUENCE QuizSequence START WITH 1 INCREMENT BY 1 CACHE 0;
  **/
 CREATE TABLE Quiz (
   id INT PRIMARY KEY,
-  login_creator VARCHAR(16), -- Utilisateur ayant créé le quiz
+  login_creator VARCHAR(16) COLLATE 'latin1_general_cs', -- Utilisateur ayant créé le quiz
   FOREIGN KEY (login_creator) REFERENCES Users(login),
   open DATE NOT NULL, -- Date à laquelle pour être ouvert le quiz
   close DATE NOT NULL, -- Date à laquelle le quiz expire
@@ -142,7 +142,7 @@ DELIMITER ;
  * et le résultat après correction
  **/
 CREATE TABLE PlayerQuizAnswered (
-  login VARCHAR(16),
+  login VARCHAR(16) COLLATE 'latin1_general_cs',
   FOREIGN KEY (login) REFERENCES Users(login),
   id INT, FOREIGN KEY (id) REFERENCES Quiz(id),
   /* TRUE si quiz réussi FALSE si quiz échoué
@@ -169,7 +169,7 @@ DELIMITER ;
  * pour les quiz auxquels ils ont répondu
  **/
 CREATE TABLE PlayerQuizResponses (
-  login VARCHAR(16),
+  login VARCHAR(16) COLLATE 'latin1_general_cs',
   FOREIGN KEY (login) REFERENCES Users(login),
   id INT, FOREIGN KEY (id) REFERENCES Quiz(id),
   response VARCHAR(256) NOT NULL,
