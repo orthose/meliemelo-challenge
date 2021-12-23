@@ -128,24 +128,20 @@ function cron_routine() {
 function list_quiz($sql1, $sql2, $params, $fill_res1 = NULL, $fill_res2 = NULL) {
   // Sélection des infos principales
   $res = array("quiz" => array(), "responses" => array());
-  $fill_res = function($row, &$res) {
+  $fill_res = $fill_res1 !== NULL ? $fill_res1 : 
+  function($row, &$res) {
     $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
     array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question));
   };
-  if ($fill_res1 !== NULL) {
-    $fill_res = $fill_res1;
-  }
   request_database(get_role(), $sql1, $params, $res, NULL, $fill_res);
   // Sélection des réponses
-  $fill_res = function($row, &$res) {
+  $fill_res = $fill_res2 !== NULL ? $fill_res2 :
+  function($row, &$res) {
     if (!isset($res["responses"][$row[0]])) {
       $res["responses"][$row[0]] = array();
     }
     array_push($res["responses"][$row[0]], array($row[1], $row[2]));
   };
-  if ($fill_res2 !== NULL) {
-    $fill_res = $fill_res2;
-  }
   request_database(get_role(), $sql2, $params, $res, NULL, $fill_res);
   return $res;
 }
