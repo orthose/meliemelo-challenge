@@ -64,24 +64,6 @@ BEGIN
 END; //
 DELIMITER ;
 
-DELIMITER //
-CREATE TRIGGER QuizDeleteTrigger
-  BEFORE DELETE ON Quiz
-  FOR EACH ROW
-BEGIN
-  DECLARE quiz_state TYPE OF Quiz.state;
-  SELECT state INTO quiz_state FROM Quiz
-  WHERE id = OLD.id; 
-  IF NOT (quiz_state = "creation" OR quiz_state = "stock") THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "You can delete only quiz in creation or in stock";
-  ELSE
-    DELETE FROM QuizResponses WHERE id = OLD.id;
-    DELETE FROM PlayerQuizResponses WHERE id = OLD.id;
-  END IF;
-END; //
-DELIMITER ;
-
 /**
  * Choix de réponses possibles pour les quiz
  * Si la réponse est valide alors valid = TRUE

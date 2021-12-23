@@ -213,6 +213,13 @@ else if ($request === "quiz_stock") {
   request_template($valid, $doc, $fun);
 }
 
+else if ($request === "quiz_editable") {
+  $valid = true;
+  $doc = "quiz_editable()";
+  $fun = function() { return quiz_editable(); };
+  request_template($valid, $doc, $fun);
+}
+
 else if ($request === "quiz_answered") {
   $valid = true;
   $doc = "quiz_answered()";

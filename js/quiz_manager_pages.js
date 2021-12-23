@@ -223,9 +223,9 @@ function remove_quiz_page() {
     push_state(14);
     const page = $(`
       <h2>Quiz supprimables</h2>
-      <p>Choisissez un quiz parmi ceux en stock.</p>
+      <p>Choisissez un quiz parmi ceux que vous avez créés.</p>
       `);
     $("main").html(page);
-    quiz_stock_remove();
+    quiz_editable_remove();
   }
 }

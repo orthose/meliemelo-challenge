@@ -203,6 +203,22 @@ function quiz_stock() {
 }
 
 /**
+ * Renvoie les quiz modifiables (tous les quiz créés par l'utilisateur)
+ * avec les infos principales et les réponses valides et invalides
+ **/
+function quiz_editable() {
+  return list_quiz(
+    "SELECT * FROM QuizStockView WHERE login_creator = :login
+    UNION SELECT * FROM QuizCurrentView WHERE login_creator = :login
+    UNION SELECT * FROM QuizArchiveView WHERE login_creator = :login", 
+    "SELECT * FROM QuizResponsesStockView WHERE login_creator = :login
+    UNION SELECT * FROM QuizResponsesCurrentView WHERE login_creator = :login
+    UNION SELECT * FROM QuizResponsesArchiveView WHERE login_creator = :login", 
+    array(":login" => get_login())
+  );
+}
+
+/**
  * Renvoie les quiz auxquels a répondu le joueur
  * avec les infos principales et les réponses "valides" qui sont celles
  * sélectionnées par le joueur et "invalides" celles non-sélectionnées

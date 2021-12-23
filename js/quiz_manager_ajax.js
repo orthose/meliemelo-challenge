@@ -92,8 +92,8 @@ function quiz_stock() {
   list_quiz("stock", "show");
 }
 
-function quiz_stock_remove() {
-  list_quiz("stock", "remove");
+function quiz_editable_remove() {
+  list_quiz("editable", "remove");
 }
 
 function quiz_current_not_playable() {

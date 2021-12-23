@@ -188,7 +188,7 @@ BEGIN
 END; //
 DELIMITER ;
 
-/* Supprimer un quiz existant en stock */
+/* Supprimer un quiz existant quel que soit son état */
 DELIMITER //
 CREATE OR REPLACE PROCEDURE remove_quiz (
   login TYPE OF Quiz.login_creator,
@@ -200,7 +200,12 @@ BEGIN
     SIGNAL SQLSTATE "45000" 
     SET MESSAGE_TEXT = "Invalid login creator or id for this quiz";
   ELSE
+    START TRANSACTION;
+    DELETE FROM PlayerQuizAnswered WHERE id = quiz_id;
+    DELETE FROM PlayerQuizResponses WHERE id = quiz_id;
+    DELETE FROM QuizResponses WHERE id = quiz_id;
     DELETE FROM Quiz WHERE login_creator = login AND id = quiz_id;
+    COMMIT;
   END IF;
 END; //
 DELIMITER ;
@@ -248,7 +253,7 @@ WHERE Quiz.state = "current" AND Quiz.id = QuizResponses.id;
 
 /* Vue pour les réponses des quiz archivés */
 CREATE OR REPLACE VIEW QuizResponsesArchiveView AS 
-SELECT QuizResponses.* FROM QuizResponses, Quiz 
+SELECT QuizResponses.*, login_creator FROM QuizResponses, Quiz 
 WHERE Quiz.state = "archive" AND Quiz.id = QuizResponses.id;
 
 /* Vue pour les réponses des joueurs */
