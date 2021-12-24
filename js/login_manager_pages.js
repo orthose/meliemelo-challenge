@@ -93,7 +93,7 @@ function unregister_page() {
     push_state(5);
     const page = $(`
       <h2>Suppression du compte</h2>
-      <p class="warning">Attention, si vous continuez vous perdrez toutes vos données. La suppression de votre compte est définitive. Notez que la suppression du compte est impossible si vous avez créé des quiz.</p>
+      <p class="warning">Attention, si vous continuez vous perdrez toutes vos données. La suppression de votre compte est définitive. Notez que si vous avez créé des quiz ils seront tous supprimés définitivement.</p>
       <p>Entrez votre mot de passe</p>
       <input type="password"><br>
       <button onclick="unregister()">Supprimer le compte</button>

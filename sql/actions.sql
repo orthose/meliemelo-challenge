@@ -141,13 +141,19 @@ BEGIN
   IF NOT authentication_is_valid(login_user, passwd) THEN
     SIGNAL SQLSTATE "45000" 
     SET MESSAGE_TEXT = "Authentication has failed";
-  ELSEIF EXISTS(SELECT * FROM Quiz WHERE login_creator = login_user) THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "You cannot unregister because you have created quiz";
   ELSE
-    DELETE FROM PlayerQuizAnswered WHERE login = login_user;
-    DELETE FROM PlayerQuizResponses WHERE login = login_user;
+    START TRANSACTION;
+    CREATE TEMPORARY TABLE QuizCreated (
+      SELECT id FROM Quiz WHERE login_creator = login_user
+    );
+    DELETE FROM PlayerQuizAnswered 
+    WHERE login = login_user OR id IN (SELECT id FROM QuizCreated);
+    DELETE FROM PlayerQuizResponses 
+    WHERE login = login_user OR id IN (SELECT id FROM QuizCreated);
+    DELETE FROM QuizResponses WHERE id IN (SELECT id FROM QuizCreated);
+    DELETE FROM Quiz WHERE id IN (SELECT id FROM QuizCreated);
     DELETE FROM Users WHERE login = login_user;
+    COMMIT;
   END IF;
 END; //
 DELIMITER ;
