@@ -50,6 +50,6 @@ GRANT SELECT ON meliemelo_challenge.QuizStockView TO "admin_meliemelo"@"localhos
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.add_response TO "admin_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizResponsesStockView TO "admin_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizResponsesArchiveView TO "admin_meliemelo"@"localhost";
-GRANT EXECUTE ON PROCEDURE meliemelo_challenge.stock_quiz TO "admin_meliemelo"@"localhost";
+GRANT EXECUTE ON FUNCTION meliemelo_challenge.check_quiz TO "admin_meliemelo"@"localhost";
 
 FLUSH PRIVILEGES;

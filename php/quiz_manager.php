@@ -11,45 +11,88 @@ require_once("connect_mariadb.php");
  **/
 function create_quiz($open, $close, $difficulty, $points, $type, $title, $question, $responses) {
   
-  // Création des métadonnées du quiz
-  $sql = "SELECT create_quiz(:login, :open, :close, :difficulty, :points, :type, :title, :question)";
-  $params = array(
-    ":login" => get_login(), 
-    ":open" => $open,
-    ":close" => $close,
-    ":difficulty" => $difficulty,
-    ":points" => $points,
-    ":type" => $type,
-    ":title" => $title,
-    ":question" => $question
-  );
   $res = array("login" => get_login(), "create_quiz_status" => true);
-  $fill_res = function($row, &$res) {
-    $res["quiz_id"] = $row[0];
-  };
-  $error_fun = function($request, &$res) {
-    error_fun_default($request, $res);
-    $res["create_quiz_status"] = false;
-  };
-  request_database(get_role(), $sql, $params, $res, $error_fun, $fill_res);
+  // Initialisation de la session avec la base
+  $pdo = connect_database(get_role(), $res);
   
-  // Ajout des réponses si la création n'a pas échoué
-  if ($res["create_quiz_status"]) {
-    $params = array(":quiz_id" => $res["quiz_id"]);
-    foreach($responses as $response) {
-      $sql = "CALL add_response(:quiz_id, :response, :valid)";
-      $params[":response"] = $response["response"];
-      $params[":valid"] = $response["valid"];
-      request_database(get_role(), $sql, $params, $res, $error_fun);
-      if (!$res["create_quiz_status"]) { break; }
-    }
-    // Mise en stock du quiz si toujours pas d'échec
-    if ($res["create_quiz_status"]) {
-      $sql = "CALL stock_quiz(:quiz_id)";
-      $params = array(":quiz_id" => $res["quiz_id"]);
-      request_database(get_role(), $sql, $params, $res, $error_fun);
+  // Lève une exception si échec de la requête
+  function check_request($res_request) {
+    if (!$res_request) {
+      throw new Exception("Fail request execution");
     }
   }
+  
+  // Echec de connexion ?
+  if ($pdo !== NULL) {
+    
+    try {
+      $step_error = "START TRANSACTION";
+      // Activation de la transaction
+      $pdo->beginTransaction();
+      
+      $step_error = "create_quiz";
+      // Création des métadonnées du quiz
+      $sql = "SELECT create_quiz(:login, :open, :close, :difficulty, :points, :type, :title, :question)";
+      $params = array(
+        ":login" => get_login(), 
+        ":open" => $open,
+        ":close" => $close,
+        ":difficulty" => $difficulty,
+        ":points" => $points,
+        ":type" => $type,
+        ":title" => $title,
+        ":question" => $question
+      );
+    
+      $request = $pdo->prepare($sql);
+      foreach($params as $param => $_) {
+        $request->bindParam($param, $params[$param]);
+      } 
+    
+      check_request($request->execute());
+      
+      // Récupération de l'identifiant de quiz
+      $res["quiz_id"] = $request->fetch()[0];
+      $request->closeCursor();
+      
+      $step_error = "add_response";
+      // Ajout des réponses si la création n'a pas échoué
+      $sql = "CALL add_response(:quiz_id, :response, :valid)";
+      $request = $pdo->prepare($sql);
+      $request->bindParam(":quiz_id", $res["quiz_id"]);
+      
+      foreach($responses as $response) {
+        $request->bindParam(":response", $response["response"]);
+        $request->bindParam(":valid", $response["valid"]);
+        check_request($request->execute());
+      }
+      
+      $step_error = "check_quiz";
+      // Vérification de la validité du quiz
+      $sql = "SELECT check_quiz(:quiz_id)";
+      $request = $pdo->prepare($sql);
+      $request->bindParam(":quiz_id", $res["quiz_id"]);
+      // La fonction check_quiz ne renvoie pas d'erreur mais un booléen
+      // L'erreur n'est pas remontée dans request_database_error
+      check_request($request->execute() && $request->fetch()[0]);
+      
+      $step_error = "COMMIT";
+      // Acceptation de la transaction
+      $pdo->commit();
+    }
+    
+    // Echec de la création de quiz
+    catch (Exception $e){
+      error_fun_default($request, $res);
+      error_debug("step_error", $step_error, $res);
+      $res["create_quiz_status"] = false;
+      // Abandon de la transaction
+      $pdo->rollback();
+    }
+  }     
+   
+  // Fermeture de la session
+  $pdo = NULL;
   
   return $res;
 }

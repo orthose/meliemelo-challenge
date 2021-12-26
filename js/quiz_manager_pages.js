@@ -202,7 +202,10 @@ function create_quiz_page() {
         <option value="radio">Choix unique</option>
         <option value="text">Texte</option>
       </select><br>
-      <p>Un quiz valide doit obligatoirement avoir au moins une réponse vraie.</p>
+      <p>
+        Un quiz valide doit obligatoirement avoir au moins une réponse. 
+        Le type de quiz choisi conditionne le nombre de réponses à ajouter.
+      </p>
       <p class="form">Réponses</p>
       <input class="response" type="text" name="quiz">
       <select name="quiz">

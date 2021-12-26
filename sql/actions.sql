@@ -363,21 +363,37 @@ BEGIN
 END; //
 DELIMITER ;
 
-/* Mettre le quiz en stock après avoir complété 
-toutes les réponses possibles du quiz */
+/**
+ * Vérifie la validité d'un quiz en fonction des réponses et du type de quiz
+ * @return TRUE si quiz valid FALSE sinon 
+ **/
 DELIMITER //
-CREATE OR REPLACE PROCEDURE stock_quiz (
+CREATE OR REPLACE FUNCTION check_quiz (
   quiz_id TYPE OF Quiz.id
-)
+) RETURNS BOOLEAN
 BEGIN
-  -- Annulation de la création du quiz
-  DECLARE EXIT HANDLER FOR SQLSTATE "45001"
-  BEGIN
-    DELETE FROM QuizResponses WHERE id = quiz_id;
-    DELETE FROM Quiz WHERE id = quiz_id;
-    RESIGNAL;
-  END;
-  UPDATE Quiz SET state = "stock" WHERE id = quiz_id;
+  DECLARE res BOOLEAN;
+  DECLARE quiz_type TYPE OF Quiz.type;
+  SELECT type INTO quiz_type FROM Quiz WHERE id = quiz_id;
+  SELECT
+    -- Au moins une réponse entrée pas obligatoirement valide
+    EXISTS(SELECT * FROM QuizResponses WHERE id = quiz_id)
+    AND (
+      -- Pas de condition particulière pour quiz checkbox
+      (quiz_type = 'checkbox')
+      -- Une seule réponse valide parmi les réponses pour quiz radio
+      OR (
+        quiz_type = 'radio' 
+        AND (SELECT COUNT(*) = 1 FROM QuizResponses WHERE id = quiz_id AND valid)
+      )
+      -- Une seule réponse valide uniquement pour quiz text
+      OR (
+        quiz_type = 'text'
+        AND (SELECT SUM(CASE WHEN valid THEN 1 ELSE -1 END) = 1 FROM QuizResponses WHERE id = quiz_id)
+      )
+    )
+  INTO res;
+  RETURN res;
 END; //
 DELIMITER ;
 

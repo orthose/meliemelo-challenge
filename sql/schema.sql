@@ -34,35 +34,11 @@ CREATE TABLE Quiz (
   CHECK(open <= close),
   difficulty TINYINT NOT NULL CHECK(1 <= difficulty AND difficulty <= 10),
   points TINYINT NOT NULL CHECK(0 <= points AND points <= 10),
-  type ENUM("checkbox", "radio", "text") NOT NULL, -- Type de réponse du quiz
-  state ENUM("creation", "stock", "current", "archive") NOT NULL DEFAULT "creation",
+  type ENUM('checkbox', 'radio', 'text') NOT NULL, -- Type de réponse du quiz
+  state ENUM('stock', 'current', 'archive') NOT NULL DEFAULT 'stock',
   title VARCHAR(256) NOT NULL, -- Peut être NULL
   question TEXT NOT NULL -- Champ principal du quiz
 );
-
-DELIMITER //
-CREATE TRIGGER QuizUpdateTrigger
-  BEFORE UPDATE ON Quiz
-  FOR EACH ROW
-BEGIN
-  /* Il faut respecter l'ordre des changements d'état du quiz */
-  IF (OLD.state = "creation" AND NEW.state != "stock")
-    OR (OLD.state = "stock" AND NEW.state != "current")
-    OR (OLD.state = "current" AND NEW.state != "archive") 
-  THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Order of state must be creation -> stock -> current -> archive";
-  
-  /* Il doit y avoir au moins une réponse valide */
-  ELSEIF NEW.state = "stock" 
-  AND NOT EXISTS(SELECT * FROM QuizResponses WHERE id = NEW.id AND valid = TRUE) 
-  THEN
-    -- Annulation de la création de quiz
-    SIGNAL SQLSTATE "45001" 
-    SET MESSAGE_TEXT = "Before setting quiz to stock you have to add at least one valid response";
-  END IF;
-END; //
-DELIMITER ;
 
 /**
  * Choix de réponses possibles pour les quiz
@@ -78,46 +54,6 @@ CREATE TABLE QuizResponses (
   valid BOOLEAN NOT NULL,
   PRIMARY KEY(id, response)
 );
-
-DELIMITER //
-CREATE TRIGGER QuizResponsesTrigger
-  BEFORE INSERT ON QuizResponses
-  FOR EACH ROW
-BEGIN
-  DECLARE quiz_type TYPE OF Quiz.type;
-  DECLARE quiz_state TYPE OF Quiz.state;
-  
-  SELECT type INTO quiz_type FROM Quiz WHERE id = NEW.id;
-  SELECT state INTO quiz_state FROM Quiz WHERE id = NEW.id;
-  
-  /* Contraintes sur l'état de quiz */
-  IF quiz_state = "stock" OR quiz_state = "current" OR quiz_state = "archive" THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Cannot add reponses to quiz with state = stock or current or archive";
-  END IF;
-  
-  /* Contraintes sur les types de quiz */
-  IF quiz_type = "radio" AND NEW.valid = TRUE
-  AND EXISTS(SELECT * FROM QuizResponses WHERE id = NEW.id AND valid = TRUE) 
-  THEN
-    -- Annulation de la création de quiz
-    SIGNAL SQLSTATE "45001" 
-    SET MESSAGE_TEXT = "Radio quiz must have only one valid response";
-  ELSEIF quiz_type = "text" THEN
-    IF EXISTS(SELECT * FROM QuizResponses WHERE id = NEW.id) 
-    THEN
-      -- Annulation de la création de quiz
-      SIGNAL SQLSTATE "45001" 
-      SET MESSAGE_TEXT = "Text quiz must have only one response";
-    END IF;
-    IF NEW.valid = FALSE THEN
-      -- Annulation de la création de quiz
-      SIGNAL SQLSTATE "45001" 
-      SET MESSAGE_TEXT = "Text quiz must have always valid = TRUE";
-    END IF;
-  END IF;
-END; //
-DELIMITER ;
 
 /**
  * Les quiz auxquels ont répondu ou pas les joueurs

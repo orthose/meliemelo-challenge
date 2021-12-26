@@ -177,7 +177,7 @@ function create_quiz() {
   }
   else if (responses.length === 0) {
     $("main p.error").show();
-    $("main p.error").html("Veuillez entrer au moins une réponse valide.");
+    $("main p.error").html("Veuillez entrer au moins une réponse.");
   }
   else {
     $.ajax({
