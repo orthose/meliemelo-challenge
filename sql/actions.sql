@@ -277,12 +277,6 @@ CREATE OR REPLACE PROCEDURE answer_quiz (
   response TYPE OF PlayerQuizResponses.response
 )
 BEGIN
-  -- Annulation de la réponse du joueur
-  DECLARE EXIT HANDLER FOR SQLSTATE "45001"
-  BEGIN
-    DELETE FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id;
-    RESIGNAL;
-  END;
   INSERT INTO PlayerQuizResponses (login, id, response) VALUES (login_player, quiz_id, response);
 END; //
 DELIMITER ;

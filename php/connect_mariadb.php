@@ -68,6 +68,13 @@ function connect_database($user, &$res) {
   }
 }
 
+// Lève une exception si échec de la requête
+function check_request($res_request) {
+  if (!$res_request) {
+    throw new Exception("Fail request execution");
+  }
+}
+
 /**
  * Modèle pour requête unitaire à la base de données
  * @param user: Clé utilisateur à choisir parmi (undefined, player, admin)

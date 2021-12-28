@@ -15,13 +15,6 @@ function create_quiz($open, $close, $difficulty, $points, $type, $title, $questi
   // Initialisation de la session avec la base
   $pdo = connect_database(get_role(), $res);
   
-  // Lève une exception si échec de la requête
-  function check_request($res_request) {
-    if (!$res_request) {
-      throw new Exception("Fail request execution");
-    }
-  }
-  
   // Echec de connexion ?
   if ($pdo !== NULL) {
     
@@ -122,29 +115,63 @@ function remove_quiz($quiz_id) {
  **/
 function answer_quiz($quiz_id, $responses) {
   
-  // Ajout des réponses
-  $sql = "CALL answer_quiz(:login, :quiz_id, :response)";
-  $params = array(":login" => get_login(), ":quiz_id" => $quiz_id);
   $res = array("login" => get_login(), "quiz_id" => $quiz_id, "answer_quiz_status" => true, "response" => $responses);
-  $error_fun = function($request, &$res) {
-    error_fun_default($request, $res);
-    $res["answer_quiz_status"] = false;
-  };
-  foreach ($responses as $response) {
-    $params[":response"] = $response;
-    request_database(get_role(), $sql, $params, $res, $error_fun);
-    if (!$res["answer_quiz_status"]) { break; }
+  // Initialisation de la session avec la base
+  $pdo = connect_database(get_role(), $res);
+  
+  // Echec de connexion ?
+  if ($pdo !== NULL) {
+  
+    try {
+      $step_error = "START TRANSACTION";
+      // Activation de la transaction
+      $pdo->beginTransaction();
+      
+      $step_error = "answer_quiz";
+      // Ajout des réponses
+      $sql = "CALL answer_quiz(:login, :quiz_id, :response)";
+      $params = array(":login" => get_login(), ":quiz_id" => $quiz_id);
+      
+      $request = $pdo->prepare($sql);
+      foreach($params as $param => $_) {
+        $request->bindParam($param, $params[$param]);
+      } 
+      
+      foreach ($responses as $response) {
+        $request->bindParam(":response", $response);
+        check_request($request->execute());
+      }
+      
+      $step_error = "check_answer";
+      // Calcul du nombre de points
+      $sql = "SELECT check_answer(:login, :quiz_id)";
+      $params = array(":login" => get_login(), ":quiz_id" => $quiz_id);
+      
+      $request = $pdo->prepare($sql);
+      foreach($params as $param => $_) {
+        $request->bindParam($param, $params[$param]);
+      }
+      
+      check_request($request->execute());
+      $res["points"] = $request->fetch()[0];
+      
+      $step_error = "COMMIT";
+      // Acceptation de la transaction
+      $pdo->commit();
+    }
+    
+    // Echec de d'envoi de la réponse
+    catch (Exception $e) {
+      error_fun_default($request, $res);
+      error_debug("step_error", $step_error, $res);
+      $res["answer_quiz_status"] = false;
+      // Abandon de la transaction
+      $pdo->rollback();
+    }
   }
   
-  // Calcul du nombre de points
-  if ($res["answer_quiz_status"]) {
-    $sql = "SELECT check_answer(:login, :quiz_id)";
-    $params = array(":login" => get_login(), ":quiz_id" => $quiz_id);
-    $fill_res = function($row, &$res) {
-      $res["points"] = $row[0];
-    };
-    request_database(get_role(), $sql, $params, $res, $error_fun, $fill_res);
-  }
+  // Fermeture de la session
+  $pdo = NULL;
   
   return $res;
 }
