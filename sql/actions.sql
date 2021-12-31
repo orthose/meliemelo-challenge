@@ -42,10 +42,16 @@ CREATE OR REPLACE FUNCTION authentication_is_valid (
 ) RETURNS BOOLEAN
 BEGIN
   DECLARE res BOOLEAN;
-  SELECT password = SHA2(CONCAT(passwd_user, salt), 256) FROM Users 
-  WHERE login = login_user INTO res;
-  -- Si res = NULL alors le login n'existe pas
-  RETURN res IS NOT NULL AND res;
+  SELECT EXISTS(
+    SELECT * FROM Users 
+    WHERE login = login_user 
+      AND password = SHA2(CONCAT(passwd_user, salt), 256)
+  ) INTO res;
+  IF res THEN
+    UPDATE Users SET connection = CURRENT_TIMESTAMP WHERE login = login_user;
+    UPDATE Users SET visits = visits + 1 WHERE login = login_user;
+  END iF;
+  RETURN res;
 END; //
 DELIMITER ;
 
@@ -334,7 +340,7 @@ BEGIN
     ))
   THEN
     -- Marquage du quiz comme réussi
-    INSERT INTO PlayerQuizAnswered VALUES
+    INSERT INTO PlayerQuizAnswered (login, id, success) VALUES
     (login_player, quiz_id, TRUE);
     -- Mise à jour du nombre de points du joueur
     SET res = (quiz_difficulty * quiz_points);

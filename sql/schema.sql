@@ -11,7 +11,10 @@ CREATE TABLE Users (
   role ENUM("player", "admin") NOT NULL DEFAULT "player",
   points INT NOT NULL DEFAULT 0,
   success INT NOT NULL DEFAULT 0, -- Nombre de quiz réussis
-  fail INT NOT NULL DEFAULT 0 -- Nombre de quiz échoués
+  fail INT NOT NULL DEFAULT 0, -- Nombre de quiz échoués
+  registration DATE NOT NULL DEFAULT CURRENT_DATE, -- Date de création du compte
+  connection TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Dernière connexion
+  visits INT NOT NULL DEFAULT 0
 );
 
 CREATE SEQUENCE QuizSequence START WITH 1 INCREMENT BY 1 CACHE 0;
@@ -31,6 +34,7 @@ CREATE TABLE Quiz (
   FOREIGN KEY (login_creator) REFERENCES Users(login),
   open DATE NOT NULL, -- Date à laquelle pour être ouvert le quiz
   close DATE NOT NULL, -- Date à laquelle le quiz expire
+  creation DATE NOT NULL DEFAULT CURRENT_DATE, -- Date de création
   CHECK(open <= close),
   difficulty TINYINT NOT NULL CHECK(1 <= difficulty AND difficulty <= 10),
   points TINYINT NOT NULL CHECK(0 <= points AND points <= 10),
@@ -56,7 +60,7 @@ CREATE TABLE QuizResponses (
 );
 
 /**
- * Les quiz auxquels ont répondu ou pas les joueurs
+ * Les quiz auxquels ont répondu les joueurs
  * et le résultat après correction
  **/
 CREATE TABLE PlayerQuizAnswered (
@@ -66,6 +70,8 @@ CREATE TABLE PlayerQuizAnswered (
   /* TRUE si quiz réussi FALSE si quiz échoué
   Si quiz pas répondu alors la ligne n'existe pas */
   success BOOLEAN NOT NULL,
+  -- Date de réponse au quiz
+  answered TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY(login, id)
 );
 
