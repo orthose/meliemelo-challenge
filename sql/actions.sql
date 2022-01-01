@@ -212,7 +212,7 @@ BEGIN
   DECLARE quiz_type TYPE OF Quiz.type;
   SELECT type INTO quiz_type FROM Quiz WHERE id = quiz_id;
   -- Au moins une réponse valide pour quiz checkbox
-  IF quiz_type = 'checkbox'
+  IF (quiz_type = 'checkbox_and' OR quiz_type = 'checkbox_or')
   AND NOT (SELECT COUNT(*) >= 1 FROM QuizResponses WHERE id = quiz_id AND valid)
   THEN
     SIGNAL SQLSTATE '45000' 
@@ -333,28 +333,38 @@ BEGIN
   et que le joueur n'a pas déjà répondu à ce quiz */ 
   IF success_quiz IS NULL AND (
     (
-      quiz_type = "checkbox" AND 
+      quiz_type = "checkbox_and" AND 
       -- Égalité entre 2 tables E_1 = E_2 <=> (E_1 Union E_2) - (E_2 Inter E_1) = Vide
       NOT EXISTS (
         SELECT a.response FROM
-          ((SELECT response FROM QuizResponses WHERE id = quiz_id AND valid = TRUE)
+          ((SELECT response FROM QuizResponses WHERE id = quiz_id AND valid)
           UNION (SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)) AS a
         EXCEPT
         SELECT b.response FROM
           ((SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
-          INTERSECT (SELECT response FROM QuizResponses WHERE id = quiz_id AND valid = TRUE)) AS b
+          INTERSECT (SELECT response FROM QuizResponses WHERE id = quiz_id AND valid)) AS b
       )
     ) OR
     (
+      quiz_type = 'checkbox_or' AND
+      -- Au moins une réponse et toutes les réponses doivent être justes
+      (SELECT COUNT(*) > 0 AND BIT_AND(valid)
+      FROM (
+        SELECT pqr.response, qr.valid
+        FROM PlayerQuizResponses AS pqr, QuizResponses AS qr
+        WHERE pqr.login = login_player AND pqr.id = quiz_id AND pqr.id = qr.id AND pqr.response = qr.response
+      ) AS pqrv)
+    ) OR
+    (
       quiz_type = "radio" AND
-      (SELECT response FROM QuizResponses WHERE id = quiz_id AND valid = TRUE) 
+      (SELECT response FROM QuizResponses WHERE id = quiz_id AND valid) 
       = (SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
     ) OR
     /* La comparaison pour un quiz text est insensible à la casse */
     (
       quiz_type = "text" AND 
       (SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
-      LIKE (SELECT CONCAT("%", response, "%") FROM QuizResponses WHERE id = quiz_id AND valid = TRUE)
+      LIKE (SELECT CONCAT("%", response, "%") FROM QuizResponses WHERE id = quiz_id AND valid)
     ))
   THEN
     -- Marquage du quiz comme réussi

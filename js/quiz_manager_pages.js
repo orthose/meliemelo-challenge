@@ -58,7 +58,7 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
       `);
     $("main").html(page);
     $("main button").on("click", function() { answer_quiz(type, quiz_id); });
-    if (type === "checkbox") {
+    if (type === "checkbox_and" || type === "checkbox_or") {
       responses.forEach(function(response) {
         $("main form").append($(`
           <div><input type="checkbox" name="quiz" value="` + response + `"><label>` + convert_md(response) + `</label></div>
@@ -131,7 +131,7 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
       }
     }
     
-    if (type === "checkbox") {
+    if (type === "checkbox_and" || type === "checkbox_or") {
       responses.forEach(function([response, valid]) {
         $("main form").append($(`
           <div><input type="checkbox" name="quiz" value="` + response + `"><label class="` + class_response(valid) + `">` + convert_md(response) + `</label></div>
@@ -198,7 +198,8 @@ function create_quiz_page() {
       <input id="points" onchange="show_range_value(this)" type="range" name="quiz" min="0" max="10" value="1"><br>
       <p class="form">Type</p>
       <select id="type" name="quiz">
-        <option value="checkbox">Choix multiples</option>
+        <option value="checkbox_and">Choix multiples [conjonction]</option>
+        <option value="checkbox_or">Choix multiples [disjonction]</option>
         <option value="radio">Choix unique</option>
         <option value="text">Texte</option>
       </select><br>

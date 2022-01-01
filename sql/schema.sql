@@ -38,7 +38,7 @@ CREATE TABLE Quiz (
   CHECK(open <= close),
   difficulty TINYINT NOT NULL CHECK(1 <= difficulty AND difficulty <= 10),
   points TINYINT NOT NULL CHECK(0 <= points AND points <= 10),
-  type ENUM('checkbox', 'radio', 'text') NOT NULL, -- Type de réponse du quiz
+  type ENUM('checkbox_and', 'checkbox_or', 'radio', 'text') NOT NULL, -- Type de réponse du quiz
   state ENUM('stock', 'current', 'archive') NOT NULL DEFAULT 'stock',
   title VARCHAR(256) NOT NULL, -- Peut être NULL
   question TEXT NOT NULL -- Champ principal du quiz
