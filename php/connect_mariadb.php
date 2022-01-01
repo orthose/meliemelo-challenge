@@ -31,14 +31,6 @@ function error_fun_default($request, &$res) {
   }
 };
 
-// Fonction pour éviter d'avoir à regarder $config depuis un autre fichier
-function error_debug($key, $value, &$res) {
-  global $config;
-  if ($config["debug"]) {
-    $res[$key] = $value;
-  }
-}
-
 /**
  * Connexion à la base de données
  * Utile pour effectuer des requêtes complexes manuellement

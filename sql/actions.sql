@@ -200,6 +200,39 @@ BEGIN
 END; //
 DELIMITER ;
 
+/**
+ * Vérifie la validité d'un quiz en fonction des réponses et du type de quiz
+ * Renvoie une erreur si le quiz est invalide
+ **/
+DELIMITER //
+CREATE OR REPLACE PROCEDURE check_quiz (
+  quiz_id TYPE OF Quiz.id
+)
+BEGIN
+  DECLARE quiz_type TYPE OF Quiz.type;
+  SELECT type INTO quiz_type FROM Quiz WHERE id = quiz_id;
+  -- Au moins une réponse valide pour quiz checkbox
+  IF quiz_type = 'checkbox'
+  AND NOT (SELECT COUNT(*) >= 1 FROM QuizResponses WHERE id = quiz_id AND valid)
+  THEN
+    SIGNAL SQLSTATE '45000' 
+    SET MESSAGE_TEXT = 'Checkbox quiz must have at least one valid response';
+  -- Une seule réponse valide parmi les réponses pour quiz radio
+  ELSEIF quiz_type = 'radio' 
+  AND NOT (SELECT COUNT(*) = 1 FROM QuizResponses WHERE id = quiz_id AND valid) 
+  THEN
+    SIGNAL SQLSTATE '45000' 
+    SET MESSAGE_TEXT = 'Radio quiz must have only one valid response';
+  -- Une seule réponse valide uniquement pour quiz text
+  ELSEIF quiz_type = 'text'
+  AND NOT (SELECT SUM(CASE WHEN valid THEN 1 ELSE -1 END) = 1 FROM QuizResponses WHERE id = quiz_id)
+  THEN
+    SIGNAL SQLSTATE '45000' 
+    SET MESSAGE_TEXT = 'Text quiz must have only one response and valid';
+  END IF;
+END; //
+DELIMITER ;
+
 /* Supprimer un quiz existant quel que soit son état */
 DELIMITER //
 CREATE OR REPLACE PROCEDURE remove_quiz (
@@ -235,23 +268,12 @@ CREATE OR REPLACE VIEW QuizArchiveView AS SELECT id, login_creator, open, close,
 CREATE OR REPLACE VIEW QuizAnsweredView AS SELECT Quiz.id, login_creator, open, close, difficulty, points, type, title, question, PlayerQuizAnswered.login, success FROM Quiz, PlayerQuizAnswered WHERE Quiz.id = PlayerQuizAnswered.id ORDER BY open DESC, close DESC;
 
 /* Ajouter un choix de réponse possible à un quiz */
-DELIMITER //
 CREATE OR REPLACE PROCEDURE add_response (
   quiz_id TYPE OF QuizResponses.id,
   new_response TYPE OF QuizResponses.response,
   is_valid TYPE OF QuizResponses.valid
 )
-BEGIN
-  -- Annulation de la création du quiz
-  DECLARE EXIT HANDLER FOR SQLSTATE "45001"
-  BEGIN
-    DELETE FROM QuizResponses WHERE id = quiz_id;
-    DELETE FROM Quiz WHERE id = quiz_id;
-    RESIGNAL;
-  END;
-  INSERT INTO QuizResponses VALUES (quiz_id, new_response, is_valid);
-END; //
-DELIMITER ;
+INSERT INTO QuizResponses VALUES (quiz_id, new_response, is_valid);
 
 /* Vue pour les réponses des quiz en stock */
 CREATE OR REPLACE VIEW QuizResponsesStockView AS 
@@ -276,16 +298,12 @@ UNION
   EXCEPT (SELECT id, response, 0, login FROM PlayerQuizResponses)) AS a);
 
 /* Répondre à un quiz */
-DELIMITER //
 CREATE OR REPLACE PROCEDURE answer_quiz (
   login_player TYPE OF PlayerQuizResponses.login,
   quiz_id TYPE OF PlayerQuizResponses.id,
   response TYPE OF PlayerQuizResponses.response
 )
-BEGIN
-  INSERT INTO PlayerQuizResponses (login, id, response) VALUES (login_player, quiz_id, response);
-END; //
-DELIMITER ;
+INSERT INTO PlayerQuizResponses (login, id, response) VALUES (login_player, quiz_id, response);
 
 /**
  * Procédure à appeler après avoir répondu à un quiz
@@ -353,46 +371,12 @@ BEGIN
   -- Le quiz est en échec
   ELSEIF success_quiz IS NULL THEN
   -- Marquage du quiz comme échoué 
-    INSERT INTO PlayerQuizAnswered VALUES
+    INSERT INTO PlayerQuizAnswered (login, id, success) VALUES
     (login_player, quiz_id, FALSE);
     -- Mise à jour du compteur de quiz échoués
     UPDATE Users SET fail = fail + 1 
     WHERE login = login_player;
   END IF;
-  RETURN res;
-END; //
-DELIMITER ;
-
-/**
- * Vérifie la validité d'un quiz en fonction des réponses et du type de quiz
- * @return TRUE si quiz valid FALSE sinon 
- **/
-DELIMITER //
-CREATE OR REPLACE FUNCTION check_quiz (
-  quiz_id TYPE OF Quiz.id
-) RETURNS BOOLEAN
-BEGIN
-  DECLARE res BOOLEAN;
-  DECLARE quiz_type TYPE OF Quiz.type;
-  SELECT type INTO quiz_type FROM Quiz WHERE id = quiz_id;
-  SELECT
-    -- Au moins une réponse entrée pas obligatoirement valide
-    EXISTS(SELECT * FROM QuizResponses WHERE id = quiz_id)
-    AND (
-      -- Pas de condition particulière pour quiz checkbox
-      (quiz_type = 'checkbox')
-      -- Une seule réponse valide parmi les réponses pour quiz radio
-      OR (
-        quiz_type = 'radio' 
-        AND (SELECT COUNT(*) = 1 FROM QuizResponses WHERE id = quiz_id AND valid)
-      )
-      -- Une seule réponse valide uniquement pour quiz text
-      OR (
-        quiz_type = 'text'
-        AND (SELECT SUM(CASE WHEN valid THEN 1 ELSE -1 END) = 1 FROM QuizResponses WHERE id = quiz_id)
-      )
-    )
-  INTO res;
   RETURN res;
 END; //
 DELIMITER ;

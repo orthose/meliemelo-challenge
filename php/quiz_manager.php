@@ -19,11 +19,9 @@ function create_quiz($open, $close, $difficulty, $points, $type, $title, $questi
   if ($pdo !== NULL) {
     
     try {
-      $step_error = "START TRANSACTION";
       // Activation de la transaction
       $pdo->beginTransaction();
       
-      $step_error = "create_quiz";
       // Création des métadonnées du quiz
       $sql = "SELECT create_quiz(:login, :open, :close, :difficulty, :points, :type, :title, :question)";
       $params = array(
@@ -48,7 +46,6 @@ function create_quiz($open, $close, $difficulty, $points, $type, $title, $questi
       $res["quiz_id"] = $request->fetch()[0];
       $request->closeCursor();
       
-      $step_error = "add_response";
       // Ajout des réponses si la création n'a pas échoué
       $sql = "CALL add_response(:quiz_id, :response, :valid)";
       $request = $pdo->prepare($sql);
@@ -60,16 +57,13 @@ function create_quiz($open, $close, $difficulty, $points, $type, $title, $questi
         check_request($request->execute());
       }
       
-      $step_error = "check_quiz";
       // Vérification de la validité du quiz
-      $sql = "SELECT check_quiz(:quiz_id)";
+      $sql = "CALL check_quiz(:quiz_id)";
       $request = $pdo->prepare($sql);
       $request->bindParam(":quiz_id", $res["quiz_id"]);
-      // La fonction check_quiz ne renvoie pas d'erreur mais un booléen
-      // L'erreur n'est pas remontée dans request_database_error
-      check_request($request->execute() && $request->fetch()[0]);
+      // La fonction check_quiz renvoie une erreur si quiz invalide
+      check_request($request->execute());
       
-      $step_error = "COMMIT";
       // Acceptation de la transaction
       $pdo->commit();
     }
@@ -77,7 +71,6 @@ function create_quiz($open, $close, $difficulty, $points, $type, $title, $questi
     // Echec de la création de quiz
     catch (Exception $e){
       error_fun_default($request, $res);
-      error_debug("step_error", $step_error, $res);
       $res["create_quiz_status"] = false;
       // Abandon de la transaction
       $pdo->rollback();
@@ -123,11 +116,9 @@ function answer_quiz($quiz_id, $responses) {
   if ($pdo !== NULL) {
   
     try {
-      $step_error = "START TRANSACTION";
       // Activation de la transaction
       $pdo->beginTransaction();
       
-      $step_error = "answer_quiz";
       // Ajout des réponses
       $sql = "CALL answer_quiz(:login, :quiz_id, :response)";
       $params = array(":login" => get_login(), ":quiz_id" => $quiz_id);
@@ -142,7 +133,6 @@ function answer_quiz($quiz_id, $responses) {
         check_request($request->execute());
       }
       
-      $step_error = "check_answer";
       // Calcul du nombre de points
       $sql = "SELECT check_answer(:login, :quiz_id)";
       $params = array(":login" => get_login(), ":quiz_id" => $quiz_id);
@@ -155,7 +145,6 @@ function answer_quiz($quiz_id, $responses) {
       check_request($request->execute());
       $res["points"] = $request->fetch()[0];
       
-      $step_error = "COMMIT";
       // Acceptation de la transaction
       $pdo->commit();
     }
@@ -163,7 +152,6 @@ function answer_quiz($quiz_id, $responses) {
     // Echec de d'envoi de la réponse
     catch (Exception $e) {
       error_fun_default($request, $res);
-      error_debug("step_error", $step_error, $res);
       $res["answer_quiz_status"] = false;
       // Abandon de la transaction
       $pdo->rollback();
