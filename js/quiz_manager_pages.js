@@ -175,6 +175,14 @@ function add_choice(tag) {
   }
 }
 
+// Conversion en string d'un objet Date
+function date_to_string(date) {
+  const day = ("0" + date.getDate()).slice(-2);
+  const month = ("0" + date.getMonth() + 1).slice(-2);
+  const year = date.getFullYear();
+  return year + "-" + month + "-" + day;
+}
+
 function create_quiz_page() {
   if (user_login !== "" && user_role !== "undefined") {
     push_state(13);
@@ -218,6 +226,16 @@ function create_quiz_page() {
       </div>
       <p class="error" hidden></p>
       `);
+    // Remplissage automatique des dates
+    const currentDate = new Date();
+    page.find("#open").val(date_to_string(currentDate));
+    const nextWeek = new Date(currentDate.setDate(currentDate.getDate() + 7));
+    page.find("#close").val(date_to_string(nextWeek));
+    page.find("#open").change(function() {
+      const openDate = new Date($("#open").val());
+      const nextWeek = new Date(openDate.setDate(openDate.getDate() + 7));
+      $("#close").val(date_to_string(nextWeek));
+    })
     $("main").html(page);
   }
 }
