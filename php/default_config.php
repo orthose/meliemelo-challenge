@@ -12,7 +12,8 @@ $config = array(
   "login_player" => "player_meliemelo",
   "passwd_player" => "test", // MODIFIER
   "login_admin" => "admin_meliemelo",
-  "passwd_admin" => "test" // MODIFIER
+  "passwd_admin" => "test", // MODIFIER
+  "theme" => "default_style",
 ); 
 
 ?>

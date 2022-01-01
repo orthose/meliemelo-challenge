@@ -56,6 +56,9 @@ mysql> source rules.sql;
 ```
 
 ## Configuration de l'accès à la base
+```
+cp ./php/default_config.php ./php/config.php
+```
 Rendez-vous dans le fichier ./php/config.php et modifiez uniquement
 les valeurs commençant par passwd. Ce sont les mots de passe associés
 aux utilisateurs de MariaDB créés précédemment.
