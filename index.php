@@ -30,6 +30,7 @@
   <script src="js/daily_msg.js"></script>
   <script src="js/login_manager_pages.js"></script>
   <script src="js/login_manager_ajax.js"></script>
+  <script src="js/lib_quiz_manager.js"></script>
   <script src="js/quiz_manager_pages.js"></script>
   <script src="js/quiz_manager_ajax.js"></script>
   <script src="js/bug_report.js"></script>

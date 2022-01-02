@@ -1,15 +1,3 @@
-function show_quiz(tag) {
-  $(tag).next().show();
-  $(tag).parent().attr("class", "select_quiz_unfolded");
-  $(tag).attr("onclick", "hide_quiz(this)");
-}
-
-function hide_quiz(tag) {
-  $(tag).next().hide();
-  $(tag).parent().attr("class", "select_quiz_folded");
-  $(tag).attr("onclick", "show_quiz(this)");
-}
-
 function list_quiz(state, action) {
   function text_button_action(action) {
     if (action === "answer") {
@@ -23,6 +11,15 @@ function list_quiz(state, action) {
     }
     else if (action === "remove") {
       return `<button class="remove">Supprimer</button><p class="error" hidden></p>`;
+    }
+    else if (action === "stock") {
+      return `
+        <p>Date d'ouverture</p>
+        <input class="open" type="date"><br>
+        <p>Date de fermeture</p>
+        <input class="close" type="date"><br>
+        <button class="stock">Stocker</button>
+        <p class="error" hidden></p>`;
     }
   }
   $.ajax({
@@ -71,6 +68,12 @@ function list_quiz(state, action) {
       else if (action === "remove") {
         line.find("button.remove").on("click", function() { remove_quiz(this, row[0]); });
       }
+      else if (action === "stock") {
+        // Remplissage automatique des dates
+        auto_init_date(line, "input.open", "input.close");
+        line.find("input.open").change(function() { auto_fill_close_date("main #"+row[0]+" input.open", "main #"+row[0]+" input.close"); });
+        line.find("button.stock").on("click", function() { stock_quiz(this, row[0]); });
+      }
       $("main").append(line);
     });
     session_is_alive(json);
@@ -102,6 +105,10 @@ function quiz_current_not_playable() {
 
 function quiz_answered() {
   list_quiz("answered", "show");
+}
+
+function quiz_stockable() {
+  list_quiz("stockable", "stock");
 }
 
 function answer_quiz(type, quiz_id) {
@@ -235,4 +242,32 @@ function remove_quiz(tag, quiz_id) {
     if (config["debug"]) { console.log(e); }
     document.location.href = "index.php";
   })
+}
+
+function stock_quiz(tag, quiz_id) {
+  $.ajax({
+    method: "POST",
+    url: config["serverURL"] + "/meliemelo-challenge/requests.php",
+    dataType: "json",
+    data: {
+      "request": "stock_quiz",
+      "quiz_id": quiz_id,
+      "open_date": $(tag).parent().find("input.open").val(),
+      "close_date": $(tag).parent().find("input.close").val()
+    }
+  }).done(function(json) {
+    if (config["debug"]) { console.log(json); }
+    if (!json["stock_quiz_status"]) {
+      const error_tag = $(tag).parent().find("p.error");
+      error_tag.show();
+      error_tag.html("Le stockage du quiz a échoué.");
+    }
+    else {
+      $("main #"+quiz_id).remove();
+    }
+    session_is_alive(json);
+  }).fail(function(e) {
+    if (config["debug"]) { console.log(e); }
+    document.location.href = "index.php";
+  });
 }

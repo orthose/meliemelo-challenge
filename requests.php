@@ -167,6 +167,18 @@ else if ($request === "remove_quiz") {
   request_template($valid, $doc, $fun);
 }
 
+else if ($request === "stock_quiz") {
+  $valid = isset($_REQUEST["quiz_id"]) && isset($_REQUEST["open_date"]) && isset($_REQUEST["close_date"]);
+  $doc = "qtock_quiz(quiz_id, open_date, close_date)";
+  $fun = function() {
+    $quiz_id = $_REQUEST["quiz_id"];
+    $open_date = $_REQUEST["open_date"];
+    $close_date = $_REQUEST["close_date"];
+    return stock_quiz($quiz_id, $open_date, $close_date);
+  };
+  request_template($valid, $doc, $fun);
+}
+
 else if ($request === "answer_quiz") {
   $valid = (isset($_REQUEST["quiz_id"]));
   $doc = "answer_quiz(quiz_id, responses = array())";
@@ -210,6 +222,14 @@ else if ($request === "quiz_stock") {
   $valid = true;
   $doc = "quiz_stock()";
   $fun = function() { return quiz_stock(); };
+  request_template($valid, $doc, $fun);
+}
+
+else if ($request === "quiz_stockable") {
+  // La base de données ne gère pas cette permission
+  $valid = isset($_SESSION["role"]) && $_SESSION["role"] === "admin";
+  $doc = "quiz_stockable()";
+  $fun = function() { return quiz_stockable(); };
   request_template($valid, $doc, $fun);
 }
 

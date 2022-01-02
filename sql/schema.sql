@@ -35,7 +35,7 @@ CREATE TABLE Quiz (
   open DATE NOT NULL, -- Date à laquelle pour être ouvert le quiz
   close DATE NOT NULL, -- Date à laquelle le quiz expire
   creation DATE NOT NULL DEFAULT CURRENT_DATE, -- Date de création
-  CHECK(open <= close),
+  CHECK(CURRENT_DATE <= open), CHECK(open <= close),
   difficulty TINYINT NOT NULL CHECK(1 <= difficulty AND difficulty <= 10),
   points TINYINT NOT NULL CHECK(0 <= points AND points <= 10),
   type ENUM('checkbox_and', 'checkbox_or', 'radio', 'text') NOT NULL, -- Type de réponse du quiz

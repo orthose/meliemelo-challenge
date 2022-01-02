@@ -175,14 +175,6 @@ function add_choice(tag) {
   }
 }
 
-// Conversion en string d'un objet Date
-function date_to_string(date) {
-  const day = ("0" + date.getDate()).slice(-2);
-  const month = ("0" + date.getMonth() + 1).slice(-2);
-  const year = date.getFullYear();
-  return year + "-" + month + "-" + day;
-}
-
 function create_quiz_page() {
   if (user_login !== "" && user_role !== "undefined") {
     push_state(13);
@@ -227,14 +219,9 @@ function create_quiz_page() {
       <p class="error" hidden></p>
       `);
     // Remplissage automatique des dates
-    const currentDate = new Date();
-    page.find("#open").val(date_to_string(currentDate));
-    const nextWeek = new Date(currentDate.setDate(currentDate.getDate() + 7));
-    page.find("#close").val(date_to_string(nextWeek));
+    auto_init_date(page, "#open", "#close");
     page.find("#open").change(function() {
-      const openDate = new Date($("#open").val());
-      const nextWeek = new Date(openDate.setDate(openDate.getDate() + 7));
-      $("#close").val(date_to_string(nextWeek));
+      auto_fill_close_date("#open", "#close");
     })
     $("main").html(page);
   }
@@ -249,5 +236,17 @@ function remove_quiz_page() {
       `);
     $("main").html(page);
     quiz_editable_remove();
+  }
+}
+
+function stockable_quiz_page() {
+  if (user_login !== "" && user_role !== "undefined") {
+    //push_state(?);
+    const page = $(`
+      <h2>Quiz ouverts</h2>
+      <p>Choisissez un quiz ouvert parmi ceux que vous avez créés.</p>
+      `);
+    $("main").html(page);
+    quiz_stockable();
   }
 }

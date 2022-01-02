@@ -403,6 +403,37 @@ CREATE OR REPLACE PROCEDURE close_quiz (
 )
 UPDATE Quiz SET state = "archive" WHERE id = quiz_id;
 
+/* Mettre en stock un quiz en jeu ou archivé */
+DELIMITER //
+CREATE OR REPLACE PROCEDURE stock_quiz (
+  login TYPE OF Quiz.login_creator,
+  quiz_id TYPE OF Quiz.id,
+  open_date TYPE OF Quiz.open,
+  close_date TYPE OF Quiz.close
+)
+BEGIN
+  IF NOT EXISTS(SELECT * FROM Quiz WHERE login_creator = login AND id = quiz_id)
+  THEN
+    SIGNAL SQLSTATE '45000' 
+    SET MESSAGE_TEXT = 'Invalid login creator or id for this quiz';
+  END IF;
+  IF (SELECT state FROM Quiz WHERE id = quiz_id) = 'stock' 
+  THEN
+    SIGNAL SQLSTATE '45000' 
+    SET MESSAGE_TEXT = 'Quiz is already in stock';
+  END IF;
+  START TRANSACTION;
+  -- Suppression des réponses données par les joueurs
+  DELETE FROM PlayerQuizResponses WHERE id = quiz_id;
+  DELETE FROM PlayerQuizAnswered WHERE id = quiz_id;
+  -- open1 <= open2 <= close2
+  UPDATE Quiz SET close = close_date WHERE id = quiz_id;
+  UPDATE Quiz SET open = open_date WHERE id = quiz_id;
+  UPDATE Quiz SET state = 'stock' WHERE id = quiz_id;
+  COMMIT;
+END; //
+DELIMITER ;
+
 /* Traitement automatique des quiz en fonction de leurs dates */
 DELIMITER //
 CREATE OR REPLACE FUNCTION cron_routine () RETURNS JSON

@@ -85,7 +85,7 @@ function create_quiz($open, $close, $difficulty, $points, $type, $title, $questi
 
 /**
  * Suppression de quiz par l'administrateur en étant le créateur si en stock
- * @return: JSON avec champ create_quiz_status = true si le quiz a bien été 
+ * @return: JSON avec champ remove_quiz_status = true si le quiz a bien été 
  * créé, le login de l'utilisateur et l'id du quiz
  **/
 function remove_quiz($quiz_id) {
@@ -95,6 +95,24 @@ function remove_quiz($quiz_id) {
   $error_fun = function($request, &$res) {
     error_fun_default($request, $res);
     $res["remove_quiz_status"] = false;
+  };
+  request_database(get_role(), $sql, $params, $res, $error_fun);
+  return $res;
+}
+
+/**
+ * Remise en stock d'un quiz en jeu ou archivé par son créateur
+ * @return: JSON avec champ quiz_stock_status = true si quiz bien mis en stock,
+ * le login de l'utilisateur et l'id du quiz
+ **/
+function stock_quiz($quiz_id, $open_date, $close_date) {
+  $sql = "CALL stock_quiz(:login, :quiz_id, :open_date, :close_date)";
+  $params = array(":login" => get_login(), ":quiz_id" => $quiz_id, 
+  ":open_date" => $open_date, ":close_date" => $close_date);
+  $res = array("login" => get_login(), "quiz_id" => $quiz_id, "stock_quiz_status" => true);
+  $error_fun = function($request, &$res) {
+    error_fun_default($request, $res);
+    $res["stock_quiz_status"] = false;
   };
   request_database(get_role(), $sql, $params, $res, $error_fun);
   return $res;
@@ -200,7 +218,9 @@ function list_quiz($sql1, $sql2, $params, $fill_res1 = NULL, $fill_res2 = NULL) 
     }
     array_push($res["responses"][$row[0]], array($row[1], $row[2]));
   };
-  request_database(get_role(), $sql2, $params, $res, NULL, $fill_res);
+  if ($sql2 !== NULL) {
+    request_database(get_role(), $sql2, $params, $res, NULL, $fill_res);
+  }
   return $res;
 }
 
@@ -257,6 +277,18 @@ function quiz_stock() {
     "SELECT * FROM QuizStockView WHERE login_creator = :login", 
     "SELECT * FROM QuizResponsesStockView WHERE login_creator = :login", 
     array(":login" => get_login())
+  );
+}
+
+/**
+ * Renvoie les quiz qui peuvent être remis en stock
+ * avec les infos principales et les réponses valides et invalides
+ **/
+function quiz_stockable() {
+  return list_quiz(
+    "SELECT * FROM QuizCurrentView WHERE login_creator = :login
+    UNION SELECT * FROM QuizArchiveView WHERE login_creator = :login",
+    NULL, array(":login" => get_login())
   );
 }
 

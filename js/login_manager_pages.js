@@ -60,6 +60,7 @@ function main_menu_page() {
         <hr>
         <button onclick="create_quiz_page()">Créer un quiz</button>
         <button onclick="remove_quiz_page()">Supprimer un quiz</button>
+        <button onclick="stockable_quiz_page()">Remettre en jeu un quiz</button>
         <hr>
         <button onclick="set_daily_msg_page()">Changer le message du jour</button>
         <button onclick="set_role_page()">Changer de rôle</button>
