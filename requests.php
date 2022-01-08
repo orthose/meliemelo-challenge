@@ -38,21 +38,18 @@ if ($request === "connection") {
     $passwd = $_REQUEST["passwd"];
     return connection($login, $passwd);
   };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "disconnection") {
   $valid = true;
   $doc = "disconnection()";
   $fun = function() { return disconnection(); };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "check_session") {
   $valid = true;
   $doc = "check_session()";
   $fun = function() { return check_session(); };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "register") {
@@ -63,7 +60,6 @@ else if ($request === "register") {
     $passwd = $_REQUEST["passwd"];
     return register($login, $passwd); 
   };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "unregister") {
@@ -73,7 +69,6 @@ else if ($request === "unregister") {
     $passwd = $_REQUEST["passwd"];
     return unregister($passwd); 
   };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "set_password") {
@@ -84,7 +79,6 @@ else if ($request === "set_password") {
     $new_passwd = $_REQUEST["new"];
     return set_password($actual_passwd, $new_passwd);
   };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "set_role") {
@@ -95,7 +89,6 @@ else if ($request === "set_role") {
     $new_role = $_REQUEST["new_role"];
     return set_role($login, $new_role);
   };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "high_score") {
@@ -104,7 +97,6 @@ else if ($request === "high_score") {
   $fun = function() {
     return high_score();
   };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "high_score_quiz_title") {
@@ -124,7 +116,6 @@ else if ($request === "high_score_quiz_title") {
     }
     return high_score_quiz_title($title, $begin_date, $end_date);
   };
-  request_template($valid, $doc, $fun);
 }
 
 // Actions de quiz_manager
@@ -154,7 +145,6 @@ else if ($request === "create_quiz") {
     }
     return create_quiz($open, $close, $difficulty, $points, $type, $title, $question, $responses);
   };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "remove_quiz") {
@@ -164,7 +154,6 @@ else if ($request === "remove_quiz") {
     $quiz_id = $_REQUEST["quiz_id"];
     return remove_quiz($quiz_id);
   };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "stock_quiz") {
@@ -176,7 +165,6 @@ else if ($request === "stock_quiz") {
     $close_date = $_REQUEST["close_date"];
     return stock_quiz($quiz_id, $open_date, $close_date);
   };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "answer_quiz") {
@@ -193,14 +181,12 @@ else if ($request === "answer_quiz") {
     }
     return answer_quiz($quiz_id, $responses);
   };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "quiz_current") {
   $valid = true;
   $doc = "quiz_current()";
   $fun = function() { return quiz_current(); };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "quiz_current_not_playable") {
@@ -208,21 +194,18 @@ else if ($request === "quiz_current_not_playable") {
   $valid = isset($_SESSION["role"]) && $_SESSION["role"] === "admin";
   $doc = "quiz_current_not_playable()";
   $fun = function() { return quiz_current_not_playable(); };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "quiz_archive") {
   $valid = true;
   $doc = "quiz_archive()";
   $fun = function() { return quiz_archive(); };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "quiz_stock") {
   $valid = true;
   $doc = "quiz_stock()";
   $fun = function() { return quiz_stock(); };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "quiz_stockable") {
@@ -230,21 +213,18 @@ else if ($request === "quiz_stockable") {
   $valid = isset($_SESSION["role"]) && $_SESSION["role"] === "admin";
   $doc = "quiz_stockable()";
   $fun = function() { return quiz_stockable(); };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "quiz_editable") {
   $valid = true;
   $doc = "quiz_editable()";
   $fun = function() { return quiz_editable(); };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "quiz_answered") {
   $valid = true;
   $doc = "quiz_answered()";
   $fun = function() { return quiz_answered(); };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "set_daily_msg") {
@@ -258,7 +238,6 @@ else if ($request === "set_daily_msg") {
     $res["set_daily_msg_status"] = (file_put_contents("public_data/daily_msg.txt", $msg) !== false);
     return $res;
   };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "bug_reported") {
@@ -266,7 +245,6 @@ else if ($request === "bug_reported") {
   $valid = isset($_SESSION["role"]) && ($_SESSION["role"] === "admin" || $_SESSION["role"] === "player");
   $doc = "bug_reported()";
   $fun = function() { return bug_reported(); };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "bug_report") {
@@ -278,7 +256,6 @@ else if ($request === "bug_report") {
     $bug = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $bug);
     return bug_report($bug); 
   };
-  request_template($valid, $doc, $fun);
 }
 
 else if ($request === "answer_bug") {
@@ -290,14 +267,16 @@ else if ($request === "answer_bug") {
     $response = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $response);
     return answer_bug($_REQUEST["id"], $response); 
   };
-  request_template($valid, $doc, $fun);
 }
 
 // Action non-répertoriée
 else {
   $valid = false;
   $doc = "Action doesn't exist";
-  request_template($valid, $doc, NULL);
+  $fun = NULL;
 }
+
+// Appel de la requête
+request_template($valid, $doc, $fun);
 
 ?>
