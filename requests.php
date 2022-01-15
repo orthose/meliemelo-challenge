@@ -197,34 +197,34 @@ else if ($request === "quiz_current_not_playable") {
 }
 
 else if ($request === "quiz_archive") {
-  $valid = true;
-  $doc = "quiz_archive()";
-  $fun = function() { return quiz_archive(); };
+  $valid = isset($_REQUEST["year"]);
+  $doc = "quiz_archive(year)";
+  $fun = function() { return quiz_archive($_REQUEST["year"]); };
 }
 
 else if ($request === "quiz_stock") {
-  $valid = true;
+  $valid = isset($_REQUEST["year"]);
   $doc = "quiz_stock()";
-  $fun = function() { return quiz_stock(); };
+  $fun = function() { return quiz_stock($_REQUEST["year"]); };
 }
 
 else if ($request === "quiz_stockable") {
   // La base de données ne gère pas cette permission
-  $valid = isset($_SESSION["role"]) && $_SESSION["role"] === "admin";
+  $valid = isset($_SESSION["role"]) && $_SESSION["role"] === "admin" && isset($_REQUEST["year"]);
   $doc = "quiz_stockable()";
-  $fun = function() { return quiz_stockable(); };
+  $fun = function() { return quiz_stockable($_REQUEST["year"]); };
 }
 
 else if ($request === "quiz_editable") {
-  $valid = true;
+  $valid = isset($_REQUEST["year"]);
   $doc = "quiz_editable()";
-  $fun = function() { return quiz_editable(); };
+  $fun = function() { return quiz_editable($_REQUEST["year"]); };
 }
 
 else if ($request === "quiz_answered") {
-  $valid = true;
+  $valid = isset($_REQUEST["year"]);
   $doc = "quiz_answered()";
-  $fun = function() { return quiz_answered(); };
+  $fun = function() { return quiz_answered($_REQUEST["year"]); };
 }
 
 else if ($request === "set_daily_msg") {

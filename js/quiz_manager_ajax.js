@@ -1,86 +1,110 @@
 function list_quiz(state, action) {
-  function text_button_action(action) {
-    if (action === "answer") {
-      return `<button class="answer">Répondre</button>`;
-    }
-    else if (state === "answered" && action === "show") {
-      return `<button class="show">Mes réponses</button>`;
-    }
-    else if (action === "show") {
-      return `<button class="show">Voir les réponses</button>`;
-    }
-    else if (action === "remove") {
-      return `<button class="remove">Supprimer</button><p class="error" hidden></p>`;
-    }
-    else if (action === "stock") {
-      return `
-        <p>Date d'ouverture</p>
-        <input class="open" type="date"><br>
-        <p>Date de fermeture</p>
-        <input class="close" type="date"><br>
-        <button class="stock">Stocker</button>
-        <p class="error" hidden></p>`;
-    }
-  }
-  $.ajax({
-    method: "POST",
-    url: config["serverURL"] + "/meliemelo-challenge/requests.php",
-    dataType: "json",
-    data: {
-      "request": "quiz_" + state
-    }
-  }).done(function(json) {
-    if (config["debug"]) { console.log(json); }
-    json["quiz"].forEach(function(row) {
-      const line = $(`<div class='select_quiz_folded' id="` + row[0] + `">`);
-      if (state === "answered") {
-        let button = $(`<button onclick="show_quiz(this)">` + row[7] + `</button>`);
-        if (row[9] == 0) {
-          button.addClass("invalid");
-        }
-        else if (row[9] == 1) {
-          button.addClass("valid");
-        }
-        line.append(button);
-      }
-      else {
-        line.append($(`<button onclick="show_quiz(this)">` + row[7] + `</button>`));
-      }
-      line.append($(`
-        <div hidden>
-        <table>
-        <tr><th>Numéro</th><th>Auteur</th></tr>
-        <tr><td>` + row[0] + `</td><td>` + row[1] + `</td></tr>
-        <tr><th>Ouverture</th><th>Fermeture</th></tr>
-        <tr><td>` + row[2] + `</td><td>` + row[3] + `</td></tr>
-        <tr><th>Difficulté</th><th>Points</th></tr>
-        <tr><td>` + row[4] + `</td><td>` + row[5] + `</td></tr>
-        </table>
-        ` + text_button_action(action) + `
-        </div>
-        `));
+  function list_quiz_ajax(state, action) {
+    function text_button_action(action) {
       if (action === "answer") {
-        line.find("button.answer").on("click", function() { answer_quiz_page(row[0], row[6], row[7], row[8], json["responses"][row[0]]); });
+        return `<button class="answer">Répondre</button>`;
+      }
+      else if (state === "answered" && action === "show") {
+        return `<button class="show">Mes réponses</button>`;
       }
       else if (action === "show") {
-        line.find("button.show").on("click", function() { show_quiz_page(state, row[0], row[6], row[7], row[8], json["responses"][row[0]]); });
+        return `<button class="show">Voir les réponses</button>`;
       }
       else if (action === "remove") {
-        line.find("button.remove").on("click", function() { remove_quiz(this, row[0]); });
+        return `<button class="remove">Supprimer</button><p class="error" hidden></p>`;
       }
       else if (action === "stock") {
-        // Remplissage automatique des dates
-        auto_init_date(line, "input.open", "input.close");
-        line.find("input.open").change(function() { auto_fill_close_date("main #"+row[0]+" input.open", "main #"+row[0]+" input.close"); });
-        line.find("button.stock").on("click", function() { stock_quiz(this, row[0]); });
+        return `
+          <p>Date d'ouverture</p>
+          <input class="open" type="date"><br>
+          <p>Date de fermeture</p>
+          <input class="close" type="date"><br>
+          <button class="stock">Stocker</button>
+          <p class="error" hidden></p>`;
       }
-      $("main").append(line);
+    }
+    $.ajax({
+      method: "POST",
+      url: config["serverURL"] + "/meliemelo-challenge/requests.php",
+      dataType: "json",
+      data: {
+        "request": "quiz_" + state,
+        "year": $("#year").val()
+      }
+    }).done(function(json) {
+      if (config["debug"]) { console.log(json); }
+      json["quiz"].forEach(function(row) {
+        const line = $(`<div class='select_quiz_folded' id="` + row[0] + `">`);
+        if (state === "answered") {
+          let button = $(`<button onclick="show_quiz(this)">` + row[7] + `</button>`);
+          if (row[9] == 0) {
+            button.addClass("invalid");
+          }
+          else if (row[9] == 1) {
+            button.addClass("valid");
+          }
+          line.append(button);
+        }
+        else {
+          line.append($(`<button onclick="show_quiz(this)">` + row[7] + `</button>`));
+        }
+        line.append($(`
+          <div hidden>
+          <table>
+          <tr><th>Numéro</th><th>Auteur</th></tr>
+          <tr><td>` + row[0] + `</td><td>` + row[1] + `</td></tr>
+          <tr><th>Ouverture</th><th>Fermeture</th></tr>
+          <tr><td>` + row[2] + `</td><td>` + row[3] + `</td></tr>
+          <tr><th>Difficulté</th><th>Points</th></tr>
+          <tr><td>` + row[4] + `</td><td>` + row[5] + `</td></tr>
+          </table>
+          ` + text_button_action(action) + `
+          </div>
+          `));
+        if (action === "answer") {
+          line.find("button.answer").on("click", function() { answer_quiz_page(row[0], row[6], row[7], row[8], json["responses"][row[0]]); });
+        }
+        else if (action === "show") {
+          line.find("button.show").on("click", function() { show_quiz_page(state, row[0], row[6], row[7], row[8], json["responses"][row[0]]); });
+        }
+        else if (action === "remove") {
+          line.find("button.remove").on("click", function() { remove_quiz(this, row[0]); });
+        }
+        else if (action === "stock") {
+          // Remplissage automatique des dates
+          auto_init_date(line, "input.open", "input.close");
+          line.find("input.open").change(function() { auto_fill_close_date("main #"+row[0]+" input.open", "main #"+row[0]+" input.close"); });
+          line.find("button.stock").on("click", function() { stock_quiz(this, row[0]); });
+        }
+        $("main div#list_quiz").append(line);
+      });
+      session_is_alive(json);
+    }).fail(function(e) {
+      if (config["debug"]) { console.log(e); }
+      document.location.href = "index.php";
+    })
+  }
+  // Sélection de l'année de filtrage
+  if (!(state === "current" || state == "current_not_playable")) {
+    const today = new Date();
+    const actual_year = today.getFullYear();
+    const select_year = $(`
+      <p>Sélectionnez une année de filtrage</p>
+      <select id="year">
+      </select>
+      `);
+    $("main h2").after(select_year);
+    // De l'année actuelle à 2021
+    for (let y = actual_year; y >= 2021; y--) {
+      $("#year").append($("<option>").val(y).text(y));
+    }
+    // Appel automatique de list_quiz si changement d'année
+    $("main #year").on("change", function() {
+      $("main div#list_quiz div").remove();
+      list_quiz_ajax(state, action);
     });
-    session_is_alive(json);
-  }).fail(function(e) {
-    if (config["debug"]) { console.log(e); }
-    document.location.href = "index.php";
-  })
+  }
+  list_quiz_ajax(state, action);
 }
 
 function quiz_current() {

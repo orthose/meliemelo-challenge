@@ -40,7 +40,7 @@ function create_quiz($open, $close, $difficulty, $points, $type, $title, $questi
         $request->bindParam($param, $params[$param]);
       } 
     
-      check_request($request->execute());
+      execute_request($request);
       
       // Récupération de l'identifiant de quiz
       $res["quiz_id"] = $request->fetch()[0];
@@ -54,7 +54,7 @@ function create_quiz($open, $close, $difficulty, $points, $type, $title, $questi
       foreach($responses as $response) {
         $request->bindParam(":response", $response["response"]);
         $request->bindParam(":valid", $response["valid"]);
-        check_request($request->execute());
+        execute_request($request);
       }
       
       // Vérification de la validité du quiz
@@ -62,7 +62,7 @@ function create_quiz($open, $close, $difficulty, $points, $type, $title, $questi
       $request = $pdo->prepare($sql);
       $request->bindParam(":quiz_id", $res["quiz_id"]);
       // La fonction check_quiz renvoie une erreur si quiz invalide
-      check_request($request->execute());
+      execute_request($request);
       
       // Acceptation de la transaction
       $pdo->commit();
@@ -148,7 +148,7 @@ function answer_quiz($quiz_id, $responses) {
       
       foreach ($responses as $response) {
         $request->bindParam(":response", $response);
-        check_request($request->execute());
+        execute_request($request);
       }
       
       // Calcul du nombre de points
@@ -160,7 +160,7 @@ function answer_quiz($quiz_id, $responses) {
         $request->bindParam($param, $params[$param]);
       }
       
-      check_request($request->execute());
+      execute_request($request);
       $res["points"] = $request->fetch()[0];
       
       // Acceptation de la transaction
@@ -200,27 +200,65 @@ function cron_routine() {
   return $res;
 }
 
-// Factorisation de requêtes
-function list_quiz($sql1, $sql2, $params, $fill_res1 = NULL, $fill_res2 = NULL) {
-  // Sélection des infos principales
+/** 
+ * Factorisation de requêtes de listage des quiz
+ * @param sql1: string de la requête SQL des métadonnées
+ * @param sql2: string de la requête SQL des réponses aux quiz
+ * @param year: Année de filtrage facultative
+ * @param fill_res1: Remplissage facultatif du tableau des résultats pour les métadonnées
+ * @param fill_res1: Remplissage facultatif du tableau des résultats pour les réponses aux quiz
+ * 
+ * Note : Les requêtes SQL doivent toujours finir par WHERE ou WHERE ... AND pour permettre
+ * le filtrage sur l'année qui est obligatoire. La fonction le laisse optionnel car quiz_current
+ * ne peut pas suivre ce pattern de factorisation.
+ **/
+function list_quiz($sql1, $sql2, $params, $year = NULL, $fill_res1 = NULL, $fill_res2 = NULL) {
   $res = array("quiz" => array(), "responses" => array());
-  $fill_res = $fill_res1 !== NULL ? $fill_res1 : 
-  function($row, &$res) {
-    $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
-    array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question));
-  };
-  request_database(get_role(), $sql1, $params, $res, NULL, $fill_res);
-  // Sélection des réponses
-  $fill_res = $fill_res2 !== NULL ? $fill_res2 :
-  function($row, &$res) {
-    if (!isset($res["responses"][$row[0]])) {
-      $res["responses"][$row[0]] = array();
+  request_database_manual($res,
+    function($pdo, &$res) use($sql1, $sql2, $params, $year, $fill_res1, $fill_res2) {
+      
+      // Sélection des infos principales
+      $sql1 = $year !== NULL ? str_replace("[YEAR]", " (YEAR(open) = :year OR YEAR(close) = :year) ", $sql1) : $sql1;
+      $sql = "CREATE TEMPORARY TABLE QuizHeader (".$sql1.")";
+      $fill_res = $fill_res1 !== NULL ? $fill_res1 : 
+      function($row, &$res) {
+        $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
+        array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question));
+      };
+      $request = $pdo->prepare($sql);
+      foreach($params as $param => $_) {
+        $request->bindParam($param, $params[$param]);
+      } 
+      if ($year !== NULL) { $request->bindParam(":year", $year); }
+      execute_request($request);
+      $sql = "SELECT * FROM QuizHeader";
+      $request = $pdo->prepare($sql);
+      execute_request($request);
+      foreach($request as $row) {
+        $fill_res($row, $res);
+      }
+      
+      // Sélection des réponses
+      if ($sql2 !== NULL) {
+        $sql = str_replace("[ID]", " id IN (SELECT id FROM QuizHeader) ", $sql2);
+        $fill_res = $fill_res2 !== NULL ? $fill_res2 :
+        function($row, &$res) {
+          if (!isset($res["responses"][$row[0]])) {
+            $res["responses"][$row[0]] = array();
+          }
+          array_push($res["responses"][$row[0]], array($row[1], $row[2]));
+        };
+        $request = $pdo->prepare($sql);
+        foreach($params as $param => $_) {
+          $request->bindParam($param, $params[$param]);
+        }
+        execute_request($request);
+        foreach($request as $row) {
+          $fill_res($row, $res);
+        }
+      }
     }
-    array_push($res["responses"][$row[0]], array($row[1], $row[2]));
-  };
-  if ($sql2 !== NULL) {
-    request_database(get_role(), $sql2, $params, $res, NULL, $fill_res);
-  }
+  );
   return $res;
 }
 
@@ -235,13 +273,10 @@ function quiz_current() {
     AND id NOT IN (
       SELECT id FROM PlayerQuizAnswered WHERE login = :login)",
     "SELECT qrcv.id, qrcv.response FROM QuizCurrentView AS qcv, QuizResponsesCurrentView AS qrcv
-    WHERE qcv.login_creator != :login
+    WHERE qrcv.id IN (SELECT id FROM QuizHeader) AND qcv.id = qrcv.id
     -- La réponse des quiz text ne doit pas être envoyée
-    AND qcv.type != 'text'
-    AND qcv.id = qrcv.id
-    AND qcv.id NOT IN (
-      SELECT id FROM PlayerQuizAnswered WHERE login = :login)",
-    array(":login" => get_login()), NULL,
+    AND qcv.type != 'text'",
+    array(":login" => get_login()), NULL, NULL,
     $fill_res = function($row, &$res) {
       if (!isset($res["responses"][$row[0]])) {
         $res["responses"][$row[0]] = array();
@@ -255,7 +290,7 @@ function quiz_current() {
 function quiz_current_not_playable() {
   return list_quiz(
     "SELECT * FROM QuizCurrentView WHERE login_creator = :login",
-    "SELECT * FROM QuizResponsesCurrentView WHERE login_creator = :login",
+    "SELECT * FROM QuizResponsesCurrentView WHERE [ID]",
     array(":login" => get_login())
   );
 }
@@ -264,19 +299,23 @@ function quiz_current_not_playable() {
  * Renvoie les quiz jouables (dans l'état archive)
  * avec les infos principales et les réponses valides et invalides
  **/
-function quiz_archive() {
-  return list_quiz("SELECT * FROM QuizArchiveView", "SELECT * FROM QuizResponsesArchiveView", array());
+function quiz_archive($year) {
+  return list_quiz(
+    "SELECT * FROM QuizArchiveView WHERE [YEAR]", 
+    "SELECT * FROM QuizResponsesArchiveView WHERE [ID]", 
+    array(), $year
+  );
 }
 
 /**
  * Renvoie les quiz en stock (dans l'état stock)
  * avec les infos principales et les réponses valides et invalides
  **/
-function quiz_stock() {
+function quiz_stock($year) {
   return list_quiz(
-    "SELECT * FROM QuizStockView WHERE login_creator = :login", 
-    "SELECT * FROM QuizResponsesStockView WHERE login_creator = :login", 
-    array(":login" => get_login())
+    "SELECT * FROM QuizStockView WHERE login_creator = :login AND [YEAR]", 
+    "SELECT * FROM QuizResponsesStockView WHERE [ID]", 
+    array(":login" => get_login()), $year
   );
 }
 
@@ -284,11 +323,11 @@ function quiz_stock() {
  * Renvoie les quiz qui peuvent être remis en stock
  * avec les infos principales et les réponses valides et invalides
  **/
-function quiz_stockable() {
+function quiz_stockable($year) {
   return list_quiz(
-    "SELECT * FROM QuizCurrentView WHERE login_creator = :login
-    UNION SELECT * FROM QuizArchiveView WHERE login_creator = :login",
-    NULL, array(":login" => get_login())
+    "SELECT * FROM (SELECT * FROM QuizCurrentView WHERE login_creator = :login AND [YEAR]
+    UNION SELECT * FROM QuizArchiveView WHERE login_creator = :login AND [YEAR]) AS t",
+    NULL, array(":login" => get_login()), $year
   );
 }
 
@@ -296,15 +335,16 @@ function quiz_stockable() {
  * Renvoie les quiz modifiables (tous les quiz créés par l'utilisateur)
  * avec les infos principales et les réponses valides et invalides
  **/
-function quiz_editable() {
+function quiz_editable($year) {
   return list_quiz(
-    "SELECT * FROM QuizStockView WHERE login_creator = :login
-    UNION SELECT * FROM QuizCurrentView WHERE login_creator = :login
-    UNION SELECT * FROM QuizArchiveView WHERE login_creator = :login", 
-    "SELECT * FROM QuizResponsesStockView WHERE login_creator = :login
-    UNION SELECT * FROM QuizResponsesCurrentView WHERE login_creator = :login
-    UNION SELECT * FROM QuizResponsesArchiveView WHERE login_creator = :login", 
-    array(":login" => get_login())
+    "SELECT * FROM (SELECT * FROM
+    (SELECT * FROM QuizStockView WHERE login_creator = :login AND [YEAR]
+    UNION SELECT * FROM QuizCurrentView WHERE login_creator = :login AND [YEAR]) AS t
+    UNION SELECT * FROM QuizArchiveView WHERE login_creator = :login AND [YEAR]) AS u", 
+    "SELECT * FROM QuizResponsesStockView WHERE [ID]
+    UNION SELECT * FROM QuizResponsesCurrentView WHERE [ID]
+    UNION SELECT * FROM QuizResponsesArchiveView WHERE [ID]", 
+    array(":login" => get_login()), $year
   );
 }
 
@@ -314,11 +354,11 @@ function quiz_editable() {
  * sélectionnées par le joueur et "invalides" celles non-sélectionnées
  * ATTENTION: Ce ne sont donc pas les réponses valides et invalides au sens propre
  **/
-function quiz_answered() {
+function quiz_answered($year) {
   return list_quiz(
-    "SELECT * FROM QuizAnsweredView WHERE login = :login", 
-    "SELECT * FROM QuizResponsesAnsweredView WHERE login = :login", 
-    array(":login" => get_login()),
+    "SELECT * FROM QuizAnsweredView WHERE login = :login AND [YEAR]", 
+    "SELECT * FROM QuizResponsesAnsweredView WHERE login = :login AND [ID]", 
+    array(":login" => get_login()), $year,
     function($row, &$res) {
       $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
       array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question, $row[10]));

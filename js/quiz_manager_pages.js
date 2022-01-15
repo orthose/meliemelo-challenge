@@ -4,6 +4,7 @@ function quiz_current_page() {
     const page = $(`
       <h2>Quiz en jeu</h2>
       <p>Choisissez un quiz parmi ceux disponibles.</p>
+      <div id="list_quiz"></div>
       `);
     $("main").html(page);
     quiz_current();
@@ -16,6 +17,7 @@ function quiz_current_not_playable_page() {
     const page = $(`
       <h2>Quiz en jeu créés par ` + user_login + `</h2>
       <p>Choisissez un quiz parmi ceux disponibles.</p>
+      <div id="list_quiz"></div>
       `);
     $("main").html(page);
     quiz_current_not_playable();
@@ -28,6 +30,7 @@ function quiz_archive_page() {
     const page = $(`
       <h2>Quiz archivés</h2>
       <p>Choisissez un quiz parmi ceux clôturés.</p>
+      <div id="list_quiz"></div>
       `);
     $("main").html(page);
     quiz_archive();
@@ -40,9 +43,49 @@ function quiz_stock_page() {
     const page = $(`
       <h2>Quiz en stock</h2>
       <p>Choisissez un quiz parmi ceux en stock.</p>
+      <div id="list_quiz"></div>
       `);
     $("main").html(page);
     quiz_stock();
+  }
+}
+
+function quiz_answered_page() {
+  if (user_login !== "" && user_role !== "undefined") {
+    push_state(16);
+    const page = $(`
+      <h2>Vos réponses aux quiz</h2>
+      <p>Choisissez un quiz parmi ceux auxquels vous avez répondu.</p>
+      <div id="list_quiz"></div>
+      `);
+    $("main").html(page);
+    quiz_answered();
+  }
+}
+
+function remove_quiz_page() {
+  if (user_login !== "" && user_role !== "undefined") {
+    push_state(14);
+    const page = $(`
+      <h2>Quiz supprimables</h2>
+      <p>Choisissez un quiz parmi ceux que vous avez créés.</p>
+      <div id="list_quiz"></div>
+      `);
+    $("main").html(page);
+    quiz_editable_remove();
+  }
+}
+
+function stockable_quiz_page() {
+  if (user_login !== "" && user_role !== "undefined") {
+    //push_state(?);
+    const page = $(`
+      <h2>Quiz ouverts</h2>
+      <p>Choisissez un quiz ouvert parmi ceux que vous avez créés.</p>
+      <div id="list_quiz"></div>
+      `);
+    $("main").html(page);
+    quiz_stockable();
   }
 }
 
@@ -78,18 +121,6 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
   }
   // Coloration syntaxique éventuelle des balises code
   hljs.highlightAll();
-}
-
-function quiz_answered_page() {
-  if (user_login !== "" && user_role !== "undefined") {
-    push_state(16);
-    const page = $(`
-      <h2>Vos réponses aux quiz</h2>
-      <p>Choisissez un quiz parmi ceux auxquels vous avez répondu.</p>
-      `);
-    $("main").html(page);
-    quiz_answered();
-  }
 }
 
 function show_quiz_page(state, quiz_id, type, title, question, responses) {
@@ -224,29 +255,5 @@ function create_quiz_page() {
       auto_fill_close_date("#open", "#close");
     })
     $("main").html(page);
-  }
-}
-
-function remove_quiz_page() {
-  if (user_login !== "" && user_role !== "undefined") {
-    push_state(14);
-    const page = $(`
-      <h2>Quiz supprimables</h2>
-      <p>Choisissez un quiz parmi ceux que vous avez créés.</p>
-      `);
-    $("main").html(page);
-    quiz_editable_remove();
-  }
-}
-
-function stockable_quiz_page() {
-  if (user_login !== "" && user_role !== "undefined") {
-    //push_state(?);
-    const page = $(`
-      <h2>Quiz ouverts</h2>
-      <p>Choisissez un quiz ouvert parmi ceux que vous avez créés.</p>
-      `);
-    $("main").html(page);
-    quiz_stockable();
   }
 }

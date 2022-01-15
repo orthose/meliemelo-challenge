@@ -60,10 +60,23 @@ function connect_database($user, &$res) {
   }
 }
 
-// Lève une exception si échec de la requête
-function check_request($res_request) {
-  if (!$res_request) {
-    throw new Exception("Fail request execution");
+// Exception en cas d'échec de requête pour le pattern de requête manuel
+class RequestDatabaseError extends Exception {
+  public PDOStatement $request;
+  public function __construct(PDOStatement $request) {
+    parent::__construct();
+    $this->request = $request;
+  }
+}
+
+/**
+ * Exécution d'une requête préparée
+ * Lève une exception avec le PDOStatement pour lire l'erreur
+ * @throws RequestDatabaseError 
+ **/
+function execute_request($request) {
+  if (!$request->execute()) {
+    throw new RequestDatabaseError($request);
   }
 }
 
@@ -114,6 +127,45 @@ function request_database($user, $sql, &$params, &$res, $error_fun = NULL, $fill
     
   // Fermeture de la connexion à la base
   $pdo = NULL;
+}
+
+/**
+ * Modèle pour requête manuelle avec appel aux méthodes de PDO
+ * @param res: Tableau des résultats passage par référence
+ * @param request_fun: Fonction qui effectue les requêtes ($pdo, &$res) -> unit
+ * @param error_fun: Fonction à appeler en cas d'erreur quelconque ($request, &$res, $exception) -> unit
+ * @param pdo: Session à la base de données passage par référence si pas renseigné
+ * création automatique d'une nouvelle session
+ * @param close: true par défaut pour fermer la session  
+ **/
+function request_database_manual(&$res, $request_fun, $error_fun = NULL, &$pdo = NULL, $close = true) {
+  // Initialisation de la session avec la base
+  $pdo = $pdo === NULL ? connect_database(get_role(), $res) : $pdo;
+  // Echec de connexion ?
+  if ($pdo !== NULL) {
+    try { $request_fun($pdo, $res); }
+    // Erreur au niveau d'une exécution de requête
+    catch (RequestDatabaseError $rde) {
+      $request = $rde->request;
+      if ($error_fun === NULL) {
+        error_fun_default($request, $res);
+      }
+      else {
+        $error_fun($request, $res);
+      } 
+    }
+    // Autres erreurs en rapport avec la session
+    catch (Exception $exception) { 
+      if ($error_fun === NULL) {
+        error_fun_default($pdo, $res);
+      }
+      else {
+        $error_fun($pdo, $res);
+      } 
+    }
+  }
+  // Fermeture de la session
+  if ($close) { $pdo = NULL; }
 }
 
 ?>

@@ -24,6 +24,7 @@ GRANT SELECT ON meliemelo_challenge.QuizResponsesArchiveView TO "player_meliemel
 GRANT SELECT ON meliemelo_challenge.QuizResponsesAnsweredView TO "player_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.answer_quiz TO "player_meliemelo"@"localhost";
 GRANT EXECUTE ON FUNCTION meliemelo_challenge.check_answer TO "player_meliemelo"@"localhost";
+GRANT SELECT, CREATE TEMPORARY TABLES ON meliemelo_challenge.* TO "player_meliemelo"@"localhost";
 
 -- Utilisateurs avec role = admin
 -- REVOKE ALL ON meliemelo_challenge.* FROM "admin_meliemelo"@"localhost";
@@ -52,6 +53,7 @@ GRANT EXECUTE ON PROCEDURE meliemelo_challenge.stock_quiz TO "admin_meliemelo"@"
 GRANT SELECT ON meliemelo_challenge.QuizStockView TO "admin_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizResponsesStockView TO "admin_meliemelo"@"localhost";
 GRANT SELECT ON meliemelo_challenge.QuizResponsesArchiveView TO "admin_meliemelo"@"localhost";
+GRANT SELECT, CREATE TEMPORARY TABLES ON meliemelo_challenge.* TO "admin_meliemelo"@"localhost";
 
 
 FLUSH PRIVILEGES;
