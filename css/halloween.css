@@ -16,7 +16,7 @@
   }
 }
 
-img {
+img, video, audio {
   max-width: 100%;
   max-height: 100%;
 }

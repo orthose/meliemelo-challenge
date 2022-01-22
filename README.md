@@ -9,54 +9,54 @@ L'application n'a été testée qu'avec le SGBD MariaDB.
 En principe, elle devrait aussi être compatible avec MySQL.
 
 1. Création de la base de données
-```
+```shell
 $ cd sql
 $ sudo mysql
 mysql> CREATE DATABASE meliemelo_challenge;
 ```
 2. Création des utilisateurs
 * L'utilisateur principal est meliemelo à n'utiliser qu'en ligne de commande et pour cron.php.
-```
+```shell
 mysql> CREATE USER "meliemelo"@"localhost" IDENTIFIED BY "mot_de_passe";
 mysql> GRANT ALL ON meliemelo_challenge.* TO "meliemelo"@"localhost";
 ```
 * L'utilisateur admin_meliemelo correspond aux droits des utilisateurs dont
 le rôle est fixé à admin.
-```
+```shell
 mysql> CREATE USER "admin_meliemelo"@"localhost" IDENTIFIED BY "mot_de_passe";
 ```
 * L'utilisateur player_meliemelo correspond aux droits des utilisateurs dont
 le rôle est fixé à player.
-```
+```shell
 mysql> CREATE USER "player_meliemelo"@"localhost" IDENTIFIED BY "mot_de_passe";
 ```
 * L'utilisateur undefined_meliemelo correspond aux droits des utilisateurs
 non-connectés.
-```
+```shell
 mysql> CREATE USER "undefined_meliemelo"@"localhost" IDENTIFIED BY "mot_de_passe";
 ```
 3. Se déconnecter puis se connecter
-```
+```shell
 mysql> EXIT;
 $ mysql -u meliemelo -D meliemelo_challenge -p
 ```
 4. Créer les tables de la base
-```
+```shell
 mysql> source schema.sql;
 ```
 5. Créer les fonctions et procédures
-```
+```shell
 mysql> source actions.sql;
 ```
 6. Définition des droits
-```
+```shell
 mysql> EXIT;
 $ sudo mysql
 mysql> source rules.sql;
 ```
 
 ## Configuration de l'accès à la base
-```
+```shell
 cp ./php/default_config.php ./php/config.php
 ```
 Rendez-vous dans le fichier ./php/config.php et modifiez uniquement
@@ -68,7 +68,7 @@ Pour pouvoir commencer à créer des quiz, il va falloir créer un premier
 utilisateur, avec le rôle d'administrateur.
 Pour cela rendez-vous sur le site web et créez un nouveau compte.
 Une fois créé, rendez-vous sur votre base de données.
-```
+```shell
 $ mysql -u meliemelo -D meliemelo_challenge -p
 mysql> CALL set_role("nouvel_utilisateur", "admin");
 ```
@@ -80,12 +80,12 @@ Pour mettre en stock et archiver les quiz, l'application utilise une tâche
 de fond, exécutée de manière régulière grâce à crontab.
 Si vous désirez recevoir les fichiers de log de ces tâches, exécutez les
 commandes suivantes (le mode débogage doit être activé dans php/config.php).
-```
+```shell
 $ touch log.txt
 $ chmod o+rw log.txt
 ```
 Pour enregistrer la tâche de fond exécutez ouvrez d'abord l'éditeur de crontab.
-```
+```shell
 crontab -e
 ```
 Puis entrez la ligne suivante en fin de fichier, qui va exécuter toutes les
@@ -102,11 +102,11 @@ toutes les 5 minutes.
 
 ## Sauvegarde de la base
 Commande pour faire une sauvegarde de la base de données.
-```
+```shell
 $ mysqldump -u meliemelo -p meliemelo_challenge > ~/meliemelo_challenge_backup_$(date +%F).sql
 ```
 Commande pour restaurer la base de données à partir d'une sauvegarde.
-```
+```shell
 $ mysqldump -u meliemelo -p meliemelo_challenge < ~/meliemelo_challenge_backup.sql
 ```
 
@@ -114,12 +114,12 @@ $ mysqldump -u meliemelo -p meliemelo_challenge < ~/meliemelo_challenge_backup.s
 Il peut être nécessaire de mettre à jour la base de données
 comme les procédures stockées.
 Pour cela il faut commencer par éteindre le serveur web.
-```
+```shell
 $ sudo systemctl stop nginx
 ```
 Il faut ensuite entrer dans la base de données en tant que super-utilisateur
 et mettre à jour la liste des procédures.
-```
+```shell
 $ cd sql
 $ sudo mysql -D meliemelo_challenge
 mysql> source actions.sql;
@@ -127,14 +127,14 @@ mysql> source rules.sql;
 mysql> EXIT;
 ```
 Il ne reste plus qu'à redémarrer le serveur web.
-```
+```shell
 $ sudo systemctl start nginx
 ```
 
 ## Changer le mot de passe d'un utilisateur
 Si un utilisateur oublie son mot de passe, l'administrateur du serveur
 peut changer le mot de passe de l'utilisateur grâce à une procédure d'urgence.
-```
+```shell
 $ mysql -u meliemelo -D meliemelo_challenge -p
 mysql> CALL emergency_set_password("login", "new_password");
 mysql> EXIT;
@@ -146,7 +146,7 @@ par l'interface web.
 Le dossier public_data contient l'ensemble des données publiques, qui peuvent être
 accédées par n'importe qui. Si ce n'est pas déjà fait créez les fichiers nécessaires
 pour le message du jour, et les rapports de bogue.
-```
+```shell
 $ cd public_data/
 $ touch daily_msg.txt
 $ echo "[]" > random_msg.json
@@ -219,7 +219,7 @@ La création de quiz est réservée aux administrateurs. Plusieurs champs doiven
 Le champ question, et les champs réponses doivent contenir du texte. Toute balise
 HTML sera automatiquement échappée par le serveur. En revanche, il est possible
 d'ajouter des balises markdown pour contourner cette sécurité.
-Ainsi, les liens, la mise en gras et la balise code sont implémentées pour ces champs.
+Ainsi, les liens, la mise en gras et la balise code sont notamment implémentées pour ces champs.
 Une fois le quiz affiché, les éléments markdown sont convertis en éléments HTML.
 
 Notez que la coloration syntaxique de la balise code est gérée par un programme tierce
@@ -230,3 +230,20 @@ Il est ensuite possible de modifier la réponse, et sa valeur de vérité (Vrai/
 Cependant, si le texte de la réponse est supprimé après coup et laissé vide,
 la réponse ne sera pas considérée. Cela peut être un bon moyen de supprimer une
 réponse erronée.
+
+## Syntaxe markdown pour intégrer des ressources
+
+Cette syntaxe peut être utilisée dans la question des quiz,
+et également dans le message du jour.
+
+* Ajout d'une image intégrée
+`![description](http://image.png)`
+
+* Ajout d'une vidéo intégrée
+`?[description](http://video.mp4)`
+
+* Ajout d'un audio intégré
+`$[description](http://audio.mp3)`
+
+* Ajout d'un lien de redirection
+`[description](http://link)`
