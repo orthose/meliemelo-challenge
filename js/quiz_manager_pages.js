@@ -1,96 +1,70 @@
-/*function quiz_page(title, instructions) {
-  
-} */
-
-function quiz_current_page() {
+function quiz_page(title, instructions, fun_push_state, fun_quiz_ajax) {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(function() {quiz_current_page();});
+    push_state(fun_push_state);
     const page = $(`
-      <h2>Quiz en jeu</h2>
-      <p>Choisissez un quiz parmi ceux disponibles.</p>
+      <h2>`+title+`</h2>
+      <p>`+instructions+`</p>
       <div id="list_quiz"></div>
       `);
     $("main").html(page);
-    quiz_current();
+    fun_quiz_ajax();
   }
+}
+
+function quiz_current_page() {
+  quiz_page(
+    "Quiz en jeu", 
+    "Choisissez un quiz parmi ceux disponibles.",
+    function() {quiz_current_page();}, quiz_current
+  );
 }
 
 function quiz_current_not_playable_page() {
-  if (user_login !== "" && user_role !== "undefined") {
-    push_state(function() {quiz_current_not_playable_page();});
-    const page = $(`
-      <h2>Quiz en jeu créés par ` + user_login + `</h2>
-      <p>Choisissez un quiz parmi ceux disponibles.</p>
-      <div id="list_quiz"></div>
-      `);
-    $("main").html(page);
-    quiz_current_not_playable();
-  }
+  quiz_page(
+    "Quiz en jeu créés par " + user_login,
+    "Choisissez un quiz parmi ceux disponibles.",
+    function() {quiz_current_not_playable_page();}, quiz_current_not_playable
+  );
 }
 
 function quiz_archive_page() {
-  if (user_login !== "" && user_role !== "undefined") {
-    push_state(function() {quiz_archive_page();});
-    const page = $(`
-      <h2>Quiz archivés</h2>
-      <p>Choisissez un quiz parmi ceux clôturés.</p>
-      <div id="list_quiz"></div>
-      `);
-    $("main").html(page);
-    quiz_archive();
-  }
+  quiz_page(
+    "Quiz archivés",
+    "Choisissez un quiz parmi ceux clôturés.",
+    function() {quiz_archive_page();}, quiz_archive
+  );
 }
 
 function quiz_stock_page() {
-  if (user_login !== "" && user_role !== "undefined") {
-    push_state(function() {quiz_stock_page();});
-    const page = $(`
-      <h2>Quiz en stock</h2>
-      <p>Choisissez un quiz parmi ceux en stock.</p>
-      <div id="list_quiz"></div>
-      `);
-    $("main").html(page);
-    quiz_stock();
-  }
+  quiz_page(
+    "Quiz en stock",
+    "Choisissez un quiz parmi ceux en stock.",
+    function() {quiz_stock_page();}, quiz_stock
+  );
 }
 
 function quiz_answered_page() {
-  if (user_login !== "" && user_role !== "undefined") {
-    push_state(function() {quiz_answered_page();});
-    const page = $(`
-      <h2>Vos réponses aux quiz</h2>
-      <p>Choisissez un quiz parmi ceux auxquels vous avez répondu.</p>
-      <div id="list_quiz"></div>
-      `);
-    $("main").html(page);
-    quiz_answered();
-  }
+  quiz_page(
+    "Vos réponses aux quiz",
+    "Choisissez un quiz parmi ceux auxquels vous avez répondu.",
+    function() {quiz_answered_page();}, quiz_answered
+  );
 }
 
 function remove_quiz_page() {
-  if (user_login !== "" && user_role !== "undefined") {
-    push_state(function() {remove_quiz_page();});
-    const page = $(`
-      <h2>Quiz supprimables</h2>
-      <p>Choisissez un quiz parmi ceux que vous avez créés.</p>
-      <div id="list_quiz"></div>
-      `);
-    $("main").html(page);
-    quiz_editable_remove();
-  }
+  quiz_page(
+    "Quiz supprimables",
+    "Choisissez un quiz parmi ceux que vous avez créés.",
+    function() {remove_quiz_page();}, quiz_editable_remove
+  );
 }
 
 function stockable_quiz_page() {
-  if (user_login !== "" && user_role !== "undefined") {
-    push_state(function() {stockable_quiz_page();});
-    const page = $(`
-      <h2>Quiz ouverts</h2>
-      <p>Choisissez un quiz ouvert parmi ceux que vous avez créés.</p>
-      <div id="list_quiz"></div>
-      `);
-    $("main").html(page);
-    quiz_stockable();
-  }
+  quiz_page(
+    "Quiz ouverts",
+    "Choisissez un quiz ouvert parmi ceux que vous avez créés.",
+    function() {stockable_quiz_page();}, quiz_stockable
+  );
 }
 
 function answer_quiz_page(quiz_id, type, title, question, responses) {
