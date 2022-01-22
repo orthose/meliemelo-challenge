@@ -47,7 +47,18 @@
       echo "serverURL: '".$config["serverURL"]."',";
     ?>
   };
-  const daily_msg = `<?php $daily_msg = file_get_contents("public_data/daily_msg.txt"); if ($daily_msg !== "") { echo str_replace("`", "\`", $daily_msg); } ?>`;
+  <?php
+    // Message personnalisé 
+    $daily_msg = file_get_contents("public_data/daily_msg.txt");
+    // Message aléatoire
+    if ($daily_msg === "") {
+      $random_msg = json_decode(file_get_contents("public_data/random_msg.json"), true);
+      $daily_msg = $random_msg[rand(0, count($random_msg) - 1)];
+    }
+    $daily_msg = str_replace("`", "\`", $daily_msg);
+    $daily_msg = str_replace(array("\r\n", "\r", "\n"), "<br>", $daily_msg);
+  ?>
+  const daily_msg = `<?php echo $daily_msg; ?>`;
   </script>
 </head>
 <body onload="convert_md_daily_msg()">

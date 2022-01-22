@@ -233,7 +233,6 @@ else if ($request === "set_daily_msg") {
   $doc = "set_daily_msg(msg)";
   $fun = function() {
     $msg = htmlspecialchars(trim($_REQUEST["msg"]));
-    $msg = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $msg);
     $res = array();
     $res["set_daily_msg_status"] = (file_put_contents("public_data/daily_msg.txt", $msg) !== false);
     return $res;
