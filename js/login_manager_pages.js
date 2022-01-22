@@ -1,5 +1,5 @@
 function register_page() {
-  push_state(1);
+  push_state(function() {register_page();});
   const page = $(`
     <p>Entrez un pseudonyme</p>
     <input type="text">
@@ -14,7 +14,7 @@ function register_page() {
 }
 
 function connection_page() {
-  push_state(2);
+  push_state(function() {connection_page();});
   check_session();
   const page = $(`
     <p>Entrez votre login</p>
@@ -29,7 +29,7 @@ function connection_page() {
 
 function main_menu_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(3);
+    push_state(function() {main_menu_page();});
     $("section#manage_account").html($(`
       <p></p>
       <button onclick="main_menu_page()">Menu principal</button>
@@ -73,7 +73,7 @@ function main_menu_page() {
 
 function set_password_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(4);
+    push_state(function() {set_password_page();});
     const page = $(`
       <h2>Changement de mot de passe</h2>
       <p>Entrez votre mot de passe actuel</p>
@@ -91,7 +91,7 @@ function set_password_page() {
 
 function unregister_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(5);
+    push_state(function() {unregister_page();});
     const page = $(`
       <h2>Suppression du compte</h2>
       <p class="warning">Attention, si vous continuez vous perdrez toutes vos données. La suppression de votre compte est définitive. Notez que si vous avez créé des quiz ils seront tous supprimés définitivement.</p>
@@ -106,7 +106,7 @@ function unregister_page() {
 
 function set_role_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(6);
+    push_state(function() {set_role_page();});
     const page = $(`
       <h2>Changement de rôle</h2>
       <p class="form">Utilisateur</p>
@@ -125,7 +125,7 @@ function set_role_page() {
 
 function high_score_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(7);
+    push_state(function() {high_score_page();});
     const page = $(`
       <h2>Classement des joueurs</h2>
       <table>
@@ -139,7 +139,7 @@ function high_score_page() {
 
 function high_score_quiz_title_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(19);
+    push_state(function() {high_score_quiz_title_page();});
     const page = $(`
       <h2>Classement par quiz</h2>
       <p class="form">Titre de quiz</p>

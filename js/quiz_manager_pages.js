@@ -1,6 +1,10 @@
+/*function quiz_page(title, instructions) {
+  
+} */
+
 function quiz_current_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(8);
+    push_state(function() {quiz_current_page();});
     const page = $(`
       <h2>Quiz en jeu</h2>
       <p>Choisissez un quiz parmi ceux disponibles.</p>
@@ -13,7 +17,7 @@ function quiz_current_page() {
 
 function quiz_current_not_playable_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(15);
+    push_state(function() {quiz_current_not_playable_page();});
     const page = $(`
       <h2>Quiz en jeu créés par ` + user_login + `</h2>
       <p>Choisissez un quiz parmi ceux disponibles.</p>
@@ -26,7 +30,7 @@ function quiz_current_not_playable_page() {
 
 function quiz_archive_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(9);
+    push_state(function() {quiz_archive_page();});
     const page = $(`
       <h2>Quiz archivés</h2>
       <p>Choisissez un quiz parmi ceux clôturés.</p>
@@ -39,7 +43,7 @@ function quiz_archive_page() {
 
 function quiz_stock_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(10);
+    push_state(function() {quiz_stock_page();});
     const page = $(`
       <h2>Quiz en stock</h2>
       <p>Choisissez un quiz parmi ceux en stock.</p>
@@ -52,7 +56,7 @@ function quiz_stock_page() {
 
 function quiz_answered_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(16);
+    push_state(function() {quiz_answered_page();});
     const page = $(`
       <h2>Vos réponses aux quiz</h2>
       <p>Choisissez un quiz parmi ceux auxquels vous avez répondu.</p>
@@ -65,7 +69,7 @@ function quiz_answered_page() {
 
 function remove_quiz_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(14);
+    push_state(function() {remove_quiz_page();});
     const page = $(`
       <h2>Quiz supprimables</h2>
       <p>Choisissez un quiz parmi ceux que vous avez créés.</p>
@@ -78,7 +82,7 @@ function remove_quiz_page() {
 
 function stockable_quiz_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    //push_state(?);
+    push_state(function() {stockable_quiz_page();});
     const page = $(`
       <h2>Quiz ouverts</h2>
       <p>Choisissez un quiz ouvert parmi ceux que vous avez créés.</p>
@@ -91,7 +95,8 @@ function stockable_quiz_page() {
 
 function answer_quiz_page(quiz_id, type, title, question, responses) {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(11);
+    // On affiche la page de choix de quiz jouable
+    push_state(function() {window.history.back();});
     const page = $(`
       <h2>` + title + `</h2>
       <div class="question">` + convert_md(question) + `</div>
@@ -140,7 +145,8 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
   }
   
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(12);
+    // On ne peut pas savoir si on a regardé les quiz stockés ou archivés
+    push_state(function() {window.history.back();});
     const page = $(`
       <h2>` + title + `</h2>
       <div class="question">` + convert_md(question) + `</div>
@@ -208,7 +214,7 @@ function add_choice(tag) {
 
 function create_quiz_page() {
   if (user_login !== "" && user_role !== "undefined") {
-    push_state(13);
+    push_state(function() {create_quiz_page();});
     const page = $(`
       <h2>Création de quiz</h2>
       <p>Veuillez compléter tous les champs ci-dessous.</p>
