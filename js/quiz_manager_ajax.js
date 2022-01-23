@@ -23,14 +23,19 @@ function list_quiz(state, action) {
           <p class="error" hidden></p>`;
       }
     }
+    let data = {
+      "request": "quiz_" + state,
+      "year": $("#year").val()
+    };
+    if (state === "answered_others") {
+      data.login = $("#player").val();
+    }
+    console.log(data);
     $.ajax({
       method: "POST",
       url: config["serverURL"] + "/meliemelo-challenge/requests.php",
       dataType: "json",
-      data: {
-        "request": "quiz_" + state,
-        "year": $("#year").val()
-      }
+      data: data
     }).done(function(json) {
       if (config["debug"]) { console.log(json); }
       json["quiz"].forEach(function(row) {
@@ -93,7 +98,7 @@ function list_quiz(state, action) {
       <select id="year">
       </select>
       `);
-    $("main h2").after(select_year);
+    $("main div#filter_date").html(select_year);
     // De l'année actuelle à 2021
     for (let y = actual_year; y >= 2021; y--) {
       $("#year").append($("<option>").val(y).text(y));
@@ -129,6 +134,10 @@ function quiz_current_not_playable() {
 
 function quiz_answered() {
   list_quiz("answered", "show");
+}
+
+function quiz_answered_others() {
+  list_quiz("answered_others", "show");
 }
 
 function quiz_stockable() {

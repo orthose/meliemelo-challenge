@@ -47,6 +47,7 @@ function main_menu_page() {
       <button onclick="quiz_current_page()">Quiz jouables</button>
       <button onclick="quiz_archive_page()">Quiz archivés</button>
       <button onclick="quiz_answered_page()">Voir mes réponses</button>
+      <button onclick="quiz_answered_others_page()">Voir les réponses des autres</button>
       <hr>
       `;
     if (user_role === "player") {

@@ -3,6 +3,7 @@ function quiz_page(title, instructions, fun_push_state, fun_quiz_ajax) {
     push_state(fun_push_state);
     const page = $(`
       <h2>`+title+`</h2>
+      <div id="filter_date"></div>
       <p>`+instructions+`</p>
       <div id="list_quiz"></div>
       `);
@@ -67,6 +68,35 @@ function stockable_quiz_page() {
   );
 }
 
+function quiz_answered_others_page() {
+  quiz_page(
+    "Réponses des autres joueurs",
+    "Choisissez un quiz parmi ceux archivés.",
+    function() {quiz_answered_others_page();}, 
+    function() {
+      $("main h2").after($(`
+        <p class="form">Joueur</p>
+        <input type="text" id="player">
+        <button id="confirm_player">Confirmer</button>
+        <p class="error" hidden></p>
+        <br>
+        `)
+      );
+      $("main #confirm_player").on("click", function() {
+        $("main div#list_quiz").html("");
+        if ($("main #player").val() === "") {
+          $("main .error").html("Veuillez entrer un pseudo de joueur.");
+          $("main .error").show();
+        }
+        else {
+          $("main .error").hide();
+          quiz_answered_others();
+        }
+      });
+    }
+  );
+}
+
 function answer_quiz_page(quiz_id, type, title, question, responses) {
   if (user_login !== "" && user_role !== "undefined") {
     // On affiche la page de choix de quiz jouable
@@ -116,11 +146,15 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
     else if (state === "answered") {
       return `<button onclick="quiz_answered_page()">Voir mes réponses</button>`;
     }
+    else if (state === "answered_others") {
+      return `<button>Voir les réponses des autres</button>`;
+    }
   }
   
   if (user_login !== "" && user_role !== "undefined") {
     // On ne peut pas savoir si on a regardé les quiz stockés ou archivés
     push_state(function() {window.history.back();});
+    const player = $("#player").val(); // Pour answered_others
     const page = $(`
       <h2>` + title + `</h2>
       <div class="question">` + convert_md(question) + `</div>
@@ -129,7 +163,15 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
       `);
     $("main").html(page);
     
-    if (state === "answered") {
+    // Remplissage automatique du pseudo du joueur
+    if (state === "answered_others") {
+      $("main button").on("click", function() {
+        quiz_answered_others_page();
+        $("#player").val(player);
+      });
+    }
+    
+    if (state === "answered" || state === "answered_others") {
       $("main form").addClass("answered");
     }
     
@@ -160,7 +202,7 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
       $("main form").append($(`<input type="text" name="quiz" value="` + responses[0][0] + `" disabled>`));
     }
     
-    if (state === "answered") {
+    if (type !== "text" && (state === "answered" || state === "answered_others")) {
       $(".valid").prev().attr("checked", "");
     }
   }

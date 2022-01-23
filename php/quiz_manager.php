@@ -366,4 +366,25 @@ function quiz_answered($year) {
   );
 }
 
+/**
+ * Renvoie les réponses des autres joueur aux quiz archivés
+ * avec les infos principales et les réponses "valides" qui sont
+ * celles sélectionnées par le joueur et "invalides" celles non-sélectionnées
+ * ATTENTION: Ce ne sont donc pas les réponses valides et invalides au sens propre
+ * @param login: login du joueur à considérer
+ **/
+function quiz_answered_others($login, $year) {
+  return list_quiz(
+    "SELECT ans.* FROM QuizArchiveView AS arc, QuizAnsweredView AS ans WHERE
+    arc.id = ans.id AND ans.login = :login 
+    AND (YEAR(arc.open) = :year OR YEAR(arc.close) = :year)",
+    "SELECT * FROM QuizResponsesAnsweredView WHERE login = :login AND [ID]",
+    array(":login" => $login), $year,
+    function($row, &$res) {
+      $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
+      array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question, $row[10]));
+    }
+  );
+}
+
 ?>
