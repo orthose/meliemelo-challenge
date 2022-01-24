@@ -169,6 +169,26 @@ CREATE OR REPLACE VIEW HighScoreView AS
 SELECT login, points, success, fail FROM Users
 ORDER BY points DESC, success DESC, fail ASC;
 
+/* Remise à zéro du tableau de score global */
+DELIMITER //
+CREATE OR REPLACE PROCEDURE reset_high_score (
+  login_user TYPE OF Users.login,
+  passwd VARCHAR(2048)
+)
+BEGIN
+  IF NOT authentication_is_valid(login_user, passwd) THEN
+    SIGNAL SQLSTATE "45000" 
+    SET MESSAGE_TEXT = "Authentication has failed";
+  ELSE
+    START TRANSACTION;
+    UPDATE Users SET points = 0;
+    UPDATE Users SET success = 0;
+    UPDATE Users SET fail = 0;
+    COMMIT;
+  END IF;
+END; //
+DELIMITER ;
+
 /**
  * Créer un nouveau quiz
  * @implementation

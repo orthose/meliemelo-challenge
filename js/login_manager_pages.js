@@ -65,6 +65,7 @@ function main_menu_page() {
         <hr>
         <button onclick="set_daily_msg_page()">Changer le message du jour</button>
         <button onclick="set_role_page()">Changer de rôle</button>
+        <button onclick="reset_high_score_page()">Remettre à zéro le classement</button>
         <hr>
         `;
     }
@@ -135,6 +136,22 @@ function high_score_page() {
       `);
     $("main").html(page);
     high_score();
+  }
+}
+
+function reset_high_score_page() {
+  if (user_login !== "" && user_role !== "undefined") {
+    push_state(function() {reset_high_score_page();});
+    const page = $(`
+      <h2>Remise à zéro du classement général</h2>
+      <p class="warning">Attention, cette opération est irréversible.
+      Le classement par quiz ne sera néanmoins pas affecté.</p>
+      <p>Entrez votre mot de passe</p>
+      <input type="password"><br>
+      <button onclick="reset_high_score()">Confirmer</button>
+      <p class="error" hidden></p>
+      `);
+    $("main").html(page);
   }
 }
 

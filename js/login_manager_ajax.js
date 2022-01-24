@@ -40,7 +40,7 @@ function register() {
       if (config["debug"]) { console.log(e); }
       $("main p.error").show();
       $("main p.error").html("Une erreur inattendue est survenue.");
-    })
+    });
   }
 }
 
@@ -61,7 +61,7 @@ function check_session() {
     }
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
-  })
+  });
 }
 
 function connection() {
@@ -96,7 +96,7 @@ function connection() {
       if (config["debug"]) { console.log(e); }
       $("main p.error").show();
       $("main p.error").html("Une erreur inattendue est survenue.");
-    })
+    });
   }
 }
 
@@ -118,7 +118,7 @@ function disconnection() {
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
     document.location.href = "index.php";
-  })
+  });
 }
 
 function set_password() {
@@ -156,7 +156,7 @@ function set_password() {
     }).fail(function(e) {
       if (config["debug"]) { console.log(e); }
       document.location.href = "index.php";
-    })
+    });
   }
 }
 
@@ -179,7 +179,7 @@ function unregister() {
       if (config["debug"]) { console.log(json); }
       if (!json["unregistration_status"]) {
         $("main p.error").show();
-        $("main p.error").html("Le suppression du compte a échoué.");
+        $("main p.error").html("La suppression du compte a échoué.");
       }
       else {
         disconnection();
@@ -188,7 +188,7 @@ function unregister() {
     }).fail(function(e) {
       if (config["debug"]) { console.log(e); }
       document.location.href = "index.php";
-    })
+    });
   }
 }
 
@@ -226,7 +226,7 @@ function set_role() {
     }).fail(function(e) {
       if (config["debug"]) { console.log(e); }
       document.location.href = "index.php";
-    })
+    });
   }
 }
 
@@ -251,7 +251,36 @@ function high_score() {
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
     document.location.href = "index.php";
-  })
+  });
+}
+
+function reset_high_score() {
+  const passwd = $("main input[type='password']").val();
+  if (passwd === "") {
+    $("main p.error").show();
+    $("main p.error").html("Veuillez entrer votre mot de passe.");
+  }
+  else {
+    $.ajax({
+      method: "POST",
+      url: config["serverURL"] + "/meliemelo-challenge/requests.php",
+      dataType: "json",
+      data: {
+        "request": "reset_high_score",
+        "passwd": passwd
+      }
+    }).done(function(json) {
+      $("main p.error").hide();
+      if (config["debug"]) { console.log(json); }
+      if (!json["reset_high_score_status"]) {
+        $("main p.error").show();
+        $("main p.error").html("L'authentification a échoué.");
+      } else { main_menu_page(); }
+    }).fail(function(e) {
+      if (config["debug"]) { console.log(e); }
+      document.location.href = "index.php";
+    });
+  }
 }
 
 function high_score_quiz_title() {
@@ -294,6 +323,6 @@ function high_score_quiz_title() {
     }).fail(function(e) {
       if (config["debug"]) { console.log(e); }
       document.location.href = "index.php";
-    })
+    });
   }
 }

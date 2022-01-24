@@ -94,9 +94,13 @@ else if ($request === "set_role") {
 else if ($request === "high_score") {
   $valid = true;
   $doc = "high_score()";
-  $fun = function() {
-    return high_score();
-  };
+  $fun = function() { return high_score(); };
+}
+
+else if ($request === "reset_high_score") {
+  $valid = isset($_SESSION["login"]) && isset($_REQUEST["passwd"]);
+  $doc = "reset_high_score(passwd)";
+  $fun = function() { return reset_high_score($_REQUEST["passwd"]); };
 }
 
 else if ($request === "high_score_quiz_title") {

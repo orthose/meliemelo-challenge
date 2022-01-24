@@ -162,6 +162,23 @@ function high_score() {
 }
 
 /**
+ * Remise à zéro des scores des joueurs
+ * @param login, passwd: Autenthification nécessaire par sécurité 
+ * @return: JSON avec champ reset_high_score_status
+ **/
+function reset_high_score($passwd) {
+  $sql = "CALL reset_high_score(:login, :passwd)";
+  $params = array(":login" => get_login(), ":passwd" => $passwd);
+  $res = array("reset_high_score_status" => true);
+  $error_fun = function($request, &$res) {
+    error_fun_default($request, $res);
+    $res["reset_high_score_status"] = false;
+  };
+  request_database(get_role(), $sql, $params, $res, $error_fun);
+  return $res;
+}
+
+/**
  * Classement des joueurs pour ensemble de quiz
  * @param title: Titre des quiz (regex)
  * @param begin_date, end_date: Plage temporelle de filtrage
