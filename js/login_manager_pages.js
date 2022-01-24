@@ -1,11 +1,13 @@
 function register_page() {
   push_state(function() {register_page();});
   const page = $(`
-    <p>Entrez un pseudonyme</p>
+    <p>Votre login ne peut pas excéder <b>16 caractères</b>.<br>
+      Votre mot de passe doit comporter au moins <b>8 caractères</b>.</p>
+    <p class="form">Entrez un pseudonyme</p>
     <input type="text">
-    <p>Entrez un mot de passe (plus de 8 caractères)</p>
+    <p class="form">Entrez un mot de passe</p>
     <input type="password">
-    <p>Entrez à nouveau le mot de passe</p>
+    <p class="form">Confirmez le mot de passe</p>
     <input type="password"><br>
     <button onclick="register()">Création du Compte</button>
     <p class="error" hidden></p>
@@ -17,9 +19,9 @@ function connection_page() {
   push_state(function() {connection_page();});
   check_session();
   const page = $(`
-    <p>Entrez votre login</p>
+    <p class="form">Votre login</p>
     <input type="text">
-    <p>Entrez votre mot de passe</p>
+    <p class="form">Votre mot de passe</p>
     <input type="password" onkeypress="(function(event) {if (event.keyCode === 13) {connection();}})(event)"><br>
     <button onclick="connection()">Connexion</button>
     <p class="error" hidden></p>
@@ -78,11 +80,11 @@ function set_password_page() {
     push_state(function() {set_password_page();});
     const page = $(`
       <h2>Changement de mot de passe</h2>
-      <p>Entrez votre mot de passe actuel</p>
+      <p class="form">Entrez votre mot de passe actuel</p>
       <input type="password">
-      <p>Entrez votre nouveau mot de passe</p>
+      <p class="form">Entrez votre nouveau mot de passe</p>
       <input type="password">
-      <p>Confirmez votre nouveau mot de passe</p>
+      <p class="form">Confirmez votre nouveau mot de passe</p>
       <input type="password"><br>
       <button onclick="set_password()">Changer le mot de passe</button>
       <p class="error" hidden></p>
@@ -97,7 +99,7 @@ function unregister_page() {
     const page = $(`
       <h2>Suppression du compte</h2>
       <p class="warning">Attention, si vous continuez vous perdrez toutes vos données. La suppression de votre compte est définitive. Notez que si vous avez créé des quiz ils seront tous supprimés définitivement.</p>
-      <p>Entrez votre mot de passe</p>
+      <p class="form">Votre mot de passe</p>
       <input type="password"><br>
       <button onclick="unregister()">Supprimer le compte</button>
       <p class="error" hidden></p>
@@ -146,7 +148,7 @@ function reset_high_score_page() {
       <h2>Remise à zéro du classement général</h2>
       <p class="warning">Attention, cette opération est irréversible.
       Le classement par quiz ne sera néanmoins pas affecté.</p>
-      <p>Entrez votre mot de passe</p>
+      <p class="form">Votre mot de passe</p>
       <input type="password"><br>
       <button onclick="reset_high_score()">Confirmer</button>
       <p class="error" hidden></p>
