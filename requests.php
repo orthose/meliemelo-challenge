@@ -145,7 +145,7 @@ else if ($request === "create_quiz") {
     $question = htmlspecialchars(trim($_REQUEST["question"]));
     $responses = $_REQUEST["responses"];
     for($i = 0; $i < count($responses); $i++) {
-      $responses[$i]["response"] = htmlspecialchars(trim($responses[$i]["response"]), ENT_QUOTES);
+      $responses[$i]["response"] = htmlspecialchars(trim($responses[$i]["response"]), ENT_COMPAT);
     }
     return create_quiz($open, $close, $difficulty, $points, $type, $title, $question, $responses);
   };
@@ -181,7 +181,7 @@ else if ($request === "answer_quiz") {
       $responses = $_REQUEST["responses"];
     }
     for($i = 0; $i < count($responses); $i++) {
-      $responses[$i] = htmlspecialchars(trim($responses[$i]), ENT_QUOTES);
+      $responses[$i] = htmlspecialchars(trim($responses[$i]), ENT_COMPAT);
     }
     return answer_quiz($quiz_id, $responses);
   };

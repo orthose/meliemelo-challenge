@@ -75,7 +75,7 @@
   </main>
   <footer>
     Application créée par Maxime Vincent | <a href="https://github.com/orthose/meliemelo-challenge" target="_blank">Code Source</a><br>
-    Commande de Amélie Gaillard | Juillet 2021
+    Commande de Amélie Gaillard | Janvier 2022
   </footer>
 </body>
 </html>

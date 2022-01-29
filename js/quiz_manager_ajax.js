@@ -146,7 +146,7 @@ function quiz_stockable() {
 
 function answer_quiz(type, quiz_id) {
   function input_type(type) {
-    if (type === "text") {
+    if (type.startsWith("text")) {
       return $("main input[type='text']");
     }
     else {

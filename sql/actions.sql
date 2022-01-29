@@ -232,7 +232,7 @@ BEGIN
   DECLARE quiz_type TYPE OF Quiz.type;
   SELECT type INTO quiz_type FROM Quiz WHERE id = quiz_id;
   -- Au moins une réponse valide pour quiz checkbox
-  IF (quiz_type = 'checkbox_and' OR quiz_type = 'checkbox_or')
+  IF (quiz_type LIKE 'checkbox%')
   AND NOT (SELECT COUNT(*) >= 1 FROM QuizResponses WHERE id = quiz_id AND valid)
   THEN
     SIGNAL SQLSTATE '45000' 
@@ -244,7 +244,7 @@ BEGIN
     SIGNAL SQLSTATE '45000' 
     SET MESSAGE_TEXT = 'Radio quiz must have only one valid response';
   -- Une seule réponse valide uniquement pour quiz text
-  ELSEIF quiz_type = 'text'
+  ELSEIF quiz_type LIKE 'text%'
   AND NOT (SELECT SUM(CASE WHEN valid THEN 1 ELSE -1 END) = 1 FROM QuizResponses WHERE id = quiz_id)
   THEN
     SIGNAL SQLSTATE '45000' 
@@ -287,13 +287,37 @@ CREATE OR REPLACE VIEW QuizArchiveView AS SELECT id, login_creator, open, close,
 /* Vue pour obtenir les quiz auxquels ont répondu les joueurs */
 CREATE OR REPLACE VIEW QuizAnsweredView AS SELECT Quiz.id, login_creator, open, close, difficulty, points, type, title, question, PlayerQuizAnswered.login, success FROM Quiz, PlayerQuizAnswered WHERE Quiz.id = PlayerQuizAnswered.id ORDER BY open DESC, close DESC;
 
+/* Echappement des réponses texte pour favoriser les joueurs */
+DELIMITER //
+CREATE OR REPLACE FUNCTION escape_response_text (
+  response TYPE OF QuizResponses.response
+) RETURNS VARCHAR(256)
+BEGIN
+  DECLARE res TYPE OF QuizResponses.response;
+  -- Echappement des apostrophes par apostrophe française
+  SELECT REGEXP_REPLACE(response, '\'|‘|’|ʼ', '’') INTO res;
+  -- Les suites d'espaces sont réduits à un seul espace
+  SELECT REGEXP_REPLACE(res, '[ ]+', ' ') INTO res;
+  RETURN res;
+END; //
+DELIMITER ;
+
 /* Ajouter un choix de réponse possible à un quiz */
+DELIMITER //
 CREATE OR REPLACE PROCEDURE add_response (
   quiz_id TYPE OF QuizResponses.id,
   new_response TYPE OF QuizResponses.response,
   is_valid TYPE OF QuizResponses.valid
 )
-INSERT INTO QuizResponses VALUES (quiz_id, new_response, is_valid);
+BEGIN
+  DECLARE quiz_type TYPE OF Quiz.type;
+  SELECT type INTO quiz_type FROM Quiz WHERE id = quiz_id;
+  IF quiz_type = 'text_weak' THEN
+    SELECT escape_response_text(new_response) INTO new_response;
+  END IF; 
+  INSERT INTO QuizResponses VALUES (quiz_id, new_response, is_valid);
+END; //
+DELIMITER ;
 
 /* Vue pour les réponses des quiz en stock */
 CREATE OR REPLACE VIEW QuizResponsesStockView AS 
@@ -382,10 +406,24 @@ BEGIN
     ) OR
     /* La comparaison pour un quiz text est insensible à la casse */
     (
-      quiz_type = "text" AND 
+      /* Vérification forte en ignorant les erreurs aux extrémités */
+      quiz_type = 'text_strong' AND 
       (SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
-      LIKE (SELECT CONCAT("%", response, "%") FROM QuizResponses WHERE id = quiz_id AND valid)
-    ))
+      LIKE (SELECT CONCAT('%', response, '%') FROM QuizResponses WHERE id = quiz_id AND valid)
+    ) OR
+    (
+      /* Vérification faible en tolérant les espaces et les apostrophes erronés */
+      quiz_type = 'text_weak' AND 
+      (SELECT escape_response_text(response) FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
+      LIKE (SELECT CONCAT('%', response, '%') FROM QuizResponses WHERE id = quiz_id AND valid)
+    ) OR
+    (
+      /* Vérification selon expression régulière */
+      quiz_type = 'text_regex' AND 
+      (SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
+      REGEXP (SELECT CONCAT('.*', response, '.*') FROM QuizResponses WHERE id = quiz_id AND valid)
+    )
+  )
   THEN
     -- Marquage du quiz comme réussi
     INSERT INTO PlayerQuizAnswered (login, id, success) VALUES

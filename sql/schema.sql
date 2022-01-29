@@ -38,7 +38,8 @@ CREATE TABLE Quiz (
   CHECK(CURRENT_DATE <= open), CHECK(open <= close),
   difficulty TINYINT NOT NULL CHECK(1 <= difficulty AND difficulty <= 10),
   points TINYINT NOT NULL CHECK(0 <= points AND points <= 10),
-  type ENUM('checkbox_and', 'checkbox_or', 'radio', 'text') NOT NULL, -- Type de réponse du quiz
+  -- Type de réponse du quiz
+  type ENUM('checkbox_and', 'checkbox_or', 'radio', 'text_strong', 'text_weak', 'text_regex') NOT NULL,
   state ENUM('stock', 'current', 'archive') NOT NULL DEFAULT 'stock',
   title VARCHAR(256) NOT NULL, -- Peut être NULL
   question TEXT NOT NULL -- Champ principal du quiz
@@ -125,7 +126,7 @@ BEGIN
   
   SELECT type INTO quiz_type FROM Quiz WHERE id = NEW.id;
   /* Une réponse doit correspondre à l'id du quiz */
-  IF quiz_type != "text" AND NEW.response NOT IN (
+  IF quiz_type NOT LIKE "text%" AND NEW.response NOT IN (
     SELECT response FROM QuizResponses 
     WHERE QuizResponses.id = NEW.id) 
   THEN
@@ -141,7 +142,7 @@ BEGIN
   END IF;
   
   /* Un joueur ne peut donner qu'une seule réponse pour un quiz de type radio ou text */
-  IF (quiz_type = "radio" OR quiz_type = "text") 
+  IF (quiz_type = "radio" OR quiz_type LIKE "text%") 
   AND EXISTS(SELECT * FROM PlayerQuizResponses 
   WHERE login = NEW.login AND id = NEW.id) 
   THEN

@@ -124,7 +124,7 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
           `));
       });
     }
-    else if (type === "text") {
+    else if (type.startsWith("text")) {
       $("main form").append($(`<input type="text" name="quiz">`));
     }
   }
@@ -198,11 +198,11 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
           `));
       });
     }
-    else if (type === "text") {
+    else if (type.startsWith("text")) {
       $("main form").append($(`<input type="text" name="quiz" value="` + responses[0][0] + `" disabled>`));
     }
     
-    if (type !== "text" && (state === "answered" || state === "answered_others")) {
+    if (!type.startsWith("text") && (state === "answered" || state === "answered_others")) {
       $(".valid").prev().attr("checked", "");
     }
   }
@@ -254,7 +254,9 @@ function create_quiz_page() {
         <option value="checkbox_and">Choix multiples [conjonction]</option>
         <option value="checkbox_or">Choix multiples [disjonction]</option>
         <option value="radio">Choix unique</option>
-        <option value="text">Texte</option>
+        <option value="text_strong">Texte [vérification exacte]</option>
+        <option value="text_weak">Texte [vérification tolérante]</option>
+        <option value="text_regex">Texte [expression régulière]</option>
       </select><br>
       <p>
         Un quiz valide doit obligatoirement avoir au moins une réponse. 
