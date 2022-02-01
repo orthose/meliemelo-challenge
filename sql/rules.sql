@@ -48,6 +48,8 @@ GRANT EXECUTE ON PROCEDURE meliemelo_challenge.set_role TO "admin_meliemelo"@"lo
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.reset_high_score TO "admin_meliemelo"@"localhost";
 GRANT EXECUTE ON FUNCTION meliemelo_challenge.create_quiz TO "admin_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.add_response TO "admin_meliemelo"@"localhost";
+GRANT EXECUTE ON PROCEDURE meliemelo_challenge.edit_quiz TO "admin_meliemelo"@"localhost";
+GRANT EXECUTE ON PROCEDURE meliemelo_challenge.remove_quiz_responses TO "admin_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.check_quiz TO "admin_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.remove_quiz TO "admin_meliemelo"@"localhost";
 GRANT EXECUTE ON PROCEDURE meliemelo_challenge.stock_quiz TO "admin_meliemelo"@"localhost";

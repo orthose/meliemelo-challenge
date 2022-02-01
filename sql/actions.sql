@@ -220,6 +220,54 @@ BEGIN
 END; //
 DELIMITER ;
 
+/* Mettre à jour tous les champs d'un quiz existant */
+DELIMITER //
+CREATE OR REPLACE PROCEDURE edit_quiz (
+  quiz_id TYPE OF Quiz.id,
+  login_user TYPE OF Quiz.login_creator,
+  new_open TYPE OF Quiz.open,
+  new_close TYPE OF Quiz.close,
+  new_difficulty TYPE OF Quiz.difficulty,
+  new_points TYPE OF Quiz.points,
+  new_type TYPE OF Quiz.type,
+  new_title TYPE OF Quiz.title,
+  new_question TYPE OF Quiz.question
+)
+BEGIN
+  IF (SELECT login_creator FROM Quiz WHERE id = quiz_id) != login_user THEN
+    SIGNAL SQLSTATE "45000" 
+    SET MESSAGE_TEXT = "Invalid login_creator for this quiz";
+  END IF;
+  UPDATE Quiz SET 
+  open = new_open,
+  close = new_close,
+  difficulty = new_difficulty,
+  points = new_points,
+  type = new_type,
+  title = new_title,
+  question = new_question
+  WHERE id = quiz_id;
+END; //
+DELIMITER ;
+
+/**
+ * Suppression des réponses d'un quiz
+ * Permet de mettre à jour les réponses d'un quiz
+ * ATTENTION: Supprime les réponses des joueurs pour ce quiz
+ **/
+DELIMITER //
+CREATE OR REPLACE PROCEDURE remove_quiz_responses (
+  quiz_id TYPE OF Quiz.id
+)
+BEGIN
+  START TRANSACTION;
+  DELETE FROM PlayerQuizAnswered WHERE id = quiz_id;
+  DELETE FROM PlayerQuizResponses WHERE id = quiz_id;
+  DELETE FROM QuizResponses WHERE id = quiz_id;
+  COMMIT;
+END; //
+DELIMITER ;
+
 /**
  * Vérifie la validité d'un quiz en fonction des réponses et du type de quiz
  * Renvoie une erreur si le quiz est invalide
@@ -245,7 +293,10 @@ BEGIN
     SET MESSAGE_TEXT = 'Radio quiz must have only one valid response';
   -- Une seule réponse valide uniquement pour quiz text
   ELSEIF quiz_type LIKE 'text%'
-  AND NOT (SELECT SUM(CASE WHEN valid THEN 1 ELSE -1 END) = 1 FROM QuizResponses WHERE id = quiz_id)
+  AND NOT (
+    (SELECT COUNT(*) FROM QuizResponses WHERE id = quiz_id AND valid) = 1
+    AND (SELECT COUNT(*) FROM QuizResponses WHERE id = quiz_id AND NOT valid) = 0
+  )
   THEN
     SIGNAL SQLSTATE '45000' 
     SET MESSAGE_TEXT = 'Text quiz must have only one response and valid';
@@ -484,10 +535,7 @@ BEGIN
   -- Suppression des réponses données par les joueurs
   DELETE FROM PlayerQuizResponses WHERE id = quiz_id;
   DELETE FROM PlayerQuizAnswered WHERE id = quiz_id;
-  -- open1 <= open2 <= close2
-  UPDATE Quiz SET close = close_date WHERE id = quiz_id;
-  UPDATE Quiz SET open = open_date WHERE id = quiz_id;
-  UPDATE Quiz SET state = 'stock' WHERE id = quiz_id;
+  UPDATE Quiz SET open = open_date, close = close_date, state = 'stock' WHERE id = quiz_id;
   COMMIT;
 END; //
 DELIMITER ;

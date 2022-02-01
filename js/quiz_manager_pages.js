@@ -52,6 +52,14 @@ function quiz_answered_page() {
   );
 }
 
+function edit_quiz_page() {
+  quiz_page(
+    "Quiz modifiables",
+    "Choisissez un quiz parmi ceux que vous avez créés.",
+    function() {edit_quiz_page();}, quiz_editable_modify
+  );
+}
+
 function remove_quiz_page() {
   quiz_page(
     "Quiz supprimables",
@@ -76,10 +84,9 @@ function quiz_answered_others_page() {
     function() {
       $("main h2").after($(`
         <p class="form">Joueur</p>
-        <input type="text" id="player">
+        <input type="text" id="player"><br>
         <button id="confirm_player">Confirmer</button>
         <p class="error" hidden></p>
-        <br>
         `)
       );
       $("main #confirm_player").on("click", function() {
@@ -217,7 +224,6 @@ function show_range_value(tag) {
 
 function add_choice(tag) {
   if ($(tag).prev().prev().val() !== "") {
-    $(tag).prev().prev().css("border", "medium solid mediumblue");
     $(tag).before($(`
       <input class="response" type="text" name="quiz">
       <select name="quiz">
@@ -279,5 +285,91 @@ function create_quiz_page() {
       auto_fill_close_date("#open", "#close");
     })
     $("main").html(page);
+  }
+}
+
+function modify_quiz_page(quiz_id, open, close, difficulty, points, type, title, question, responses) {
+  if (user_login !== "" && user_role !== "undefined") {
+    const page = $(`
+      <h2>Modification de quiz</h2>
+      <p>Veuillez compléter tous les champs ci-dessous.</p>
+      <div class="create_quiz">
+      <p class="form">Titre</p>
+      <input id="title" type="text" name="quiz" value="`+title+`"><br>
+      <p class="form">Question</p>
+      <textarea id="question" name="quiz">`+question+`</textarea><br><br>
+      <p>La date d'ouverture doit être antérieure à la date de fermeture.</p>
+      <p class="form">Date d'ouverture</p>
+      <input id="open" type="date" name="quiz" value="`+open+`"><br>
+      <p class="form">Date de fermeture</p>
+      <input id="close" type="date" name="quiz" value="`+close+`"><br>
+      <p>Le nombre de points total correspond à la difficulté multipliée par le nombre de points.</p>
+      <p class="form">Difficulté (`+difficulty+`)</p>
+      <input id="difficulty" onchange="show_range_value(this)" type="range" name="quiz" min="1" max="10" value="`+difficulty+`"><br>
+      <p class="form">Points (`+points+`)</p>
+      <input id="points" onchange="show_range_value(this)" type="range" name="quiz" min="0" max="10" value="`+points+`"><br>
+      <p class="form">Type</p>
+      <select id="type" name="quiz">
+        <option value="checkbox_and">Choix multiples [conjonction]</option>
+        <option value="checkbox_or">Choix multiples [disjonction]</option>
+        <option value="radio">Choix unique</option>
+        <option value="text_strong">Texte [vérification exacte]</option>
+        <option value="text_weak">Texte [vérification tolérante]</option>
+        <option value="text_regex">Texte [expression régulière]</option>
+      </select><br>
+      <p>
+        Un quiz valide doit obligatoirement avoir au moins une réponse. 
+        Le type de quiz choisi conditionne le nombre de réponses à ajouter.
+      </p>
+      <p class="form">Réponses</p>
+      <p class="warning">
+        Si vous choisissez de modifier les réponses déjà enregistrées, les réponses des joueurs
+        pour ce quiz seront supprimées définitivement. Ce n'est pas un problème si le quiz
+        n'a jamais été mis en jeu. 
+      </p>
+      <div id="modify_responses"><input type="checkbox"><label>Modifier les réponses</label></div>
+      <div id="original_responses"></div>
+      <input class="response" type="text" name="quiz">
+      <select name="quiz">
+        <option value="0">Faux</option>
+        <option value="1">Vrai</option>
+      </select>
+      <button onclick="add_choice(this)">Ajouter une réponse</button><br>
+      <button onclick="modify_quiz(`+quiz_id+`)">Modifier le quiz</button>
+      </div>
+      <p class="error" hidden></p>
+      `);
+      
+    // Remplissage automatique des dates
+    page.find("#open").change(function() {
+      auto_fill_close_date("#open", "#close");
+    })
+    $("main").html(page);
+    
+    // Sélection du type de quiz
+    $("main select#type").val(type);
+    
+    // Ajout des réponses déjà entrées
+    responses.forEach(function(response) {
+      $("main #original_responses").append(
+        $(`<input class="response" type="text" name="quiz">`).val(response[0]).prop("disabled", true)
+        .add($(`
+        <select name="quiz" disabled>
+          <option value="0">Faux</option>
+          <option value="1">Vrai</option>
+        </select>`).val(response[1]).prop("disabled", true)
+      ));
+    });
+    
+    // Modification des réponses
+    $("main #modify_responses input[type='checkbox']").on("change", function(event) {
+      if ($("main #modify_responses input[type='checkbox']").is(":checked")) {
+        $("main #original_responses input").prop("disabled", false);
+        $("main #original_responses select").prop("disabled", false);
+      } else {
+        $("main #original_responses input").prop("disabled", true);
+        $("main #original_responses select").prop("disabled", true);
+      }
+    });
   }
 }

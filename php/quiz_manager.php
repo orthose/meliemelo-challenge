@@ -76,7 +76,93 @@ function create_quiz($open, $close, $difficulty, $points, $type, $title, $questi
       $pdo->rollback();
     }
   }     
-   
+  // Fermeture de la session
+  $pdo = NULL;
+  
+  return $res;
+}
+
+/**
+ * Modification de quiz par un administrateur
+ * @param quiz_id: identifiant du quiz à modifier
+ * @param responses: Tableau des réponses possibles, chaque réponse est de la forme
+ * array("response" => "Un réponse au hasard", "valid" => true)
+ * @param overwrite: Si true suppression des réponses déjà existantes
+ * @return: JSON avec champ edit_quiz_status = true si le quiz a bien été 
+ * créé et le login du créateur
+ **/
+function edit_quiz($quiz_id, $open, $close, $difficulty, $points, $type, $title, $question, $responses, $overwrite = false) {
+    
+  $res = array("login" => get_login(), "edit_quiz_status" => true, "quiz_id" => $quiz_id);
+  // Initialisation de la session avec la base
+  $pdo = connect_database(get_role(), $res);
+  
+  // Echec de connexion ?
+  if ($pdo !== NULL) {
+    
+    try {
+      // Activation de la transaction
+      $pdo->beginTransaction();
+      
+      // Modification des métadonnées du quiz
+      $sql = "CALL edit_quiz(:quiz_id, :login, :open, :close, :difficulty, :points, :type, :title, :question)";
+      $params = array(
+        ":quiz_id" => $quiz_id,
+        ":login" => get_login(), 
+        ":open" => $open,
+        ":close" => $close,
+        ":difficulty" => $difficulty,
+        ":points" => $points,
+        ":type" => $type,
+        ":title" => $title,
+        ":question" => $question
+      );
+    
+      $request = $pdo->prepare($sql);
+      foreach($params as $param => $_) {
+        $request->bindParam($param, $params[$param]);
+      } 
+    
+      execute_request($request);
+      
+      // Suppression des réponses si modification des réponses
+      if ($overwrite) {
+        $sql = "CALL remove_quiz_responses(:quiz_id)";
+        $request = $pdo->prepare($sql);
+        $request->bindParam(":quiz_id", $res["quiz_id"]);
+        execute_request($request);
+      }
+      
+      // Ajout des réponses si la création n'a pas échoué
+      $sql = "CALL add_response(:quiz_id, :response, :valid)";
+      $request = $pdo->prepare($sql);
+      $request->bindParam(":quiz_id", $res["quiz_id"]);
+      
+      foreach($responses as $response) {
+        $request->bindParam(":response", $response["response"]);
+        $request->bindParam(":valid", $response["valid"]);
+        execute_request($request);
+      }
+      
+      // Vérification de la validité du quiz
+      $sql = "CALL check_quiz(:quiz_id)";
+      $request = $pdo->prepare($sql);
+      $request->bindParam(":quiz_id", $res["quiz_id"]);
+      // La fonction check_quiz renvoie une erreur si quiz invalide
+      execute_request($request);
+      
+      // Acceptation de la transaction
+      $pdo->commit();
+    }
+    
+    // Echec de la création de quiz
+    catch (Exception $e){
+      error_fun_default($request, $res);
+      $res["edit_quiz_status"] = false;
+      // Abandon de la transaction
+      $pdo->rollback();
+    }
+  } 
   // Fermeture de la session
   $pdo = NULL;
   
@@ -126,7 +212,7 @@ function stock_quiz($quiz_id, $open_date, $close_date) {
  **/
 function answer_quiz($quiz_id, $responses) {
   
-  $res = array("login" => get_login(), "quiz_id" => $quiz_id, "answer_quiz_status" => true, "response" => $responses);
+  $res = array("login" => get_login(), "quiz_id" => $quiz_id, "answer_quiz_status" => true, "responses" => $responses);
   // Initialisation de la session avec la base
   $pdo = connect_database(get_role(), $res);
   
@@ -179,24 +265,6 @@ function answer_quiz($quiz_id, $responses) {
   // Fermeture de la session
   $pdo = NULL;
   
-  return $res;
-}
-
-// Routine à exécuter avec crontab de manière régulière
-function cron_routine() {
-  $sql = "SELECT cron_routine()";
-  $params = array();
-  $res = array("cron_routine_status" => true);
-  $error_fun = function($request, &$res) {
-    error_fun_default($request, $res);
-    $res["cron_routine_status"] = false;
-  };
-  $fill_res = function($row, &$res) {
-    $res_json = json_decode($row[0], true);
-    $res["stock"] = $res_json["stock"];
-    $res["close"] = $res_json["close"];
-  };
-  request_database("undefined", $sql, $params, $res, $error_fun, $fill_res);
   return $res;
 }
 
@@ -385,6 +453,24 @@ function quiz_answered_others($login, $year) {
       array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question, $row[10]));
     }
   );
+}
+
+// Routine à exécuter avec crontab de manière régulière
+function cron_routine() {
+  $sql = "SELECT cron_routine()";
+  $params = array();
+  $res = array("cron_routine_status" => true);
+  $error_fun = function($request, &$res) {
+    error_fun_default($request, $res);
+    $res["cron_routine_status"] = false;
+  };
+  $fill_res = function($row, &$res) {
+    $res_json = json_decode($row[0], true);
+    $res["stock"] = $res_json["stock"];
+    $res["close"] = $res_json["close"];
+  };
+  request_database("undefined", $sql, $params, $res, $error_fun, $fill_res);
+  return $res;
 }
 
 ?>

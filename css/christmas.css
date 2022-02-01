@@ -219,6 +219,30 @@ input:focus, textarea:focus {
   outline: none;
 }
 
+div#modify_responses {
+  background-color: deepskyblue;
+  border: medium solid mediumblue;
+  color: mediumblue;
+  display: flex;
+  align-items: center;
+}
+
+div#modify_responses input[type="checkbox"] {
+  position: relative;
+  appearance: none; outline: none;
+  width: 35px; height: 15px;
+  background-color: #ffffff; 
+  border: none;
+  border-radius: 35px; 
+  box-shadow: inset -20px 0 0 0 #dddddd;
+  transition-duration: 200ms;
+}
+
+div#modify_responses input[type="checkbox"]:checked {
+  border-color: mediumblue;
+  box-shadow: inset 20px 0 0 0 mediumblue;
+}
+
 button {
   margin: 5px 0px;
 }

@@ -151,6 +151,40 @@ else if ($request === "create_quiz") {
   };
 }
 
+else if ($request === "edit_quiz") {
+  $valid = (
+    isset($_REQUEST["quiz_id"])
+    && isset($_REQUEST["open"])
+    && isset($_REQUEST["close"])
+    && isset($_REQUEST["difficulty"])
+    && isset($_REQUEST["points"])
+    && isset($_REQUEST["type"])
+    && isset($_REQUEST["title"])
+    && isset($_REQUEST["question"])
+    && isset($_REQUEST["overwrite"])
+  );
+  $doc = "edit_quiz(quiz_id, open, close, difficulty, points, type, title, question, responses, overwrite)";
+  $fun = function() {
+    $quiz_id = $_REQUEST["quiz_id"];
+    $open = $_REQUEST["open"];
+    $close = $_REQUEST["close"];
+    $difficulty = $_REQUEST["difficulty"];
+    $points = $_REQUEST["points"];
+    $type = $_REQUEST["type"];
+    $title = htmlspecialchars(trim($_REQUEST["title"]));
+    $question = htmlspecialchars(trim($_REQUEST["question"]));
+    $responses = array();
+    if (isset($_REQUEST["responses"])) {
+      $responses = $_REQUEST["responses"];
+      for($i = 0; $i < count($responses); $i++) {
+        $responses[$i]["response"] = htmlspecialchars(trim($responses[$i]["response"]), ENT_COMPAT);
+      }
+    }
+    $overwrite = (bool)$_REQUEST["overwrite"];
+    return edit_quiz($quiz_id, $open, $close, $difficulty, $points, $type, $title, $question, $responses, $overwrite);
+  };
+}
+
 else if ($request === "remove_quiz") {
   $valid = isset($_REQUEST["quiz_id"]);
   $doc = "remove_quiz(quiz_id)";

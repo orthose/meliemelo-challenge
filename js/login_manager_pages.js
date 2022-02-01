@@ -62,6 +62,7 @@ function main_menu_page() {
         <button onclick="quiz_current_not_playable_page()">Quiz jouables par les autres</button>
         <hr>
         <button onclick="create_quiz_page()">Créer un quiz</button>
+        <button onclick="edit_quiz_page()">Modifier un quiz</button>
         <button onclick="remove_quiz_page()">Supprimer un quiz</button>
         <button onclick="stockable_quiz_page()">Remettre en jeu un quiz</button>
         <hr>
@@ -119,7 +120,7 @@ function set_role_page() {
       <select>
         <option value="player">Joueur</option>
         <option value="admin">Administrateur</option>
-      </select>
+      </select><br>
       <button onclick="set_role()">Confirmer</button>
       <p id="info_status" hidden></p>
       `);
