@@ -17,28 +17,27 @@ mysql> CREATE DATABASE meliemelo_challenge;
 2. Création des utilisateurs
 * L'utilisateur principal est meliemelo à n'utiliser qu'en ligne de commande et pour cron.php.
 ```shell
-mysql> CREATE USER "meliemelo"@"localhost" IDENTIFIED BY "mot_de_passe";
-mysql> GRANT ALL ON meliemelo_challenge.* TO "meliemelo"@"localhost";
+mysql> CREATE USER 'meliemelo'@'localhost' IDENTIFIED BY 'mot_de_passe';
+mysql> GRANT ALL ON meliemelo_challenge.* TO 'meliemelo'@'localhost';
 ```
 * L'utilisateur admin_meliemelo correspond aux droits des utilisateurs dont
 le rôle est fixé à admin.
 ```shell
-mysql> CREATE USER "admin_meliemelo"@"localhost" IDENTIFIED BY "mot_de_passe";
+mysql> CREATE USER 'admin_meliemelo'@'localhost' IDENTIFIED BY 'mot_de_passe';
 ```
 * L'utilisateur player_meliemelo correspond aux droits des utilisateurs dont
 le rôle est fixé à player.
 ```shell
-mysql> CREATE USER "player_meliemelo"@"localhost" IDENTIFIED BY "mot_de_passe";
+mysql> CREATE USER 'player_meliemelo'@'localhost' IDENTIFIED BY 'mot_de_passe';
 ```
 * L'utilisateur undefined_meliemelo correspond aux droits des utilisateurs
 non-connectés.
 ```shell
-mysql> CREATE USER "undefined_meliemelo"@"localhost" IDENTIFIED BY "mot_de_passe";
+mysql> CREATE USER 'undefined_meliemelo'@'localhost' IDENTIFIED BY 'mot_de_passe';
 ```
-3. Se déconnecter puis se connecter
+3. Se connecter à la base
 ```shell
-mysql> EXIT;
-$ mysql -u meliemelo -D meliemelo_challenge -p
+mysql> use meliemelo_challenge;
 ```
 4. Créer les tables de la base
 ```shell
@@ -50,8 +49,6 @@ mysql> source actions.sql;
 ```
 6. Définition des droits
 ```shell
-mysql> EXIT;
-$ sudo mysql
 mysql> source rules.sql;
 ```
 
@@ -70,7 +67,7 @@ Pour cela rendez-vous sur le site web et créez un nouveau compte.
 Une fois créé, rendez-vous sur votre base de données.
 ```shell
 $ mysql -u meliemelo -D meliemelo_challenge -p
-mysql> CALL set_role("nouvel_utilisateur", "admin");
+mysql> CALL set_role('nouvel_utilisateur', 'admin');
 ```
 Ce premier utilisateur peut par la suite donner le rôle d'administrateur,
 ou le reprendre à un utilisateur depuis l'interface web directement.

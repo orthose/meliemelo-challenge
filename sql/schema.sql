@@ -8,7 +8,7 @@ CREATE TABLE Users (
   login VARCHAR(16) PRIMARY KEY COLLATE 'latin1_general_cs', -- Sensible à la casse
   password CHAR(64) NOT NULL,
   salt CHAR(16) NOT NULL CHECK(LENGTH(salt) = 16),
-  role ENUM("player", "admin") NOT NULL DEFAULT "player",
+  role ENUM('player', 'admin') NOT NULL DEFAULT 'player',
   points INT NOT NULL DEFAULT 0,
   success INT NOT NULL DEFAULT 0, -- Nombre de quiz réussis
   fail INT NOT NULL DEFAULT 0, -- Nombre de quiz échoués
@@ -29,7 +29,7 @@ CREATE SEQUENCE QuizSequence START WITH 1 INCREMENT BY 1 CACHE 0;
  * archive: le quiz n'est plus jouable définitivement
  **/
 CREATE TABLE Quiz (
-  id INT PRIMARY KEY,
+  id BIGINT UNSIGNED PRIMARY KEY,
   login_creator VARCHAR(16) COLLATE 'latin1_general_cs', -- Utilisateur ayant créé le quiz
   FOREIGN KEY (login_creator) REFERENCES Users(login),
   open DATE NOT NULL, -- Date à laquelle pour être ouvert le quiz
@@ -54,7 +54,7 @@ CREATE TABLE Quiz (
  * Si type = text il n'y a qu'une seule réponse
  **/
 CREATE TABLE QuizResponses (
-  id INT, FOREIGN KEY (id) REFERENCES Quiz(id),
+  id BIGINT UNSIGNED, FOREIGN KEY (id) REFERENCES Quiz(id),
   response VARCHAR(256) NOT NULL,
   valid BOOLEAN NOT NULL,
   PRIMARY KEY(id, response)
@@ -67,7 +67,7 @@ CREATE TABLE QuizResponses (
 CREATE TABLE PlayerQuizAnswered (
   login VARCHAR(16) COLLATE 'latin1_general_cs',
   FOREIGN KEY (login) REFERENCES Users(login),
-  id INT, FOREIGN KEY (id) REFERENCES Quiz(id),
+  id BIGINT UNSIGNED, FOREIGN KEY (id) REFERENCES Quiz(id),
   /* TRUE si quiz réussi FALSE si quiz échoué
   Si quiz pas répondu alors la ligne n'existe pas */
   success BOOLEAN NOT NULL,
@@ -83,8 +83,8 @@ CREATE TRIGGER PlayerQuizAnsweredTrigger
 BEGIN
   /* Un utilisateur ne peut pas répondre à un quiz qu'il a créé */
   IF NEW.login = (SELECT login_creator FROM Quiz WHERE id = NEW.id) THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "User cannot answers quiz because he created it";
+    SIGNAL SQLSTATE '45001' 
+    SET MESSAGE_TEXT = 'User cannot answers quiz because he created it';
   END IF;
 END; //
 DELIMITER ;
@@ -96,7 +96,7 @@ DELIMITER ;
 CREATE TABLE PlayerQuizResponses (
   login VARCHAR(16) COLLATE 'latin1_general_cs',
   FOREIGN KEY (login) REFERENCES Users(login),
-  id INT, FOREIGN KEY (id) REFERENCES Quiz(id),
+  id BIGINT UNSIGNED, FOREIGN KEY (id) REFERENCES Quiz(id),
   response VARCHAR(256) NOT NULL,
   PRIMARY KEY(login, id, response)
 ); 
@@ -113,42 +113,40 @@ BEGIN
   SELECT success INTO success_quiz FROM PlayerQuizAnswered
   WHERE login = NEW.login AND id = NEW.id; 
   IF success_quiz IS NOT NULL THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Player has already answered this quiz";
+    SIGNAL SQLSTATE '45002' 
+    SET MESSAGE_TEXT = 'Player has already answered this quiz';
   END IF;
   
   /* On ne peut pas répondre à un quiz qui n'est pas jouable */
-  IF (SELECT state FROM Quiz WHERE id = NEW.id) != "current" 
+  IF (SELECT state FROM Quiz WHERE id = NEW.id) != 'current' 
   THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Quiz isn't in current state";
+    SIGNAL SQLSTATE '45003' 
+    SET MESSAGE_TEXT = 'Quiz isn\'t in current state';
   END IF;
   
   SELECT type INTO quiz_type FROM Quiz WHERE id = NEW.id;
   /* Une réponse doit correspondre à l'id du quiz */
-  IF quiz_type NOT LIKE "text%" AND NEW.response NOT IN (
+  IF quiz_type NOT LIKE 'text%' AND NEW.response NOT IN (
     SELECT response FROM QuizResponses 
     WHERE QuizResponses.id = NEW.id) 
   THEN
-    -- Annulation de la réponse du joueur
-    SIGNAL SQLSTATE "45001" 
-    SET MESSAGE_TEXT = "Response doesn't match quiz id";
+    SIGNAL SQLSTATE '45004' 
+    SET MESSAGE_TEXT = 'Response doesn\'t match quiz id';
   END IF;
   
   /* Un utilisateur ne peut pas répondre à un quiz qu'il a créé */
   IF NEW.login = (SELECT login_creator FROM Quiz WHERE id = NEW.id) THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "User cannot answers quiz because he created it";
+    SIGNAL SQLSTATE '45005' 
+    SET MESSAGE_TEXT = 'User cannot answers quiz because he created it';
   END IF;
   
   /* Un joueur ne peut donner qu'une seule réponse pour un quiz de type radio ou text */
-  IF (quiz_type = "radio" OR quiz_type LIKE "text%") 
+  IF (quiz_type = 'radio' OR quiz_type LIKE 'text%') 
   AND EXISTS(SELECT * FROM PlayerQuizResponses 
   WHERE login = NEW.login AND id = NEW.id) 
   THEN
-    -- Annulation de la réponse du joueur
-    SIGNAL SQLSTATE "45001" 
-    SET MESSAGE_TEXT = "Player must give only one answer for radio or text quiz";
+    SIGNAL SQLSTATE '45006' 
+    SET MESSAGE_TEXT = 'Player must give only one answer for radio or text quiz';
   END IF;
 END; //
 DELIMITER ;

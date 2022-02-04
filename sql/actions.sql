@@ -8,8 +8,8 @@ BEGIN
   DECLARE random_salt TYPE OF Users.salt;
   DECLARE hash_passwd TYPE OF Users.password;
   IF LENGTH(new_passwd) < 8 THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Password must have length >= 8" ;
+    SIGNAL SQLSTATE '45007' 
+    SET MESSAGE_TEXT = 'Password must have length >= 8' ;
   ELSE
     SELECT LEFT(MD5(RAND()), 16) INTO random_salt;
     SELECT SHA2(CONCAT(new_passwd, random_salt), 256) INTO hash_passwd;
@@ -23,7 +23,7 @@ DELIMITER ;
 DELIMITER //
 CREATE OR REPLACE FUNCTION get_role (
   login_user TYPE OF Users.login
-) RETURNS ENUM("player", "admin")
+) RETURNS ENUM('player', 'admin')
 BEGIN
   DECLARE res TYPE OF Users.role;
   SELECT role INTO res FROM Users WHERE login = login_user;
@@ -82,8 +82,8 @@ CREATE OR REPLACE PROCEDURE set_role (
 BEGIN
   IF NOT login_exists(login_user) 
   THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Invalid login";
+    SIGNAL SQLSTATE '45008' 
+    SET MESSAGE_TEXT = 'Invalid login';
   ELSE
     UPDATE Users SET role = new_role 
     WHERE login = login_user;
@@ -100,11 +100,11 @@ CREATE OR REPLACE PROCEDURE set_password (
 )
 BEGIN
   IF LENGTH(new_passwd) < 8 THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Password must have length >= 8";
+    SIGNAL SQLSTATE '45009' 
+    SET MESSAGE_TEXT = 'Password must have length >= 8';
   ELSEIF NOT authentication_is_valid(login_user, actual_passwd) THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Authentication has failed";
+    SIGNAL SQLSTATE '45010' 
+    SET MESSAGE_TEXT = 'Authentication has failed';
   ELSE
     UPDATE Users SET password = SHA2(CONCAT(new_passwd, salt), 256) 
     WHERE login = login_user;
@@ -125,11 +125,11 @@ CREATE OR REPLACE PROCEDURE emergency_set_password (
 )
 BEGIN
   IF LENGTH(new_passwd) < 8 THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Password must have length >= 8";
+    SIGNAL SQLSTATE '45011' 
+    SET MESSAGE_TEXT = 'Password must have length >= 8';
   ELSEIF NOT login_exists(login_user) THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Login doesn't exist";
+    SIGNAL SQLSTATE '45012' 
+    SET MESSAGE_TEXT = 'Login doesn\'t exist';
   ELSE
     UPDATE Users SET password = SHA2(CONCAT(new_passwd, salt), 256) 
     WHERE login = login_user;
@@ -145,8 +145,8 @@ CREATE OR REPLACE PROCEDURE unregister_user (
 )
 BEGIN
   IF NOT authentication_is_valid(login_user, passwd) THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Authentication has failed";
+    SIGNAL SQLSTATE '45013' 
+    SET MESSAGE_TEXT = 'Authentication has failed';
   ELSE
     START TRANSACTION;
     CREATE TEMPORARY TABLE QuizCreated (
@@ -177,8 +177,8 @@ CREATE OR REPLACE PROCEDURE reset_high_score (
 )
 BEGIN
   IF NOT authentication_is_valid(login_user, passwd) THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Authentication has failed";
+    SIGNAL SQLSTATE '45014' 
+    SET MESSAGE_TEXT = 'Authentication has failed';
   ELSE
     START TRANSACTION;
     UPDATE Users SET points = 0;
@@ -209,9 +209,9 @@ CREATE OR REPLACE FUNCTION create_quiz (
   type TYPE OF Quiz.type,
   title TYPE OF Quiz.title,
   question TYPE OF Quiz.question
-) RETURNS INT
+) RETURNS BIGINT UNSIGNED
 BEGIN
-  DECLARE quiz_id INT;
+  DECLARE quiz_id BIGINT UNSIGNED;
   SELECT NEXTVAL(QuizSequence) INTO quiz_id;
   -- Peut renvoyer des exceptions
   INSERT INTO Quiz (id, login_creator, open, close, difficulty, points, type, title, question)
@@ -235,8 +235,8 @@ CREATE OR REPLACE PROCEDURE edit_quiz (
 )
 BEGIN
   IF (SELECT login_creator FROM Quiz WHERE id = quiz_id) != login_user THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Invalid login_creator for this quiz";
+    SIGNAL SQLSTATE '45015' 
+    SET MESSAGE_TEXT = 'Invalid login_creator for this quiz';
   END IF;
   UPDATE Quiz SET 
   open = new_open,
@@ -283,13 +283,13 @@ BEGIN
   IF (quiz_type LIKE 'checkbox%')
   AND NOT (SELECT COUNT(*) >= 1 FROM QuizResponses WHERE id = quiz_id AND valid)
   THEN
-    SIGNAL SQLSTATE '45000' 
+    SIGNAL SQLSTATE '45016' 
     SET MESSAGE_TEXT = 'Checkbox quiz must have at least one valid response';
   -- Une seule réponse valide parmi les réponses pour quiz radio
   ELSEIF quiz_type = 'radio' 
   AND NOT (SELECT COUNT(*) = 1 FROM QuizResponses WHERE id = quiz_id AND valid) 
   THEN
-    SIGNAL SQLSTATE '45000' 
+    SIGNAL SQLSTATE '45017' 
     SET MESSAGE_TEXT = 'Radio quiz must have only one valid response';
   -- Une seule réponse valide uniquement pour quiz text
   ELSEIF quiz_type LIKE 'text%'
@@ -298,7 +298,7 @@ BEGIN
     AND (SELECT COUNT(*) FROM QuizResponses WHERE id = quiz_id AND NOT valid) = 0
   )
   THEN
-    SIGNAL SQLSTATE '45000' 
+    SIGNAL SQLSTATE '45018' 
     SET MESSAGE_TEXT = 'Text quiz must have only one response and valid';
   END IF;
 END; //
@@ -313,8 +313,8 @@ CREATE OR REPLACE PROCEDURE remove_quiz (
 BEGIN
   IF NOT EXISTS(SELECT * FROM Quiz WHERE login_creator = login AND id = quiz_id) 
   THEN
-    SIGNAL SQLSTATE "45000" 
-    SET MESSAGE_TEXT = "Invalid login creator or id for this quiz";
+    SIGNAL SQLSTATE '45019' 
+    SET MESSAGE_TEXT = 'Invalid login creator or id for this quiz';
   ELSE
     START TRANSACTION;
     DELETE FROM PlayerQuizAnswered WHERE id = quiz_id;
@@ -327,13 +327,13 @@ END; //
 DELIMITER ;
 
 /* Vue pour obtenir les quiz en stock */
-CREATE OR REPLACE VIEW QuizStockView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "stock" ORDER BY open ASC, close ASC;
+CREATE OR REPLACE VIEW QuizStockView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = 'stock' ORDER BY open ASC, close ASC;
 
 /* Vue pour obtenir les quiz courants */
-CREATE OR REPLACE VIEW QuizCurrentView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "current" ORDER BY close ASC, open ASC;
+CREATE OR REPLACE VIEW QuizCurrentView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = 'current' ORDER BY close ASC, open ASC;
 
 /* Vue pour obtenir les quiz archivés */
-CREATE OR REPLACE VIEW QuizArchiveView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = "archive" ORDER BY close DESC, open DESC;
+CREATE OR REPLACE VIEW QuizArchiveView AS SELECT id, login_creator, open, close, difficulty, points, type, title, question FROM Quiz WHERE state = 'archive' ORDER BY close DESC, open DESC;
 
 /* Vue pour obtenir les quiz auxquels ont répondu les joueurs */
 CREATE OR REPLACE VIEW QuizAnsweredView AS SELECT Quiz.id, login_creator, open, close, difficulty, points, type, title, question, PlayerQuizAnswered.login, success FROM Quiz, PlayerQuizAnswered WHERE Quiz.id = PlayerQuizAnswered.id ORDER BY open DESC, close DESC;
@@ -373,17 +373,17 @@ DELIMITER ;
 /* Vue pour les réponses des quiz en stock */
 CREATE OR REPLACE VIEW QuizResponsesStockView AS 
 SELECT QuizResponses.*, login_creator FROM QuizResponses, Quiz 
-WHERE Quiz.state = "stock" AND Quiz.id = QuizResponses.id;
+WHERE Quiz.state = 'stock' AND Quiz.id = QuizResponses.id;
 
 /* Vue pour les réponses des quiz jouables */
 CREATE OR REPLACE VIEW QuizResponsesCurrentView AS 
 SELECT QuizResponses.*, login_creator FROM QuizResponses, Quiz 
-WHERE Quiz.state = "current" AND Quiz.id = QuizResponses.id;
+WHERE Quiz.state = 'current' AND Quiz.id = QuizResponses.id;
 
 /* Vue pour les réponses des quiz archivés */
 CREATE OR REPLACE VIEW QuizResponsesArchiveView AS 
 SELECT QuizResponses.*, login_creator FROM QuizResponses, Quiz 
-WHERE Quiz.state = "archive" AND Quiz.id = QuizResponses.id;
+WHERE Quiz.state = 'archive' AND Quiz.id = QuizResponses.id;
 
 /* Vue pour les réponses des joueurs */
 CREATE OR REPLACE VIEW QuizResponsesAnsweredView AS
@@ -428,7 +428,7 @@ BEGIN
   et que le joueur n'a pas déjà répondu à ce quiz */ 
   IF success_quiz IS NULL AND (
     (
-      quiz_type = "checkbox_and" AND 
+      quiz_type = 'checkbox_and' AND 
       -- Égalité entre 2 tables E_1 = E_2 <=> (E_1 Union E_2) - (E_2 Inter E_1) = Vide
       NOT EXISTS (
         SELECT a.response FROM
@@ -451,7 +451,7 @@ BEGIN
       ) AS pqrv)
     ) OR
     (
-      quiz_type = "radio" AND
+      quiz_type = 'radio' AND
       (SELECT response FROM QuizResponses WHERE id = quiz_id AND valid) 
       = (SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
     ) OR
@@ -504,13 +504,13 @@ DELIMITER ;
 CREATE OR REPLACE PROCEDURE open_quiz (
   quiz_id TYPE OF Quiz.id
 )
-UPDATE Quiz SET state = "current" WHERE id = quiz_id;
+UPDATE Quiz SET state = 'current' WHERE id = quiz_id;
 
 /* Archiver le quiz */
 CREATE OR REPLACE PROCEDURE close_quiz (
   quiz_id TYPE OF Quiz.id
 )
-UPDATE Quiz SET state = "archive" WHERE id = quiz_id;
+UPDATE Quiz SET state = 'archive' WHERE id = quiz_id;
 
 /* Mettre en stock un quiz en jeu ou archivé */
 DELIMITER //
@@ -523,12 +523,12 @@ CREATE OR REPLACE PROCEDURE stock_quiz (
 BEGIN
   IF NOT EXISTS(SELECT * FROM Quiz WHERE login_creator = login AND id = quiz_id)
   THEN
-    SIGNAL SQLSTATE '45000' 
+    SIGNAL SQLSTATE '45020' 
     SET MESSAGE_TEXT = 'Invalid login creator or id for this quiz';
   END IF;
   IF (SELECT state FROM Quiz WHERE id = quiz_id) = 'stock' 
   THEN
-    SIGNAL SQLSTATE '45000' 
+    SIGNAL SQLSTATE '45021' 
     SET MESSAGE_TEXT = 'Quiz is already in stock';
   END IF;
   START TRANSACTION;
@@ -549,9 +549,9 @@ BEGIN
   DECLARE end_cursor BOOLEAN DEFAULT FALSE;
   DECLARE quiz_row ROW TYPE OF Quiz; 
   DECLARE quiz_stock_cursor CURSOR FOR
-  SELECT * FROM Quiz WHERE state = "stock";
+  SELECT * FROM Quiz WHERE state = 'stock';
   DECLARE quiz_current_cursor CURSOR FOR
-  SELECT * FROM Quiz WHERE state = "current"; 
+  SELECT * FROM Quiz WHERE state = 'current'; 
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET end_cursor = TRUE;
   
   SET res.stock = 0; SET res.close = 0;

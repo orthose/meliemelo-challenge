@@ -1,7 +1,4 @@
 /* Triggers */
-DROP TRIGGER QuizUpdateTrigger;
-DROP TRIGGER QuizDeleteTrigger;
-DROP TRIGGER QuizResponsesTrigger;
 DROP TRIGGER PlayerQuizResponsesTrigger;
 DROP TRIGGER PlayerQuizAnsweredTrigger;
 
@@ -31,7 +28,11 @@ DROP PROCEDURE set_role;
 DROP PROCEDURE set_password;
 DROP PROCEDURE unregister_user;
 DROP FUNCTION create_quiz;
+DROP PROCEDURE edit_quiz;
+DROP PROCEDURE remove_quiz_responses;
+DROP PROCEDURE check_quiz;
 DROP PROCEDURE remove_quiz;
+DROP FUNCTION escape_response_text;
 DROP PROCEDURE add_response;
 DROP PROCEDURE answer_quiz;
 DROP FUNCTION check_answer;
