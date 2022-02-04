@@ -188,13 +188,15 @@ input[type=submit]:hover, a:hover, button:hover {
   background-color: deepskyblue;
 }
 
+input[type=text].response {
+  border-color: mediumblue;
+}
+
 input:focus, textarea:focus {
   outline: none;
 }
 
 div#modify_responses {
-  background-color: deepskyblue;
-  border: medium solid mediumblue;
   color: mediumblue;
   display: flex;
   align-items: center;
