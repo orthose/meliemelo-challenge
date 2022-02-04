@@ -184,7 +184,7 @@ input, button, a[href="index.php"], select {
   box-sizing: border-box;
   text-align: center;
   margin: 1px 0px;
-  padding: 0px 0px;
+  padding: 5px 0px;
   width: 100%;
 }
 
@@ -256,4 +256,38 @@ textarea {
   width: 100%;
   height: 100px;
   text-align: left;
+}
+
+#select_page {
+  display: flex;
+}
+
+#select_page button {
+  width: 100%;
+  border: medium solid mediumblue;
+  border-radius: 0px;
+  background-color: mediumblue;
+  color: white;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+#select_page span#num_page {
+  border: medium solid white;
+  background-color: white;
+  color: mediumblue;
+  padding: 5px 0px;
+  align-self: center;
+}
+
+#select_page button:hover {
+  color: deepskyblue;
+}
+
+#select_page button#previous_page {
+  margin-right: 2%;
+}
+
+#select_page button#next_page {
+  margin-left: 2%;
 }

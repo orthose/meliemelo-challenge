@@ -1,15 +1,12 @@
-function list_quiz(state, string_quiz_button, fun_quiz_button, filter_year) {
+function list_quiz(state, string_quiz_button, fun_quiz_button, num_page = 0) {
   function list_quiz_ajax() {
     const data = {
-      "request": "quiz_" + state
+      "request": "quiz_" + state,
+      "num_page": num_page
     };
-    if (filter_year) {
-      data.year = $("#year").val();
-    }
     if (state === "answered_others") {
       data.login = $("#player").val();
     }
-  
     $.ajax({
       method: "POST",
       url: config["serverURL"] + "/meliemelo-challenge/requests.php",
@@ -55,8 +52,23 @@ function list_quiz(state, string_quiz_button, fun_quiz_button, filter_year) {
     });
   }
   
-  // Sélection de l'année de filtrage
-  if (filter_year) {
+  // Sélection de la page de quiz à requêter
+  const previous = $(`<button id="previous_page">Page&nbsp;précédente</button>`).on("click", function() {
+    if (0 < num_page) {
+      $("main div#list_quiz").html(""); num_page--; 
+      $("main span#num_page").html(num_page + 1); list_quiz_ajax();
+    }
+  });
+  const next = $(`<button id="next_page">Page&nbsp;suivante</button>`).on("click", function() {
+    if ($("main div#list_quiz div").length !== 0) {
+      $("main div#list_quiz").html(""); num_page++;
+      $("main span#num_page").html(num_page + 1); list_quiz_ajax();
+    }
+  });
+  const show_num_page = $(`<span id="num_page">1</span>`);
+  $("main div#select_page").html(previous.add(show_num_page).add(next));
+  
+  /*if (filter_year) {
     const today = new Date();
     const actual_year = today.getFullYear();
     const select_year = $(`
@@ -74,7 +86,8 @@ function list_quiz(state, string_quiz_button, fun_quiz_button, filter_year) {
       $("main div#list_quiz div").remove();
       list_quiz_ajax();
     });
-  } list_quiz_ajax();
+  }*/ 
+  list_quiz_ajax();
 }
 
 const show_quiz_button = `<button class="show">Voir la réponse</button>`;
@@ -90,15 +103,15 @@ function quiz_current() {
     line.find("button.answer").on("click", function() { 
       answer_quiz_page(row[0], row[6], row[7], row[8], json["responses"][row[0]]); 
     });
-  }, false);
+  });
 }
 
 function quiz_archive() {
-  list_quiz("archive", show_quiz_button, fun_show_quiz_button, true);
+  list_quiz("archive", show_quiz_button, fun_show_quiz_button);
 }
 
 function quiz_stock() {
-  list_quiz("stock", show_quiz_button, fun_show_quiz_button, true);
+  list_quiz("stock", show_quiz_button, fun_show_quiz_button);
 }
 
 function quiz_editable_remove() {
@@ -107,7 +120,7 @@ function quiz_editable_remove() {
     line.find("button.remove").on("click", function() { 
       remove_quiz(this, row[0]); 
     });
-  }, true);
+  });
 }
 
 function quiz_editable_modify() {
@@ -116,19 +129,19 @@ function quiz_editable_modify() {
     line.find("button.edit").on("click", function() { 
       modify_quiz_page(row[0], row[2], row[3], row[4], row[5], row[6], row[7], row[8], json["responses"][row[0]]); 
     });
-  }, true);
+  });
 }
 
 function quiz_current_not_playable() {
-  list_quiz("current_not_playable", show_quiz_button, fun_show_quiz_button, false);
+  list_quiz("current_not_playable", show_quiz_button, fun_show_quiz_button);
 }
 
 function quiz_answered() {
-  list_quiz("answered", show_quiz_button, fun_show_quiz_button, true);
+  list_quiz("answered", show_quiz_button, fun_show_quiz_button);
 }
 
 function quiz_answered_others() {
-  list_quiz("answered_others", show_quiz_button, fun_show_quiz_button, true);
+  list_quiz("answered_others", show_quiz_button, fun_show_quiz_button);
 }
 
 function quiz_stockable() {
@@ -145,7 +158,7 @@ function quiz_stockable() {
     line.find("input.open").change(function() { 
       auto_fill_close_date("main #"+row[0]+" input.open", "main #"+row[0]+" input.close"); });
     line.find("button.stock").on("click", function() { stock_quiz(this, row[0]); });
-  }, true);
+  });
 }
 
 function answer_quiz(type, quiz_id) {

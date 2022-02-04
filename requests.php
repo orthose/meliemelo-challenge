@@ -235,40 +235,40 @@ else if ($request === "quiz_current_not_playable") {
 }
 
 else if ($request === "quiz_archive") {
-  $valid = isset($_REQUEST["year"]);
-  $doc = "quiz_archive(year)";
-  $fun = function() { return quiz_archive($_REQUEST["year"]); };
+  $valid = isset($_REQUEST["num_page"]);
+  $doc = "quiz_archive(num_page)";
+  $fun = function() { return quiz_archive($_REQUEST["num_page"]); };
 }
 
 else if ($request === "quiz_stock") {
-  $valid = isset($_REQUEST["year"]);
-  $doc = "quiz_stock(year)";
-  $fun = function() { return quiz_stock($_REQUEST["year"]); };
+  $valid = isset($_REQUEST["num_page"]);
+  $doc = "quiz_stock(num_page)";
+  $fun = function() { return quiz_stock($_REQUEST["num_page"]); };
 }
 
 else if ($request === "quiz_stockable") {
   // La base de données ne gère pas cette permission
-  $valid = isset($_SESSION["role"]) && $_SESSION["role"] === "admin" && isset($_REQUEST["year"]);
-  $doc = "quiz_stockable(year)";
-  $fun = function() { return quiz_stockable($_REQUEST["year"]); };
+  $valid = isset($_SESSION["role"]) && $_SESSION["role"] === "admin" && isset($_REQUEST["num_page"]);
+  $doc = "quiz_stockable(num_page)";
+  $fun = function() { return quiz_stockable($_REQUEST["num_page"]); };
 }
 
 else if ($request === "quiz_editable") {
-  $valid = isset($_REQUEST["year"]);
-  $doc = "quiz_editable(year)";
-  $fun = function() { return quiz_editable($_REQUEST["year"]); };
+  $valid = isset($_REQUEST["num_page"]);
+  $doc = "quiz_editable(num_page)";
+  $fun = function() { return quiz_editable($_REQUEST["num_page"]); };
 }
 
 else if ($request === "quiz_answered") {
-  $valid = isset($_REQUEST["year"]);
-  $doc = "quiz_answered(year)";
-  $fun = function() { return quiz_answered($_REQUEST["year"]); };
+  $valid = isset($_REQUEST["num_page"]);
+  $doc = "quiz_answered(num_page)";
+  $fun = function() { return quiz_answered($_REQUEST["num_page"]); };
 }
 
 else if ($request === "quiz_answered_others") {
-  $valid = isset($_REQUEST["login"]) && $_REQUEST["year"];
-  $doc = "quiz_answered_others(login, year)";
-  $fun = function() { return quiz_answered_others($_REQUEST["login"], $_REQUEST["year"]); };
+  $valid = isset($_REQUEST["login"]) && $_REQUEST["num_page"];
+  $doc = "quiz_answered_others(login, num_page)";
+  $fun = function() { return quiz_answered_others($_REQUEST["login"], $_REQUEST["num_page"]); };
 }
 
 else if ($request === "set_daily_msg") {

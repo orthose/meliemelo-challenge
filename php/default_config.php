@@ -14,6 +14,7 @@ $config = array(
   "login_admin" => "admin_meliemelo",
   "passwd_admin" => "test", // MODIFIER
   "theme" => "default_style",
+  "limit_quiz" => 50,
 ); 
 
 ?>

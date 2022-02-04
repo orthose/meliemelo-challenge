@@ -3,7 +3,7 @@ function quiz_page(title, instructions, fun_push_state, fun_quiz_ajax) {
     push_state(fun_push_state);
     const page = $(`
       <h2>`+title+`</h2>
-      <div id="filter_date"></div>
+      <div id="select_page"></div>
       <p>`+instructions+`</p>
       <div id="list_quiz"></div>
       `);

@@ -1,6 +1,7 @@
 <?php
 
 require_once("connect_mariadb.php");
+require_once("config.php");
 
 /**
  * Création de quiz par un administrateur
@@ -272,7 +273,7 @@ function answer_quiz($quiz_id, $responses) {
  * Factorisation de requêtes de listage des quiz
  * @param sql1: string de la requête SQL des métadonnées
  * @param sql2: string de la requête SQL des réponses aux quiz
- * @param year: Année de filtrage facultative
+ * @param num_page: Numéro de page [0, 1, 2, ...]
  * @param fill_res1: Remplissage facultatif du tableau des résultats pour les métadonnées
  * @param fill_res1: Remplissage facultatif du tableau des résultats pour les réponses aux quiz
  * 
@@ -280,13 +281,14 @@ function answer_quiz($quiz_id, $responses) {
  * le filtrage sur l'année qui est obligatoire. La fonction le laisse optionnel car quiz_current
  * ne peut pas suivre ce pattern de factorisation.
  **/
-function list_quiz($sql1, $sql2, $params, $year = NULL, $fill_res1 = NULL, $fill_res2 = NULL) {
+function list_quiz($sql1, $sql2, $params, $num_page = 0, $fill_res1 = NULL, $fill_res2 = NULL) {
+  global $config;
   $res = array("quiz" => array(), "responses" => array());
   request_database_manual($res,
-    function($pdo, &$res) use($sql1, $sql2, $params, $year, $fill_res1, $fill_res2) {
-      
+    function($pdo, &$res) use($sql1, $sql2, $params, $num_page, $fill_res1, $fill_res2) {
+      global $config;
       // Sélection des infos principales
-      $sql1 = $year !== NULL ? str_replace("[YEAR]", " (YEAR(open) = :year OR YEAR(close) = :year) ", $sql1) : $sql1;
+      $sql1 = str_replace("[LIMIT]", " LIMIT :limit_quiz OFFSET :offset_quiz ", $sql1);
       $sql = "CREATE TEMPORARY TABLE QuizHeader (".$sql1.")";
       $fill_res = $fill_res1 !== NULL ? $fill_res1 : 
       function($row, &$res) {
@@ -297,7 +299,10 @@ function list_quiz($sql1, $sql2, $params, $year = NULL, $fill_res1 = NULL, $fill
       foreach($params as $param => $_) {
         $request->bindParam($param, $params[$param]);
       } 
-      if ($year !== NULL) { $request->bindParam(":year", $year); }
+      $limit_quiz = $config["limit_quiz"];
+      $offset = ($num_page * $limit_quiz);
+      $request->bindParam(":limit_quiz", $limit_quiz, PDO::PARAM_INT);
+      $request->bindParam(":offset_quiz", $offset, PDO::PARAM_INT);
       execute_request($request);
       $sql = "SELECT * FROM QuizHeader";
       $request = $pdo->prepare($sql);
@@ -339,7 +344,7 @@ function quiz_current() {
     "SELECT * FROM QuizCurrentView
     WHERE login_creator != :login
     AND id NOT IN (
-      SELECT id FROM PlayerQuizAnswered WHERE login = :login)",
+      SELECT id FROM PlayerQuizAnswered WHERE login = :login) [LIMIT]",
     "SELECT qrcv.id, qrcv.response FROM QuizCurrentView AS qcv, QuizResponsesCurrentView AS qrcv
     WHERE qrcv.id IN (SELECT id FROM QuizHeader) AND qcv.id = qrcv.id
     -- La réponse des quiz text ne doit pas être envoyée
@@ -357,7 +362,7 @@ function quiz_current() {
 // Quiz jouables par les autres (pas par son créateur)
 function quiz_current_not_playable() {
   return list_quiz(
-    "SELECT * FROM QuizCurrentView WHERE login_creator = :login",
+    "SELECT * FROM QuizCurrentView WHERE login_creator = :login [LIMIT]",
     "SELECT * FROM QuizResponsesCurrentView WHERE [ID]",
     array(":login" => get_login())
   );
@@ -367,11 +372,11 @@ function quiz_current_not_playable() {
  * Renvoie les quiz jouables (dans l'état archive)
  * avec les infos principales et les réponses valides et invalides
  **/
-function quiz_archive($year) {
+function quiz_archive($num_page) {
   return list_quiz(
-    "SELECT * FROM QuizArchiveView WHERE [YEAR]", 
+    "SELECT * FROM QuizArchiveView [LIMIT]", 
     "SELECT * FROM QuizResponsesArchiveView WHERE [ID]", 
-    array(), $year
+    array(), $num_page
   );
 }
 
@@ -379,11 +384,11 @@ function quiz_archive($year) {
  * Renvoie les quiz en stock (dans l'état stock)
  * avec les infos principales et les réponses valides et invalides
  **/
-function quiz_stock($year) {
+function quiz_stock($num_page) {
   return list_quiz(
-    "SELECT * FROM QuizStockView WHERE login_creator = :login AND [YEAR]", 
+    "SELECT * FROM QuizStockView WHERE login_creator = :login [LIMIT]", 
     "SELECT * FROM QuizResponsesStockView WHERE [ID]", 
-    array(":login" => get_login()), $year
+    array(":login" => get_login()), $num_page
   );
 }
 
@@ -391,11 +396,11 @@ function quiz_stock($year) {
  * Renvoie les quiz qui peuvent être remis en stock
  * avec les infos principales et les réponses valides et invalides
  **/
-function quiz_stockable($year) {
+function quiz_stockable($num_page) {
   return list_quiz(
-    "SELECT * FROM (SELECT * FROM QuizCurrentView WHERE login_creator = :login AND [YEAR]
-    UNION SELECT * FROM QuizArchiveView WHERE login_creator = :login AND [YEAR]) AS t",
-    NULL, array(":login" => get_login()), $year
+    "SELECT * FROM (SELECT * FROM QuizCurrentView WHERE login_creator = :login
+    UNION SELECT * FROM QuizArchiveView WHERE login_creator = :login) AS t [LIMIT]",
+    NULL, array(":login" => get_login()), $num_page
   );
 }
 
@@ -403,16 +408,16 @@ function quiz_stockable($year) {
  * Renvoie les quiz modifiables (tous les quiz créés par l'utilisateur)
  * avec les infos principales et les réponses valides et invalides
  **/
-function quiz_editable($year) {
+function quiz_editable($num_page) {
   return list_quiz(
     "SELECT * FROM (SELECT * FROM
-    (SELECT * FROM QuizStockView WHERE login_creator = :login AND [YEAR]
-    UNION SELECT * FROM QuizCurrentView WHERE login_creator = :login AND [YEAR]) AS t
-    UNION SELECT * FROM QuizArchiveView WHERE login_creator = :login AND [YEAR]) AS u", 
+    (SELECT * FROM QuizStockView WHERE login_creator = :login
+    UNION SELECT * FROM QuizCurrentView WHERE login_creator = :login) AS t
+    UNION SELECT * FROM QuizArchiveView WHERE login_creator = :login) AS u [LIMIT]", 
     "SELECT * FROM QuizResponsesStockView WHERE [ID]
     UNION SELECT * FROM QuizResponsesCurrentView WHERE [ID]
     UNION SELECT * FROM QuizResponsesArchiveView WHERE [ID]", 
-    array(":login" => get_login()), $year
+    array(":login" => get_login()), $num_page
   );
 }
 
@@ -422,11 +427,11 @@ function quiz_editable($year) {
  * sélectionnées par le joueur et "invalides" celles non-sélectionnées
  * ATTENTION: Ce ne sont donc pas les réponses valides et invalides au sens propre
  **/
-function quiz_answered($year) {
+function quiz_answered($num_page) {
   return list_quiz(
-    "SELECT * FROM QuizAnsweredView WHERE login = :login AND [YEAR]", 
+    "SELECT * FROM QuizAnsweredView WHERE login = :login [LIMIT]", 
     "SELECT * FROM QuizResponsesAnsweredView WHERE login = :login AND [ID]", 
-    array(":login" => get_login()), $year,
+    array(":login" => get_login()), $num_page,
     function($row, &$res) {
       $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
       array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question, $row[10]));
@@ -441,13 +446,12 @@ function quiz_answered($year) {
  * ATTENTION: Ce ne sont donc pas les réponses valides et invalides au sens propre
  * @param login: login du joueur à considérer
  **/
-function quiz_answered_others($login, $year) {
+function quiz_answered_others($login, $num_page) {
   return list_quiz(
     "SELECT ans.* FROM QuizArchiveView AS arc, QuizAnsweredView AS ans WHERE
-    arc.id = ans.id AND ans.login = :login 
-    AND (YEAR(arc.open) = :year OR YEAR(arc.close) = :year)",
+    arc.id = ans.id AND ans.login = :login [LIMIT]",
     "SELECT * FROM QuizResponsesAnsweredView WHERE login = :login AND [ID]",
-    array(":login" => $login), $year,
+    array(":login" => $login), $num_page,
     function($row, &$res) {
       $question = str_replace(array("\r\n", "\r", "\n"), "<br>\n", $row[8]);
       array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $question, $row[10]));
