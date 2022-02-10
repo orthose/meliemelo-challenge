@@ -192,8 +192,12 @@ function answer_quiz(type, quiz_id) {
     }
     else {
       $("main p.error").show();
-      $("main p.error").attr("class", "success")
-      $("main p.success").html("Votre réponse a été enregistrée. Vous avez gagné " + json["points"] + " point(s).");
+      if (json["points"] > 0) {
+        $("main p.error").attr("class", "success");
+        $("main p.success").html("Bravo&nbsp;! Vous gagnez " + json["points"] + " point(s).");
+      } else {
+        $("main p.error").html("Dommage&nbsp;! Mauvaise réponse&hellip;");
+      }
     }
     $("main button").replaceWith($(`<button onclick="quiz_current_page()">Quiz jouables</button>`));
     session_is_alive(json);
