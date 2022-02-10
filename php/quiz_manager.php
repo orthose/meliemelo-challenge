@@ -339,7 +339,7 @@ function list_quiz($sql1, $sql2, $params, $num_page = 0, $fill_res1 = NULL, $fil
  * Renvoie les quiz jouables (dans l'état current)
  * avec les infos principales et les réponses
  **/
-function quiz_current() {
+function quiz_current($num_page) {
   return list_quiz(
     "SELECT * FROM QuizCurrentView
     WHERE login_creator != :login
@@ -349,7 +349,7 @@ function quiz_current() {
     WHERE qrcv.id IN (SELECT id FROM QuizHeader) AND qcv.id = qrcv.id
     -- La réponse des quiz text ne doit pas être envoyée
     AND qcv.type != 'text'",
-    array(":login" => get_login()), NULL, NULL,
+    array(":login" => get_login()), $num_page, NULL,
     $fill_res = function($row, &$res) {
       if (!isset($res["responses"][$row[0]])) {
         $res["responses"][$row[0]] = array();
@@ -360,11 +360,11 @@ function quiz_current() {
 }
 
 // Quiz jouables par les autres (pas par son créateur)
-function quiz_current_not_playable() {
+function quiz_current_not_playable($num_page) {
   return list_quiz(
     "SELECT * FROM QuizCurrentView WHERE login_creator = :login [LIMIT]",
     "SELECT * FROM QuizResponsesCurrentView WHERE [ID]",
-    array(":login" => get_login())
+    array(":login" => get_login()), $num_page
   );
 }
 

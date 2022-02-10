@@ -222,16 +222,16 @@ else if ($request === "answer_quiz") {
 }
 
 else if ($request === "quiz_current") {
-  $valid = true;
-  $doc = "quiz_current()";
-  $fun = function() { return quiz_current(); };
+  $valid = isset($_REQUEST["num_page"]);
+  $doc = "quiz_current(num_page)";
+  $fun = function() { return quiz_current($_REQUEST["num_page"]); };
 }
 
 else if ($request === "quiz_current_not_playable") {
   // La base de données ne gère pas cette permission
-  $valid = isset($_SESSION["role"]) && $_SESSION["role"] === "admin";
-  $doc = "quiz_current_not_playable()";
-  $fun = function() { return quiz_current_not_playable(); };
+  $valid = isset($_SESSION["role"]) && $_SESSION["role"] === "admin" && isset($_REQUEST["num_page"]);
+  $doc = "quiz_current_not_playable(num_page)";
+  $fun = function() { return quiz_current_not_playable($_REQUEST["num_page"]); };
 }
 
 else if ($request === "quiz_archive") {

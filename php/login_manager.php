@@ -188,17 +188,22 @@ function reset_high_score($passwd) {
 function high_score_quiz_title($title, $begin_date=NULL, $end_date=NULL) {
   $params = array(":title" => $title);
   $sql = 
-    " SELECT PlayerQuizAnswered.login, "
-    ." SUM(CASE WHEN PlayerQuizAnswered.success = 1 THEN (Quiz.difficulty * Quiz.points) ELSE 0 END) AS points, "
-    ." SUM(CASE WHEN PlayerQuizAnswered.success = 1 THEN 1 ELSE 0 END) AS success, "
-    ." SUM(CASE WHEN PlayerQuizAnswered.success = 0 THEN 1 ELSE 0 END) AS fail "
-    ." FROM Quiz, PlayerQuizAnswered "
-    ." WHERE Quiz.title REGEXP :title AND Quiz.id = PlayerQuizAnswered.id ";
+    " SELECT PlayerQuizAnswered.login,
+    SUM(CASE WHEN PlayerQuizAnswered.success = 1 THEN
+      CASE WHEN Quiz.type = 'checkbox_or' THEN ROUND(
+        (Quiz.points * (SELECT COUNT(response) FROM PlayerQuizResponses WHERE login = PlayerQuizAnswered.login AND id = Quiz.id))
+        / (SELECT COUNT(response) FROM QuizResponses WHERE id = Quiz.id AND valid)
+      ) ELSE Quiz.points END
+    ELSE 0 END) AS points,
+    SUM(CASE WHEN PlayerQuizAnswered.success = 1 THEN 1 ELSE 0 END) AS success,
+    SUM(CASE WHEN PlayerQuizAnswered.success = 0 THEN 1 ELSE 0 END) AS fail
+    FROM Quiz, PlayerQuizAnswered
+    WHERE Quiz.title REGEXP :title AND Quiz.id = PlayerQuizAnswered.id ";
   // Ajout filtrage temporel
   if (!is_null($begin_date) && !is_null($end_date)) {
     $sql .= 
-      " AND ((:begin_date <= Quiz.open AND Quiz.open <= :end_date) "
-      ." OR (:begin_date <= Quiz.close AND Quiz.close <= :end_date)) ";
+      " AND ((:begin_date <= Quiz.open AND Quiz.open <= :end_date)
+      OR (:begin_date <= Quiz.close AND Quiz.close <= :end_date)) ";
     $params[":begin_date"] = $begin_date;
     $params[":end_date"] = $end_date;
   }
