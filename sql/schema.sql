@@ -37,7 +37,7 @@ CREATE TABLE Quiz (
   creation DATE NOT NULL DEFAULT CURRENT_DATE, -- Date de création
   CHECK(creation <= open), CHECK(open <= close),
   difficulty TINYINT NOT NULL CHECK(1 <= difficulty AND difficulty <= 10),
-  points TINYINT NOT NULL CHECK(0 <= points AND points <= 10),
+  points TINYINT NOT NULL CHECK(1 <= points AND points <= 10),
   -- Type de réponse du quiz
   type ENUM('checkbox_and', 'checkbox_or', 'radio', 'text_strong', 'text_weak', 'text_regex') NOT NULL,
   state ENUM('stock', 'current', 'archive') NOT NULL DEFAULT 'stock',

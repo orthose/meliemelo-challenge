@@ -413,24 +413,26 @@ CREATE OR REPLACE FUNCTION check_answer (
 ) RETURNS INT
 BEGIN
   DECLARE quiz_type TYPE OF Quiz.type;
-  DECLARE quiz_difficulty TYPE OF Quiz.difficulty;
   DECLARE quiz_points TYPE OF Quiz.points;
   DECLARE success_quiz TYPE OF PlayerQuizAnswered.success;
   DECLARE res INT;
   SET res = 0;
   
-  SELECT type, difficulty, points INTO quiz_type, quiz_difficulty, quiz_points
+  SELECT type, points INTO quiz_type, quiz_points
   FROM Quiz WHERE id = quiz_id;
   SELECT success INTO success_quiz FROM PlayerQuizAnswered
   WHERE login = login_player AND id = quiz_id;
   
-  /* Vérification que les réponses sont correctes 
-  et que le joueur n'a pas déjà répondu à ce quiz */ 
-  IF success_quiz IS NULL AND (
-    (
-      quiz_type = 'checkbox_and' AND 
-      -- Égalité entre 2 tables E_1 = E_2 <=> (E_1 Union E_2) - (E_2 Inter E_1) = Vide
-      NOT EXISTS (
+  /* @implement: branchement conditionnel car évaluation paresseuse 
+  d'une expression booléenne boguée sous MariaDB */
+  
+  /* Vérification que le joueur n'a pas déjà répondu à ce quiz */ 
+  IF success_quiz IS NULL THEN
+  
+    /* Vérification que les réponses sont correctes selon type de quiz */ 
+    IF quiz_type = 'checkbox_and' THEN
+      /* Égalité entre 2 tables E_1 = E_2 <=> (E_1 Union E_2) - (E_2 Inter E_1) = Vide */
+      SELECT NOT EXISTS (
         SELECT a.response FROM
           ((SELECT response FROM QuizResponses WHERE id = quiz_id AND valid)
           UNION (SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)) AS a
@@ -438,64 +440,71 @@ BEGIN
         SELECT b.response FROM
           ((SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
           INTERSECT (SELECT response FROM QuizResponses WHERE id = quiz_id AND valid)) AS b
-      )
-    ) OR
-    (
-      quiz_type = 'checkbox_or' AND
-      -- Au moins une réponse et toutes les réponses doivent être justes
-      (SELECT COUNT(*) > 0 AND BIT_AND(valid)
+      ) INTO success_quiz;
+      
+    ELSEIF quiz_type = 'checkbox_or' THEN
+      /* Au moins une réponse et toutes les réponses doivent être justes */
+      SELECT (SELECT COUNT(*) > 0 AND BIT_AND(valid)
       FROM (
         SELECT pqr.response, qr.valid
         FROM PlayerQuizResponses AS pqr, QuizResponses AS qr
         WHERE pqr.login = login_player AND pqr.id = quiz_id AND pqr.id = qr.id AND pqr.response = qr.response
-      ) AS pqrv)
-    ) OR
-    (
-      quiz_type = 'radio' AND
-      (SELECT response FROM QuizResponses WHERE id = quiz_id AND valid) 
-      = (SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
-    ) OR
+      ) AS pqrv) INTO success_quiz;
+      
+    ELSEIF quiz_type = 'radio' THEN
+      SELECT (SELECT response FROM QuizResponses WHERE id = quiz_id AND valid) 
+      = (SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id) INTO success_quiz;
+      
     /* La comparaison pour un quiz text est insensible à la casse */
-    (
+    ELSEIF quiz_type = 'text_strong' THEN
       /* Vérification forte en ignorant les erreurs aux extrémités */
-      quiz_type = 'text_strong' AND 
-      (SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
-      LIKE (SELECT CONCAT('%', response, '%') FROM QuizResponses WHERE id = quiz_id AND valid)
-    ) OR
-    (
+      SELECT (SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
+      LIKE (SELECT CONCAT('%', response, '%') FROM QuizResponses WHERE id = quiz_id AND valid) INTO success_quiz;
+      
+    ELSEIF quiz_type = 'text_weak' THEN
       /* Vérification faible en tolérant les espaces et les apostrophes erronés */
-      quiz_type = 'text_weak' AND 
-      (SELECT escape_response_text(response) FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
-      LIKE (SELECT CONCAT('%', response, '%') FROM QuizResponses WHERE id = quiz_id AND valid)
-    ) OR
-    (
+      SELECT (SELECT escape_response_text(response) FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
+      LIKE (SELECT CONCAT('%', response, '%') FROM QuizResponses WHERE id = quiz_id AND valid) INTO success_quiz;
+      
+    ELSEIF quiz_type = 'text_regex' THEN
       /* Vérification selon expression régulière */
-      quiz_type = 'text_regex' AND 
-      (SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
-      REGEXP (SELECT CONCAT('.*', response, '.*') FROM QuizResponses WHERE id = quiz_id AND valid)
-    )
-  )
-  THEN
-    -- Marquage du quiz comme réussi
-    INSERT INTO PlayerQuizAnswered (login, id, success) VALUES
-    (login_player, quiz_id, TRUE);
-    -- Mise à jour du nombre de points du joueur
-    SET res = (quiz_difficulty * quiz_points);
-    UPDATE Users SET points = points + res 
-    WHERE login = login_player;
-    -- Mise à jour du compteur de quiz réussis
-    UPDATE Users SET success = success + 1 
-    WHERE login = login_player;
-  
-  -- Le quiz est en échec
-  ELSEIF success_quiz IS NULL THEN
-  -- Marquage du quiz comme échoué 
-    INSERT INTO PlayerQuizAnswered (login, id, success) VALUES
-    (login_player, quiz_id, FALSE);
-    -- Mise à jour du compteur de quiz échoués
-    UPDATE Users SET fail = fail + 1 
-    WHERE login = login_player;
+      SELECT (SELECT response FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id)
+      REGEXP (SELECT CONCAT('.*', response, '.*') FROM QuizResponses WHERE id = quiz_id AND valid) INTO success_quiz;
+    END IF;
+    
+    /* Le quiz est réussi */
+    IF success_quiz THEN
+      -- Marquage du quiz comme réussi
+      INSERT INTO PlayerQuizAnswered (login, id, success) VALUES
+      (login_player, quiz_id, TRUE);
+      -- Mise à jour du nombre de points du joueur
+      /* En cas d'ajout ou modification des règles de calcul des points
+      modifier high_score_quiz_title dans php/login_manager.php */
+      IF quiz_type = 'checkbox_or' THEN
+        SET res = ROUND(
+          (quiz_points * (SELECT COUNT(response) FROM PlayerQuizResponses WHERE login = login_player AND id = quiz_id))
+          / (SELECT COUNT(response) FROM QuizResponses WHERE id = quiz_id AND valid)
+        );
+      ELSE
+        SET res = quiz_points;
+      END IF;
+      UPDATE Users SET points = points + res 
+      WHERE login = login_player;
+      -- Mise à jour du compteur de quiz réussis
+      UPDATE Users SET success = success + 1 
+      WHERE login = login_player;
+      
+    /* Le quiz est en échec */
+    ELSE
+      -- Marquage du quiz comme échoué 
+      INSERT INTO PlayerQuizAnswered (login, id, success) VALUES
+      (login_player, quiz_id, FALSE);
+      -- Mise à jour du compteur de quiz échoués
+      UPDATE Users SET fail = fail + 1 
+      WHERE login = login_player;
+    END IF;
   END IF;
+  
   RETURN res;
 END; //
 DELIMITER ;

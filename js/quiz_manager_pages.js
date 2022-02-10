@@ -254,7 +254,7 @@ function create_quiz_page() {
       <p class="form">Difficulté (1)</p>
       <input id="difficulty" onchange="show_range_value(this)" type="range" name="quiz" min="1" max="10" value="1"><br>
       <p class="form">Points (1)</p>
-      <input id="points" onchange="show_range_value(this)" type="range" name="quiz" min="0" max="10" value="1"><br>
+      <input id="points" onchange="show_range_value(this)" type="range" name="quiz" min="1" max="10" value="1"><br>
       <p class="form">Type</p>
       <select id="type" name="quiz">
         <option value="checkbox_and">Choix multiples [conjonction]</option>
@@ -307,7 +307,7 @@ function modify_quiz_page(quiz_id, open, close, difficulty, points, type, title,
       <p class="form">Difficulté (`+difficulty+`)</p>
       <input id="difficulty" onchange="show_range_value(this)" type="range" name="quiz" min="1" max="10" value="`+difficulty+`"><br>
       <p class="form">Points (`+points+`)</p>
-      <input id="points" onchange="show_range_value(this)" type="range" name="quiz" min="0" max="10" value="`+points+`"><br>
+      <input id="points" onchange="show_range_value(this)" type="range" name="quiz" min="1" max="10" value="`+points+`"><br>
       <p class="form">Type</p>
       <select id="type" name="quiz">
         <option value="checkbox_and">Choix multiples [conjonction]</option>
