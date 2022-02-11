@@ -266,7 +266,7 @@ else if ($request === "quiz_answered") {
 }
 
 else if ($request === "quiz_answered_others") {
-  $valid = isset($_REQUEST["login"]) && $_REQUEST["num_page"];
+  $valid = isset($_REQUEST["login"]) && isset($_REQUEST["num_page"]);
   $doc = "quiz_answered_others(login, num_page)";
   $fun = function() { return quiz_answered_others($_REQUEST["login"], $_REQUEST["num_page"]); };
 }

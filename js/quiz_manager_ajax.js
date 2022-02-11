@@ -83,26 +83,7 @@ function list_quiz(state, string_quiz_button, fun_quiz_button, num_page = 0) {
   });
   const show_num_page = $(`<span id="num_page">1</span>`);
   $("main div#select_page").html(previous.add(show_num_page).add(next));
-  
-  /*if (filter_year) {
-    const today = new Date();
-    const actual_year = today.getFullYear();
-    const select_year = $(`
-      <p>Sélectionnez une année de filtrage</p>
-      <select id="year">
-      </select>
-      `);
-    $("main div#filter_date").html(select_year);
-    // De l'année actuelle à 2021
-    for (let y = actual_year; y >= 2021; y--) {2022
-      $("#year").append($("<option>").val(y).text(y));
-    }
-    // Appel automatique de list_quiz si changement d'année
-    $("main #year").on("change", function() {
-      $("main div#list_quiz div").remove();
-      list_quiz_ajax();
-    });
-  }*/ 
+   
   list_quiz_ajax();
 }
 
