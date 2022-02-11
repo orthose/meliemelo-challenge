@@ -1,4 +1,20 @@
 function list_quiz(state, string_quiz_button, fun_quiz_button, num_page = 0) {
+  
+  function explain_difficulty(difficulty) {
+    switch(Number(difficulty)) {
+      case 1: return "Stupide";
+      case 2: return "Trivial";
+      case 3: return "Novice";
+      case 4: return "Facile";
+      case 5: return "Normal";
+      case 6: return "Intermédiaire";
+      case 7: return "Difficile";
+      case 8: return "Confirmé";
+      case 9: return "Expert";
+      case 10: return "Impossible";
+    }
+  }
+  
   function list_quiz_ajax() {
     const data = {
       "request": "quiz_" + state,
@@ -37,7 +53,7 @@ function list_quiz(state, string_quiz_button, fun_quiz_button, num_page = 0) {
           <tr><th>Ouverture</th><th>Fermeture</th></tr>
           <tr><td>` + row[2] + `</td><td>` + row[3] + `</td></tr>
           <tr><th>Difficulté</th><th>Points</th></tr>
-          <tr><td>` + row[4] + `</td><td>` + row[5] + `</td></tr>
+          <tr><td>` + explain_difficulty(row[4]) + `</td><td>` + row[5] + `</td></tr>
           </table>
           ` + string_quiz_button + `
           </div>

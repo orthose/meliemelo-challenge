@@ -251,8 +251,8 @@ function create_quiz_page() {
       <p class="form">Date de fermeture</p>
       <input id="close" type="date" name="quiz"><br>
       <p>Le nombre de points total correspond à la difficulté multipliée par le nombre de points.</p>
-      <p class="form">Difficulté (1)</p>
-      <input id="difficulty" onchange="show_range_value(this)" type="range" name="quiz" min="1" max="10" value="1"><br>
+      <p class="form">Difficulté (5)</p>
+      <input id="difficulty" onchange="show_range_value(this)" type="range" name="quiz" min="1" max="10" value="5"><br>
       <p class="form">Points (1)</p>
       <input id="points" onchange="show_range_value(this)" type="range" name="quiz" min="1" max="10" value="1"><br>
       <p class="form">Type</p>
