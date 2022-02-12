@@ -210,7 +210,7 @@ ne seront pas détaillées. En revanche, certains points peuvent être accompagn
 d'explications supplémentaires.
 
 ## Création de quiz
-La création de quiz est réservée aux administrateurs. Plusieurs champs doivent
+La **création de quiz** est réservée aux administrateurs. Plusieurs champs doivent
 être remplis avant d'envoyer le quiz au serveur pour vérification.
 
 Le champ question, et les champs réponses doivent contenir du texte. Toute balise
@@ -222,11 +222,16 @@ Une fois le quiz affiché, les éléments markdown sont convertis en éléments 
 Notez que la coloration syntaxique de la balise code est gérée par un programme tierce
 disponible sur ce [site](https://highlightjs.org/).
 
-Lorsqu'on ajoute une réponse, la réponse ajoutée voit son cadre mis en bleu foncé.
+Vous pouvez ajouter autant de réponses que vous le voulez.
 Il est ensuite possible de modifier la réponse, et sa valeur de vérité (Vrai/Faux).
 Cependant, si le texte de la réponse est supprimé après coup et laissé vide,
 la réponse ne sera pas considérée. Cela peut être un bon moyen de supprimer une
 réponse erronée.
+
+Un quiz n'est valide que sous certaines conditions bien spécifiques. 
+Ces conditions sont exprimées dans la table Quiz de sql/schema.sql et la fonction
+check_quiz de sql/actions.sql. Si la création du quiz échoue c'est que vous ne
+respectez pas ces conditions.
 
 ## Syntaxe markdown pour intégrer des ressources
 
@@ -244,3 +249,78 @@ et également dans le message du jour.
 
 * Ajout d'un lien de redirection
 `[description](http://link)`
+
+Attention à vérifier que les ressources s'affichent bien dans le quiz.
+Certains formats ne sont pas pris en charge par le navigateur.
+
+## Syntaxe markdown pour la mise en forme
+
+Cette syntaxe peut être utilisée pour appliquer des effets sur du texte.
+
+* Mettre en gras
+`**texte important**`
+
+* Intégrer du code source
+`\`\`\`let v = 0;\`\`\``
+
+## Classement par quiz
+
+Le **classement par quiz** prend comme entrées le nom d'un quiz (expression régulière acceptée)
+et une plage de dates. Il calcule alors le classement à partir de la table
+PlayerQuizAnswered et l'affiche. Les joueurs n'ayant pas participé aux quiz sélectionnés
+ne sont pas affichés.
+
+Ce classement peut se désynchroniser du classement général pour plusieurs raisons :
+* Remise à zéro du classement général
+* Suppression de quiz
+* Modification de quiz
+* Remise en jeu de quiz
+
+Néanmoins, le classement par quiz reste celui avec la meilleure traçabilité.
+Il doit être utilisé à ce titre pour les résultats de jeu concours.
+Il faut cependant veiller à renseigner une expression régulière correcte pour ne
+sélectionner que les quiz voulus (Exemple : `^Halloween$`).
+
+## Voir les réponses des autres
+
+**Voir les réponses des autres** est une fonctionnalité qui permet de choisir un joueur
+pour voir les réponses qu'il a donné aux quiz. Une fonctionnalité de filtrage par titre
+de quiz de la même manière que le classement par quiz pourra être ajoutée a posteriori.
+
+Seuls les quiz archivés peuvent être consultés car autrement les joueurs pourraient
+copier sur les autres pour répondre aux quiz en jeu.
+
+## Conditions sur les quiz jouables
+
+Les **quiz jouables** ne le sont pas pour tout le monde.
+
+Les quiz auxquels un joueur a déjà répondu et qui sont encore en jeu resteront visibles
+dans la section **Voir mes réponses**.
+
+**Les quiz jouables par les autres** est une fonctionnalité réservée aux administrateurs
+pour voir les quiz en jeu auxquels ils ne peuvent pas jouer car ils en sont les créateurs.
+
+## Modification de quiz
+
+La **modification de quiz** est une fonctionnalité qui peut s'avérer dangereuse.
+En effet, en fonction de l'état du quiz (stock, current, archive) 
+la modification d'un quiz peut :
+* Fausser le classement si le nombre de points du quiz est modifié.
+* Supprimer les réponses des joueurs si les réponses sont modifiées.
+
+Pour ces raisons, il est préférable de modifier un quiz seulement s'il est
+en stock ou archivé.
+
+Notez, que la modification des dates pour un quiz en jeu ou archivé n'aura pas d'effet
+sur l'état du quiz. Pour cela il faut utiliser la fonctionnalité de remise en jeu de quiz.
+
+## Remise en jeu de quiz
+
+La **remise en jeu de quiz** est une fonctionnalité permettant en réalité de remettre
+en stock un quiz. Seuls les quiz en jeu ou archivés peuvent être remis en stock.
+De la même manière que la modification de quiz, remettre en jeu un quiz peut :
+* Fausser le classement.
+* Supprimer les réponses des joueurs.
+
+Pour ces raisons, il est préférable de suivre autant que possible 
+le cycle de vie classique d'un quiz : stock -> current -> archive.
