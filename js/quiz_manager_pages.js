@@ -1,5 +1,6 @@
 function quiz_page(title, instructions, fun_push_state, fun_quiz_ajax) {
   if (user_login !== "" && user_role !== "undefined") {
+    window.scrollTo(0, 0);
     push_state(fun_push_state);
     const page = $(`
       <h2>`+title+`</h2>
@@ -106,6 +107,7 @@ function quiz_answered_others_page() {
 
 function answer_quiz_page(quiz_id, type, title, question, responses) {
   if (user_login !== "" && user_role !== "undefined") {
+    window.scrollTo(0, 0);
     // On affiche la page de choix de quiz jouable
     push_state(function() {window.history.back();});
     const page = $(`
@@ -159,6 +161,7 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
   }
   
   if (user_login !== "" && user_role !== "undefined") {
+    window.scrollTo(0, 0);
     // On ne peut pas savoir si on a regardé les quiz stockés ou archivés
     push_state(function() {window.history.back();});
     const player = $("#player").val(); // Pour answered_others
@@ -217,26 +220,10 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
   hljs.highlightAll();
 }
 
-function show_range_value(tag) {
-  let text = $(tag).prev().text();
-  $(tag).prev().html(text.replace(new RegExp("[0-9]+"), $(tag).val()));
-}
-
-function add_choice(tag) {
-  if ($(tag).prev().prev().val() !== "") {
-    $(tag).before($(`
-      <input class="response" type="text" name="quiz">
-      <select name="quiz">
-        <option value="0">Faux</option>
-        <option value="1">Vrai</option>
-      </select>
-      `));
-  }
-}
-
 function create_quiz_page() {
   if (user_login !== "" && user_role !== "undefined") {
     push_state(function() {create_quiz_page();});
+    window.scrollTo(0, 0);
     const page = $(`
       <h2>Création de quiz</h2>
       <p>Veuillez compléter tous les champs ci-dessous.</p>
@@ -290,6 +277,7 @@ function create_quiz_page() {
 
 function modify_quiz_page(quiz_id, open, close, difficulty, points, type, title, question, responses) {
   if (user_login !== "" && user_role !== "undefined") {
+    window.scrollTo(0, 0);
     const page = $(`
       <h2>Modification de quiz</h2>
       <p>Veuillez compléter tous les champs ci-dessous.</p>

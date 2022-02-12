@@ -33,3 +33,20 @@ function hide_quiz(tag) {
   $(tag).parent().attr("class", "select_quiz_folded");
   $(tag).attr("onclick", "show_quiz(this)");
 }
+
+function show_range_value(tag) {
+  let text = $(tag).prev().text();
+  $(tag).prev().html(text.replace(new RegExp("[0-9]+"), $(tag).val()));
+}
+
+function add_choice(tag) {
+  if ($(tag).prev().prev().val() !== "") {
+    $(tag).before($(`
+      <input class="response" type="text" name="quiz">
+      <select name="quiz">
+        <option value="0">Faux</option>
+        <option value="1">Vrai</option>
+      </select>
+      `));
+  }
+}

@@ -1,5 +1,6 @@
 function set_daily_msg_page() {
   if (user_login !== "" && user_role !== "undefined") {
+    window.scrollTo(0, 0);
     push_state(function() {set_daily_msg_page();});
     const page = $(`
       <h2>Modification du message d'accueil</h2>

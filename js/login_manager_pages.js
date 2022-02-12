@@ -1,4 +1,5 @@
 function register_page() {
+  window.scrollTo(0, 0);
   push_state(function() {register_page();});
   const page = $(`
     <p>Votre login ne peut pas excéder <b>16 caractères</b>.<br>
@@ -16,6 +17,7 @@ function register_page() {
 }
 
 function connection_page() {
+  window.scrollTo(0, 0);
   push_state(function() {connection_page();});
   check_session();
   const page = $(`
@@ -30,6 +32,7 @@ function connection_page() {
 }
 
 function main_menu_page() {
+  window.scrollTo(0, 0);
   if (user_login !== "" && user_role !== "undefined") {
     push_state(function() {main_menu_page();});
     $("section#manage_account").html($(`
@@ -78,6 +81,7 @@ function main_menu_page() {
 
 function set_password_page() {
   if (user_login !== "" && user_role !== "undefined") {
+    window.scrollTo(0, 0);
     push_state(function() {set_password_page();});
     const page = $(`
       <h2>Changement de mot de passe</h2>
@@ -96,6 +100,7 @@ function set_password_page() {
 
 function unregister_page() {
   if (user_login !== "" && user_role !== "undefined") {
+    window.scrollTo(0, 0);
     push_state(function() {unregister_page();});
     const page = $(`
       <h2>Suppression du compte</h2>
@@ -111,6 +116,7 @@ function unregister_page() {
 
 function set_role_page() {
   if (user_login !== "" && user_role !== "undefined") {
+    window.scrollTo(0, 0);
     push_state(function() {set_role_page();});
     const page = $(`
       <h2>Changement de rôle</h2>
@@ -130,6 +136,7 @@ function set_role_page() {
 
 function high_score_page() {
   if (user_login !== "" && user_role !== "undefined") {
+    window.scrollTo(0, 0);
     push_state(function() {high_score_page();});
     const page = $(`
       <h2>Classement des joueurs</h2>
@@ -144,6 +151,7 @@ function high_score_page() {
 
 function reset_high_score_page() {
   if (user_login !== "" && user_role !== "undefined") {
+    window.scrollTo(0, 0);
     push_state(function() {reset_high_score_page();});
     const page = $(`
       <h2>Remise à zéro du classement général</h2>
@@ -160,6 +168,7 @@ function reset_high_score_page() {
 
 function high_score_quiz_title_page() {
   if (user_login !== "" && user_role !== "undefined") {
+    window.scrollTo(0, 0);
     push_state(function() {high_score_quiz_title_page();});
     const page = $(`
       <h2>Classement par quiz</h2>

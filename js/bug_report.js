@@ -1,5 +1,6 @@
 function bug_report_page() {
   if (user_login !== "" && user_role !== "undefined") {
+    window.scrollTo(0, 0);
     push_state(function() {bug_report_page();});
     const page = $(`
       <h2>Report de bogue</h2>
