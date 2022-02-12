@@ -1,7 +1,6 @@
 function session_is_alive(json) {
   if(!json["status_session"]) {
-    $("section#manage_account").remove();
-    connection_page();
+    document.location.href = "index.php";
   } 
 }
 
