@@ -417,7 +417,11 @@ function quiz_editable($num_page) {
     "SELECT * FROM QuizResponsesStockView WHERE [ID]
     UNION SELECT * FROM QuizResponsesCurrentView WHERE [ID]
     UNION SELECT * FROM QuizResponsesArchiveView WHERE [ID]", 
-    array(":login" => get_login()), $num_page
+    array(":login" => get_login()), $num_page, 
+    function($row, &$res) {
+      // On ne veut pas transformer en <br> les \n dans la question
+      array_push($res["quiz"], array($row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7], $row[8]));
+    }
   );
 }
 
