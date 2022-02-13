@@ -261,7 +261,7 @@ Cette syntaxe peut être utilisée pour appliquer des effets sur du texte.
 `**texte important**`
 
 * Intégrer du code source
-`\`\`\`let v = 0;\`\`\``
+<code>\`\`\`let v = 0;\`\`\`</code>
 
 ## Classement par quiz
 
