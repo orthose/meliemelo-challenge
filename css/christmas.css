@@ -157,11 +157,15 @@ table {
   width: 100%;
 }
 
-td {
+td, p.info {
   text-align: center;
   color: mediumblue;
   background-color: dodgerblue;
   border: medium solid lightskyblue;
+}
+
+p.info {
+  border: medium solid dodgerblue;
 }
 
 th {

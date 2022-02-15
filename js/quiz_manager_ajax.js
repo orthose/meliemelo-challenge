@@ -30,6 +30,9 @@ function list_quiz(state, string_quiz_button, fun_quiz_button, num_page = 0) {
       data: data
     }).done(function(json) {
       if (config["debug"]) { console.log(json); }
+      if (json["quiz"].length === 0) {
+        $("main div#list_quiz").html("<p class='info'>Aucun quiz trouvé</p>")
+      }
       json["quiz"].forEach(function(row) {
         const line = $(`<div class='select_quiz_folded' id="` + row[0] + `">`);
         if (state === "answered") {

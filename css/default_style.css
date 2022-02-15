@@ -115,7 +115,6 @@ div.select_quiz_folded {
   border: none;
 }
 
-
 div.bug_report {
   border: medium solid mediumblue;
   padding: 3px 5px;
@@ -137,10 +136,14 @@ table {
   width: 100%;
 }
 
-td {
+td, p.info {
   text-align: center;
   background-color: deepskyblue;
   border: medium solid lightskyblue;
+}
+
+p.info {
+  border: medium solid deepskyblue;
 }
 
 th {

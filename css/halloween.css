@@ -139,10 +139,14 @@ table {
   width: 100%;
 }
 
-td {
+td, p.info {
   text-align: center;
   background-color: orangered;
   border: medium solid orange;
+}
+
+p.info {
+  border: medium solid orangered;
 }
 
 th {
