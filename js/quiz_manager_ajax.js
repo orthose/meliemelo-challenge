@@ -64,6 +64,7 @@ function list_quiz(state, string_quiz_button, fun_quiz_button, num_page = 0) {
         fun_quiz_button(line, row, json, state);
         $("main div#list_quiz").append(line);
       });
+      $("main")[0].scrollIntoView();
       session_is_alive(json);
     }).fail(function(e) {
       if (config["debug"]) { console.log(e); }

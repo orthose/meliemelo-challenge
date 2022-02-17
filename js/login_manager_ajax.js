@@ -246,6 +246,7 @@ function high_score() {
       }
       $("main table").append(line);
     });
+    $("main")[0].scrollIntoView();
     session_is_alive(json);
   }).fail(function(e) {
     if (config["debug"]) { console.log(e); }
@@ -318,6 +319,7 @@ function high_score_quiz_title() {
         $("main table").append($("<tr class='results'><td colspan='4'>Aucun résultat trouvé</td></tr>"));
       }
       $("main table").show();
+      $("main")[0].scrollIntoView();
       session_is_alive(json);
     }).fail(function(e) {
       if (config["debug"]) { console.log(e); }

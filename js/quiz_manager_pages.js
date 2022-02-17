@@ -1,6 +1,5 @@
 function quiz_page(title, instructions, fun_push_state, fun_quiz_ajax) {
   if (user_login !== "" && user_role !== "undefined") {
-    window.scrollTo(0, 0);
     push_state(fun_push_state);
     const page = $(`
       <h2>`+title+`</h2>
@@ -107,7 +106,6 @@ function quiz_answered_others_page() {
 
 function answer_quiz_page(quiz_id, type, title, question, responses) {
   if (user_login !== "" && user_role !== "undefined") {
-    window.scrollTo(0, 0);
     // On affiche la page de choix de quiz jouable
     push_state(function() {window.history.back();});
     const page = $(`
@@ -137,6 +135,7 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
       $("main form").append($(`<input type="text" name="quiz">`));
     }
   }
+  $("main")[0].scrollIntoView();
   // Coloration syntaxique éventuelle des balises code
   hljs.highlightAll();
 }
@@ -161,7 +160,6 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
   }
   
   if (user_login !== "" && user_role !== "undefined") {
-    window.scrollTo(0, 0);
     // On ne peut pas savoir si on a regardé les quiz stockés ou archivés
     push_state(function() {window.history.back();});
     const player = $("#player").val(); // Pour answered_others
@@ -216,6 +214,7 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
       $(".valid").prev().attr("checked", "");
     }
   }
+  $("main")[0].scrollIntoView();
   // Coloration syntaxique éventuelle des balises code
   hljs.highlightAll();
 }
@@ -223,7 +222,6 @@ function show_quiz_page(state, quiz_id, type, title, question, responses) {
 function create_quiz_page() {
   if (user_login !== "" && user_role !== "undefined") {
     push_state(function() {create_quiz_page();});
-    window.scrollTo(0, 0);
     const page = $(`
       <h2>Création de quiz</h2>
       <p>Veuillez compléter tous les champs ci-dessous.</p>
@@ -272,12 +270,12 @@ function create_quiz_page() {
       auto_fill_close_date("#open", "#close");
     })
     $("main").html(page);
+    $("main")[0].scrollIntoView();
   }
 }
 
 function modify_quiz_page(quiz_id, open, close, difficulty, points, type, title, question, responses) {
   if (user_login !== "" && user_role !== "undefined") {
-    window.scrollTo(0, 0);
     const page = $(`
       <h2>Modification de quiz</h2>
       <p>Veuillez compléter tous les champs ci-dessous.</p>
@@ -333,6 +331,7 @@ function modify_quiz_page(quiz_id, open, close, difficulty, points, type, title,
       auto_fill_close_date("#open", "#close");
     })
     $("main").html(page);
+    $("main")[0].scrollIntoView();
     
     // Sélection du type de quiz
     $("main select#type").val(type);
