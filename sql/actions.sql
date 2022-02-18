@@ -389,8 +389,10 @@ WHERE Quiz.state = 'archive' AND Quiz.id = QuizResponses.id;
 CREATE OR REPLACE VIEW QuizResponsesAnsweredView AS
 (SELECT id, response, 1 AS valid, login FROM PlayerQuizResponses) 
 UNION 
-(SELECT a.* FROM ((SELECT QuizResponses.id, response, 0, login FROM QuizResponses, PlayerQuizAnswered WHERE QuizResponses.id = PlayerQuizAnswered.id) 
-  EXCEPT (SELECT id, response, 0, login FROM PlayerQuizResponses)) AS a);
+(SELECT a.* FROM (
+  (SELECT QuizResponses.id, response, 0, login FROM QuizResponses, PlayerQuizAnswered, Quiz 
+  WHERE QuizResponses.id = PlayerQuizAnswered.id AND PlayerQuizAnswered.id = Quiz.id AND Quiz.type NOT LIKE 'text%') 
+  EXCEPT (SELECT id, response, 0, login FROM PlayerQuizResponses)) AS a)
 
 /* Répondre à un quiz */
 CREATE OR REPLACE PROCEDURE answer_quiz (
