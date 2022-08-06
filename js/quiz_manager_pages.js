@@ -116,7 +116,7 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
       <p class="error" hidden></p>
       `);
     $("main").html(page);
-    $("main button").on("click", function() { answer_quiz(type, quiz_id); });
+    $("main button").on("dblclick", function() { answer_quiz(type, quiz_id); });
     if (type === "checkbox_and" || type === "checkbox_or") {
       responses.forEach(function(response) {
         $("main form").append($(`
