@@ -10,7 +10,6 @@
   <link rel="apple-touch-icon" type="image/png" href="favicon.png" sizes="512x512">
   <!-- Feuilles de style -->
   <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ubuntu">
-  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css">
   <link href='css/a11y-light.min.css' rel='stylesheet'>
   <?php
     require("php/config.php");
@@ -26,7 +25,6 @@
   ?>
   <!-- Scripts -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
   <script src="js/popstate.js"></script>
   <script src="js/convert_markdown.js"></script>
   <script src="js/daily_msg.js"></script>

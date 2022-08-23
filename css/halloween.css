@@ -118,7 +118,7 @@ div.select_quiz_folded {
 }
 
 
-div.bug_report {
+div.bug_report, div#confirm-box {
   border: medium solid firebrick;
   padding: 3px 5px;
   margin: 5px 0px;
@@ -238,11 +238,11 @@ textarea {
   text-align: left;
 }
 
-#select_page {
+#select_page, #confirm-box #flex-container {
   display: flex;
 }
 
-#select_page button {
+#select_page button, #confirm-box button {
   width: 100%;
   border: medium solid firebrick;
   border-radius: 0px;
@@ -260,14 +260,19 @@ textarea {
   align-self: center;
 }
 
-#select_page button:hover {
+#select_page button:hover, #confirm-box button:hover {
   color: orangered;
 }
 
-#select_page button#previous_page {
+#select_page button#previous_page, #confirm-box button#confirm {
   margin-right: 2%;
 }
 
-#select_page button#next_page {
+#select_page button#next_page, #confirm-box button#cancel {
   margin-left: 2%;
+}
+
+#confirm-box p {
+  font-weight: bold;
+  border: none;
 }

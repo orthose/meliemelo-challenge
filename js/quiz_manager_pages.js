@@ -112,25 +112,26 @@ function answer_quiz_page(quiz_id, type, title, question, responses) {
       <h2>` + title + `</h2>
       <div class="question">` + convert_md(question) + `</div>
       <form></form><br>
-      <button>Envoyer la réponse</button>
-      <div id="confirm-box">Voulez-vous vraiment envoyer cette réponse ?</div>
+      <button id="send">Envoyer la réponse</button>
+      <div id="confirm-box" hidden>
+        <p>Voulez-vous vraiment envoyer cette réponse ?</p>
+        <div id="flex-container">
+          <button id="confirm">Confirmer</button>
+          <button id="cancel">Annuler</button>
+        </div>
+      </div>
       <p class="error" hidden></p>
       `);
     $("main").html(page);
-    // https://stackoverflow.com/questions/887029/how-to-implement-confirmation-dialog-in-jquery-ui-dialog
-    // Boîte de dialogue modale non-désactivable avec JQueryUI
-    $("#confirm-box").dialog({
-      autoOpen: false,
-      modal: true,
-      draggable: false,
-      resizable: false,
-      buttons: {
-        "Confirmer": function() {answer_quiz(type, quiz_id);$("#confirm-box").dialog("destroy");},
-        "Annuler": function() {$("#confirm-box").dialog("close");}
-      }
+    // Boîte de confirmation de la réponse du joueur
+    $("#confirm-box button#confirm").on("click", function() {
+      answer_quiz(type, quiz_id);$("#confirm-box").hide();
     });
-    $("main button").on("click", function() {
-      $("#confirm-box").dialog("open")
+    $("#confirm-box button#cancel").on("click", function() {
+      $("#confirm-box").hide();$("button#send").show();
+    });
+    $("main button#send").on("click", function() {
+      $("#confirm-box").show();$("button#send").hide();
     });
     if (type === "checkbox_and" || type === "checkbox_or") {
       responses.forEach(function(response) {
